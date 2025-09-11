@@ -32,7 +32,7 @@ function Header() {
 
         <div className="header__extra">
           <Button as="a" href="#pricing" variant="outline" size="sm">
-            View Plans
+            Login
           </Button>
         </div>
       </div>

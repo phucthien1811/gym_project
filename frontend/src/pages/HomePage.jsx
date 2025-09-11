@@ -18,11 +18,11 @@ export default function HomePage() {
             animi vitae consectetur obcaecati.
           </p>
 
-          <div className="hero__actions">
-            <Button size="lg">Join Us</Button>
+          <div className="hero__actions ">
             <Button as="a" href="#pricing" variant="outline" size="lg">
               View Plans
             </Button>
+            <Button size="lg">Join Us</Button>
           </div>
         </div>
 
