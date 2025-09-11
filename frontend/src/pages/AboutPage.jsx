@@ -7,7 +7,7 @@ export default function AboutPage() {
       <div className="container about__inner">
         <figure className="about__media">
           <img
-            src="https://images.unsplash.com/photo-1517832606299-7ae9b720a186?q=80&w=1400&auto=format&fit=crop"
+            src="https://ty-gym-website.vercel.app/assets/about.jpg"
             alt="Treadmills at Royal Fitness"
           />
         </figure>
