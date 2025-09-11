@@ -1,8 +1,12 @@
 import React from "react";
-import Button from "../componets/common/Button";
-
+import Button from "../componets/common/Button.jsx"; // ✅ sửa path
 
 export default function HomePage() {
+  const scrollToJoin = () => {
+    const el = document.getElementById("join-section");
+    if (el) el.scrollIntoView({ behavior: "smooth", block: "start" });
+  };
+
   return (
     <section id="home" className="section hero">
       <div className="container hero__inner">
@@ -18,11 +22,15 @@ export default function HomePage() {
             animi vitae consectetur obcaecati.
           </p>
 
-          <div className="hero__actions ">
+          <div className="hero__actions">
             <Button as="a" href="#pricing" variant="outline" size="lg">
               View Plans
             </Button>
-            <Button size="lg">Join Us</Button>
+
+            {/* 👉 Giống Header: click là scroll mượt tới #join-section */}
+            <Button size="lg" onClick={scrollToJoin}>
+              Join Us
+            </Button>
           </div>
         </div>
 
@@ -32,7 +40,6 @@ export default function HomePage() {
             src="https://images.unsplash.com/photo-1517836357463-d25dfeac3438?q=80&w=1400&auto=format&fit=crop"
             alt=""
           />
-         
         </div>
       </div>
     </section>

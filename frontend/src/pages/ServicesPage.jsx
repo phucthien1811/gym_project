@@ -3,11 +3,11 @@ import React from "react";
 const services = [
   {
     title: "Physical Fitness",
-    img: "https://images.unsplash.com/photo-1599058945522-28d584b6f0ff?q=80&w=1400&auto=format&fit=crop",
+    img: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSXAetnGZ6oTT8xxcVLXE-0CM3AW-A23WCC7A&s",
   },
   {
     title: "Weight Gain",
-    img: "https://images.unsplash.com/photo-1517832606299-7ae9b720a186?q=80&w=1400&auto=format&fit=crop",
+    img: "https://ty-gym-website.vercel.app/assets/image2.jpg",
   },
   {
     title: "Strength Training",
@@ -19,11 +19,11 @@ const services = [
   },
   {
     title: "Fat Loss",
-    img: "https://images.unsplash.com/photo-1517963628607-235ccdd543f3?q=80&w=1400&auto=format&fit=crop",
+    img: "https://ty-gym-website.vercel.app/assets/image4.jpg",
   },
   {
     title: "Personal Training",
-    img: "https://images.unsplash.com/photo-1534367610401-9f51f7b1d1f4?q=80&w=1400&auto=format&fit=crop",
+    img: "https://ty-gym-website.vercel.app/assets/image1.jpg",
   },
 ];
 
