@@ -1,0 +1,5 @@
+/* Component-level styles or Tailwind component utilities can go here */
+
+.card {
+  @apply bg-white rounded shadow p-4;
+}
