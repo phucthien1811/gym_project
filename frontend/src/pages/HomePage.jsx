@@ -1,24 +1,40 @@
-import React from 'react';
+import React from "react";
+import Button from "../componets/common/Button";
 
-const HomePage = () => {
+
+export default function HomePage() {
   return (
-    <main className="min-h-screen bg-gray-50">
-      <section className="py-16 bg-white">
-        <div className="max-w-5xl mx-auto px-4 text-center">
-          <h1 className="text-3xl font-bold mb-4">Welcome to Gym Project</h1>
-          <p className="text-gray-600 mb-6">Find workouts, products, and plans to reach your goals.</p>
-        </div>
-      </section>
+    <section id="home" className="section hero">
+      <div className="container hero__inner">
+        <div className="hero__content">
+          <h1 className="hero__title">
+            Build Your <br /> <span className="text-brand">Dream Physique</span>
+          </h1>
 
-      <section className="py-12">
-        <div className="max-w-5xl mx-auto px-4 grid grid-cols-1 md:grid-cols-3 gap-6">
-          <div className="p-6 bg-white rounded shadow">Workouts</div>
-          <div className="p-6 bg-white rounded shadow">Nutrition</div>
-          <div className="p-6 bg-white rounded shadow">Equipment</div>
+          <h2 className="hero__subtitle">Weight Training • Cardio • Nutrition</h2>
+
+          <p className="hero__desc">
+            Lorem ipsum dolor sit, bus earum, aliquam ipsa repellat iusto esse laudantium
+            animi vitae consectetur obcaecati.
+          </p>
+
+          <div className="hero__actions">
+            <Button size="lg">Join Us</Button>
+            <Button as="a" href="#pricing" variant="outline" size="lg">
+              View Plans
+            </Button>
+          </div>
         </div>
-      </section>
-    </main>
+
+        <div className="hero__media" aria-hidden="true">
+          <img
+            className="hero__image"
+            src="https://images.unsplash.com/photo-1517836357463-d25dfeac3438?q=80&w=1400&auto=format&fit=crop"
+            alt=""
+          />
+         
+        </div>
+      </div>
+    </section>
   );
-};
-
-export default HomePage;
+}

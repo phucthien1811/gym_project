@@ -1,16 +1,66 @@
-import React from 'react';
+import React from "react";
+import Button from "../componets/common/Button";
 
-const PricingPage = () => {
+
+const plans = [
+  {
+    name: "BASIC",
+    price: 100,
+    features: ["Smart workout plan", "At home workouts"],
+  },
+  {
+    name: "PRO",
+    price: 150,
+    features: ["Pro GYMS", "Smart workout plan", "At home workouts"],
+  },
+  {
+    name: "PREMIUM",
+    price: 300,
+    features: [
+      "ELITE Gyms & Classes",
+      "Pro GYMS",
+      "Smart workout plan",
+      "At home workouts",
+      "Personal Training",
+    ],
+  },
+];
+
+export default function PricingPage() {
   return (
-    <div className="max-w-5xl mx-auto p-6">
-      <h2 className="text-2xl font-bold mb-6">Pricing Plans</h2>
-      <div className="grid md:grid-cols-3 gap-4">
-        <div className="p-6 bg-white rounded shadow">Basic</div>
-        <div className="p-6 bg-white rounded shadow">Pro</div>
-        <div className="p-6 bg-white rounded shadow">Enterprise</div>
-      </div>
-    </div>
-  );
-};
+    <section id="pricing" className="section pricing">
+      <div className="container">
+        <h2 className="section__eyebrow">Our</h2>
+        <h3 className="section__title">
+          <span className="text-brand">Plans</span>
+        </h3>
 
-export default PricingPage;
+        <div className="pricing__grid">
+          {plans.map((p) => (
+            <article className="plan" key={p.name}>
+              <header className="plan__header">
+                <h4 className="plan__name">{p.name}</h4>
+                <div className="plan__price">
+                  ${p.price}
+                  <span className="plan__price--unit">/Month</span>
+                </div>
+              </header>
+
+              <ul className="plan__features">
+                {p.features.map((f) => (
+                  <li key={f}>{f}</li>
+                ))}
+              </ul>
+
+              <footer className="plan__footer">
+                <Button as="a" href="#join-section" variant="ghost">
+                  Join Now →
+                </Button>
+              </footer>
+            </article>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}

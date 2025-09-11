@@ -1,13 +1,28 @@
-import React from 'react';
+import React from "react";
+import PropTypes from "prop-types";
 
-const StockStatus = ({ count = 0 }) => {
-  if (count <= 0) {
-    return <div className="text-sm text-red-600">Out of stock</div>;
-  }
-  if (count < 5) {
-    return <div className="text-sm text-yellow-600">Only {count} left</div>;
-  }
-  return <div className="text-sm text-green-600">In stock</div>;
+/**
+ * Hiển thị trạng thái tồn kho: in | low | out
+ */
+const map = {
+  in: { text: "In stock", cls: "bg-emerald-600/15 text-emerald-400" },
+  low: { text: "Low stock", cls: "bg-amber-600/15 text-amber-400" },
+  out: { text: "Out of stock", cls: "bg-rose-600/15 text-rose-400" },
+};
+
+function StockStatus({ status = "in", className = "" }) {
+  const info = map[status] || map.in;
+  return (
+    <span className={`inline-flex items-center rounded-md px-2 py-1 text-xs font-medium ${info.cls} ${className}`}>
+      <span className="mr-1.5 h-1.5 w-1.5 rounded-full bg-current" />
+      {info.text}
+    </span>
+  );
+}
+
+StockStatus.propTypes = {
+  status: PropTypes.oneOf(["in", "low", "out"]),
+  className: PropTypes.string,
 };
 
 export default StockStatus;

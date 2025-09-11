@@ -1,13 +1,13 @@
 import React from "react";
 import { createRoot } from "react-dom/client";
-import App from "./App";           // <-- chỉ rõ .jsx
+import App from "./app.jsx";
 
-// CSS của bạn (nếu để trong src/styles)
+// Import CSS global của bạn (trong src/styles)
 import "./styles/globals.css";
 import "./styles/components.css";
 
-const root = createRoot(document.getElementById("root"));
-root.render(
+const rootEl = document.getElementById("root");
+createRoot(rootEl).render(
   <React.StrictMode>
     <App />
   </React.StrictMode>
