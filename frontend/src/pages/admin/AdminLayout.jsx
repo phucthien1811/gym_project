@@ -18,7 +18,7 @@ export default function AdminLayout() {
   return (
     <div className="admin admin-theme">
       <aside className="admin__side">
-        <div className="admin__brand">Power Zone</div>
+        <div className="admin__brand">Admin Page</div>
         <nav className="admin__nav">
           <NavLink end to="/admin" className="admin__link">
             <FontAwesomeIcon icon={faGaugeHigh} className="admin__link-icon" /> {/* Icon Dashboard */}
@@ -43,7 +43,7 @@ export default function AdminLayout() {
           {/* Icon cho "Back to site" */}
           <Link to="/" className="admin__pill">
             <FontAwesomeIcon icon={faHouse} className="admin__pill-icon" /> {/* Icon Home */}
-            ← Back to site
+            ← Back to Home
           </Link>
           <div className="admin__user">{user?.name || "Admin"}</div>
         </header>
