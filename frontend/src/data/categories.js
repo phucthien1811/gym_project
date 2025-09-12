@@ -1,6 +1,5 @@
 const categories = [
-  { id: 'supplements', name: 'Supplements' },
-  { id: 'equipment', name: 'Equipment' },
+  {'id': 1, 'name': 'Cardio' },
 ];
 
 export default categories;
