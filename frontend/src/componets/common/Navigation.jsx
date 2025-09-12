@@ -1,10 +1,11 @@
 import React, { useEffect, useState } from "react";
 import PropTypes from "prop-types";
-import Button from "./Button";
 
-function Navigation({ links = [], onCtaClick, ctaLabel = "Join Us", className = "" }) {
+function Navigation({ links = [], className = "" }) {
   const [open, setOpen] = useState(false);
-  const [hash, setHash] = useState(typeof window !== "undefined" ? window.location.hash || "#home" : "#home");
+  const [hash, setHash] = useState(
+    typeof window !== "undefined" ? window.location.hash || "#home" : "#home"
+  );
 
   useEffect(() => {
     const onHash = () => setHash(window.location.hash || "#home");
@@ -14,20 +15,19 @@ function Navigation({ links = [], onCtaClick, ctaLabel = "Join Us", className = 
 
   return (
     <nav className={`nav ${className}`}>
-      {/* Desktop */}
       <div className="nav__bar">
         <ul className="nav__links">
           {links.map((l) => (
             <li key={l.href}>
-              <a className={`nav-link ${hash === l.href ? "nav-link--active" : ""}`} href={l.href}>
+              <a
+                className={`nav-link ${hash === l.href ? "nav-link--active" : ""}`}
+                href={l.href}
+              >
                 {l.label}
               </a>
             </li>
           ))}
         </ul>
-        <div className="nav__cta">
-          <Button onClick={onCtaClick} size="sm">{ctaLabel}</Button>
-        </div>
 
         {/* Mobile toggle */}
         <button
@@ -50,15 +50,14 @@ function Navigation({ links = [], onCtaClick, ctaLabel = "Join Us", className = 
               <a
                 key={l.href}
                 href={l.href}
-                className={`nav-link nav-link--block ${hash === l.href ? "nav-link--active" : ""}`}
+                className={`nav-link nav-link--block ${
+                  hash === l.href ? "nav-link--active" : ""
+                }`}
                 onClick={() => setOpen(false)}
               >
                 {l.label}
               </a>
             ))}
-            <Button onClick={() => { setOpen(false); onCtaClick?.(); }} className="mt-8" size="md">
-              {ctaLabel}
-            </Button>
           </div>
         </div>
       )}
@@ -67,9 +66,9 @@ function Navigation({ links = [], onCtaClick, ctaLabel = "Join Us", className = 
 }
 
 Navigation.propTypes = {
-  links: PropTypes.arrayOf(PropTypes.shape({ label: PropTypes.string, href: PropTypes.string })),
-  onCtaClick: PropTypes.func,
-  ctaLabel: PropTypes.string,
+  links: PropTypes.arrayOf(
+    PropTypes.shape({ label: PropTypes.string, href: PropTypes.string })
+  ),
   className: PropTypes.string,
 };
 

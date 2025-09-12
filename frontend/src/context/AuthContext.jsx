@@ -1,36 +1,53 @@
-import React, { createContext, useContext, useState } from 'react';
+import React, { createContext, useContext, useEffect, useMemo, useState } from "react";
 
 const AuthContext = createContext(null);
 
-export const AuthProvider = ({ children }) => {
-  const [user, setUser] = useState(null);
-  const [token, setToken] = useState(null);
+const LS_KEY = "rf_auth_v1";
 
-  const login = async (credentials) => {
-    // placeholder: replace with real auth call
-    await new Promise((r) => setTimeout(r, 300));
-    const fakeUser = { id: 'u1', name: 'Demo User', email: 'demo@example.com' };
-    setUser(fakeUser);
-    setToken('fake-token');
-    return fakeUser;
+// Demo accounts (sau này thay bằng API)
+const DEMO_USERS = [
+  { id: "1", name: "Admin", email: "admin@royal.fit", role: "admin", password: "123456" },
+  { id: "2", name: "Member", email: "member@royal.fit", role: "member", password: "123456" },
+];
+
+export function AuthProvider({ children }) {
+  const [user, setUser] = useState(null);
+
+  // khôi phục phiên từ localStorage
+  useEffect(() => {
+    try {
+      const raw = localStorage.getItem(LS_KEY);
+      if (raw) setUser(JSON.parse(raw));
+    } catch {}
+  }, []);
+
+  const login = async ({ email, password }) => {
+    // demo: kiểm tra mảng cứng
+    const found = DEMO_USERS.find(u => u.email === email && u.password === password);
+    if (!found) throw new Error("Email hoặc mật khẩu không đúng.");
+    const { password: _pw, ...publicUser } = found;
+    setUser(publicUser);
+    localStorage.setItem(LS_KEY, JSON.stringify(publicUser));
+    return publicUser;
   };
 
   const logout = () => {
     setUser(null);
-    setToken(null);
+    localStorage.removeItem(LS_KEY);
   };
 
-  return (
-    <AuthContext.Provider value={{ user, token, login, logout }}>
-      {children}
-    </AuthContext.Provider>
-  );
-};
+  const value = useMemo(() => ({
+    user,
+    isAuthenticated: !!user,
+    login,
+    logout
+  }), [user]);
 
-export const useAuth = () => {
+  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
+}
+
+export function useAuth() {
   const ctx = useContext(AuthContext);
-  if (!ctx) throw new Error('useAuth must be used within AuthProvider');
+  if (!ctx) throw new Error("useAuth phải được dùng bên trong <AuthProvider>");
   return ctx;
-};
-
-export default AuthContext;
+}
