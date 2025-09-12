@@ -1,23 +1,57 @@
-import React from 'react';
+import React from "react";
+import PropTypes from "prop-types";
 
-const Star = ({ filled }) => (
-  <svg className={`h-4 w-4 ${filled ? 'text-yellow-400' : 'text-gray-300'}`} viewBox="0 0 20 20" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
-    <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.286 3.966a1 1 0 00.95.69h4.162c.969 0 1.371 1.24.588 1.81l-3.37 2.448a1 1 0 00-.364 1.118l1.287 3.966c.3.921-.755 1.688-1.54 1.118L10 13.347l-3.37 2.448c-.784.57-1.84-.197-1.54-1.118l1.287-3.966a1 1 0 00-.364-1.118L2.642 9.393c-.783-.57-.38-1.81.588-1.81h4.162a1 1 0 00.95-.69l1.286-3.966z" />
-  </svg>
-);
-
-const ProductRating = ({ value = 0, count = 0 }) => {
-  const full = Math.round(value);
+/**
+ * Hiển thị sao 0..5 (cho phép half .5)
+ * UI-only
+ */
+function Star({ filled = 0, size = 18 }) {
+  // filled: 0 empty, 0.5 half, 1 full
   return (
-    <div className="flex items-center space-x-2">
-      <div className="flex -space-x-1">
-        {Array.from({ length: 5 }).map((_, i) => (
-          <Star key={i} filled={i < full} />
+    <svg width={size} height={size} viewBox="0 0 24 24" className="inline-block">
+      <defs>
+        <linearGradient id="half">
+          <stop offset="50%" stopColor="#34d399" />
+          <stop offset="50%" stopColor="transparent" />
+        </linearGradient>
+      </defs>
+      <path
+        d="M12 .587l3.668 7.431 8.2 1.192-5.934 5.787 1.402 8.172L12 18.896 4.664 23.17l1.402-8.172L.132 9.21l8.2-1.192L12 .587z"
+        fill={filled === 1 ? "#34d399" : filled === 0.5 ? "url(#half)" : "none"}
+        stroke="#34d399"
+        strokeWidth="1.5"
+      />
+    </svg>
+  );
+}
+
+function ProductRating({ rating = 0, count, size = 18, className = "" }) {
+  const full = Math.floor(rating);
+  const half = rating - full >= 0.5 ? 1 : 0;
+  const empty = 5 - full - half;
+  return (
+    <div className={`flex items-center gap-2 ${className}`}>
+      <div className="leading-none">
+        {Array.from({ length: full }).map((_, i) => (
+          <Star key={`f-${i}`} filled={1} size={size} />
+        ))}
+        {half ? <Star filled={0.5} size={size} /> : null}
+        {Array.from({ length: empty }).map((_, i) => (
+          <Star key={`e-${i}`} filled={0} size={size} />
         ))}
       </div>
-      <div className="text-sm text-gray-600">{value.toFixed(1)} ({count})</div>
+      {typeof count === "number" && (
+        <span className="text-xs text-zinc-400">({count})</span>
+      )}
     </div>
   );
+}
+
+ProductRating.propTypes = {
+  rating: PropTypes.number,
+  count: PropTypes.number,
+  size: PropTypes.number,
+  className: PropTypes.string,
 };
 
 export default ProductRating;

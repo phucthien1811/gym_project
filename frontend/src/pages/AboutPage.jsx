@@ -1,12 +1,33 @@
-import React from 'react';
+import React from "react";
+import Button from "../componets/common/Button";
 
-const AboutPage = () => {
+export default function AboutPage() {
   return (
-    <div className="max-w-4xl mx-auto p-6">
-      <h2 className="text-2xl font-bold mb-4">About Us</h2>
-      <p className="text-gray-700">We help people achieve their fitness goals with expert trainers and community support.</p>
-    </div>
-  );
-};
+    <section id="about" className="section about">
+      <div className="container about__inner">
+        <figure className="about__media">
+          <img
+            src="https://ty-gym-website.vercel.app/assets/about.jpg"
+            alt="Treadmills at Royal Fitness"
+          />
+        </figure>
 
-export default AboutPage;
+        <div className="about__content">
+          <h2 className="section__eyebrow">Why Choose</h2>
+          <h3 className="section__title">Us?</h3>
+
+          <ul className="about__bullets">
+            <li>Friendly, supportive community to keep you motivated.</li>
+            <li>Unlock your potential with expert Personal Trainers.</li>
+            <li>Elevate your fitness with practice sessions.</li>
+            <li>Supportive management for your success.</li>
+          </ul>
+
+          <Button as="a" href="#pricing" size="md">
+            Book A Free Class
+          </Button>
+        </div>
+      </div>
+    </section>
+  );
+}

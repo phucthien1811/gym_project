@@ -1,24 +1,56 @@
-import React from 'react';
+import React from "react";
+import PropTypes from "prop-types";
 
-const formatCurrency = (value) => {
-  if (value == null) return '';
-  return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(value);
-};
+/**
+ * Hiển thị giá + giá gốc + % giảm (UI-only)
+ * Nếu bạn có utils/formatPrice, có thể import; dưới đây dùng toLocaleString fallback.
+ */
+const format = (n, currency = "USD") =>
+  (typeof n === "number"
+    ? n
+    : Number(n ?? 0)
+  ).toLocaleString(undefined, { style: "currency", currency });
 
-const PriceDisplay = ({ price, compareAt }) => {
-  const onSale = compareAt && compareAt > price;
+function PriceDisplay({
+  price,
+  originalPrice,
+  currency = "USD",
+  className = "",
+  align = "start",
+  size = "md",
+}) {
+  const hasDiscount = originalPrice && Number(originalPrice) > Number(price);
+  const percent =
+    hasDiscount && Math.round(((originalPrice - price) / originalPrice) * 100);
+
+  const sizeCls = size === "lg" ? "text-2xl" : size === "sm" ? "text-sm" : "text-lg";
 
   return (
-    <div className="flex items-center space-x-3">
-      <div className="text-lg font-semibold text-gray-900">{formatCurrency(price)}</div>
-      {onSale && (
-        <div className="text-sm text-gray-500 line-through">{formatCurrency(compareAt)}</div>
-      )}
-      {onSale && (
-        <div className="ml-2 rounded-full bg-red-100 text-red-700 text-xs px-2 py-0.5">Sale</div>
+    <div className={`flex items-baseline gap-3 ${className}`} style={{ justifyContent: align }}>
+      <span className={`${sizeCls} font-semibold text-white`}>
+        {format(price, currency)}
+      </span>
+      {hasDiscount && (
+        <>
+          <span className="text-zinc-400 line-through">
+            {format(originalPrice, currency)}
+          </span>
+          <span className="rounded-md bg-emerald-600/15 px-2 py-0.5 text-xs font-medium text-emerald-400">
+            -{percent}%
+          </span>
+        </>
       )}
     </div>
   );
+}
+
+PriceDisplay.propTypes = {
+  price: PropTypes.number.isRequired,
+  originalPrice: PropTypes.number,
+  currency: PropTypes.string,
+  className: PropTypes.string,
+  align: PropTypes.oneOf(["start", "center", "end"]),
+  size: PropTypes.oneOf(["sm", "md", "lg"]),
 };
 
 export default PriceDisplay;

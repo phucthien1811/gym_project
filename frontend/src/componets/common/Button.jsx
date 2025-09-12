@@ -1,16 +1,46 @@
-import React from 'react';
-import './Button.css';
+import React, { forwardRef } from "react";
+import PropTypes from "prop-types";
 
-const Button = ({ children, onClick, variant = 'primary', type = 'button' }) => {
+const VARIANT = {
+  primary: "btn btn--primary",
+  outline: "btn btn--outline",
+  secondary: "btn btn--secondary",
+  ghost: "btn btn--ghost",
+};
+
+const SIZE = {
+  sm: "btn-sm",
+  md: "btn-md",
+  lg: "btn-lg",
+};
+
+const Button = forwardRef(function Button(
+  {
+    as: Comp = "button",
+    children,
+    className = "",
+    variant = "primary",
+    size = "md",
+    ...rest
+  },
+  ref
+) {
+  const cls = [VARIANT[variant] || VARIANT.primary, SIZE[size] || SIZE.md, className]
+    .filter(Boolean)
+    .join(" ");
   return (
-    <button 
-      className={`button ${variant}`}
-      onClick={onClick}
-      type={type}
-    >
+    <Comp ref={ref} className={cls} {...rest}>
       {children}
-    </button>
+    </Comp>
   );
+});
+
+Button.propTypes = {
+  as: PropTypes.elementType,
+  children: PropTypes.node,
+  className: PropTypes.string,
+  variant: PropTypes.oneOf(["primary", "outline", "secondary", "ghost"]),
+  size: PropTypes.oneOf(["sm", "md", "lg"]),
 };
 
 export default Button;

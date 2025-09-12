@@ -1,26 +1,45 @@
-import React from 'react';
+import React, { useState } from "react";
+import PropTypes from "prop-types";
 
-const WishlistIcon = ({ active = false, onToggle }) => {
+/**
+ * Icon trái tim toggle (UI-only).
+ * - defaultChecked: trạng thái ban đầu
+ * - onToggle(checked): callback
+ */
+function WishlistIcon({ defaultChecked = false, onToggle = () => {}, className = "" }) {
+  const [checked, setChecked] = useState(defaultChecked);
+
+  const toggle = () => {
+    const next = !checked;
+    setChecked(next);
+    onToggle(next);
+  };
+
   return (
     <button
-      aria-pressed={active}
-      onClick={() => onToggle && onToggle(!active)}
-      className={`p-2 rounded-full transition-colors ${active ? 'bg-red-100 text-red-600' : 'bg-gray-100 text-gray-500'}`}
-      title={active ? 'Remove from wishlist' : 'Add to wishlist'}
+      type="button"
+      aria-pressed={checked}
+      onClick={toggle}
+      className={`rounded-full p-2 transition hover:bg-zinc-800/70 ${className}`}
     >
-      {active ? (
-        // filled heart
-        <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-          <path d="M3.172 5.172a4 4 0 015.656 0L10 6.343l1.172-1.171a4 4 0 115.656 5.656L10 17.657l-6.828-6.829a4 4 0 010-5.656z" />
-        </svg>
-      ) : (
-        // outline heart
-        <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4.318 6.318a4.5 4.5 0 016.364 0L12 7.636l1.318-1.318a4.5 4.5 0 116.364 6.364L12 20.364l-7.682-7.682a4.5 4.5 0 010-6.364z" />
-        </svg>
-      )}
+      <svg
+        width="22"
+        height="22"
+        viewBox="0 0 24 24"
+        fill={checked ? "#34d399" : "none"}
+        stroke={checked ? "#34d399" : "currentColor"}
+        strokeWidth="2"
+      >
+        <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 1 0-7.78 7.78L12 21.23l8.84-8.84a5.5 5.5 0 0 0 0-7.78z" />
+      </svg>
     </button>
   );
+}
+
+WishlistIcon.propTypes = {
+  defaultChecked: PropTypes.bool,
+  onToggle: PropTypes.func,
+  className: PropTypes.string,
 };
 
 export default WishlistIcon;
