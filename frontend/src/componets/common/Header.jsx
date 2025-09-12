@@ -1,8 +1,9 @@
 import React from "react";
+import { Link, useNavigate } from "react-router-dom";
 import Navigation from "./Navigation";
 import Button from "./Button";
+import { useAuth } from "../../context/AuthContext.jsx";
 
-/** Header sticky, nền glass nhẹ, anchor link */
 function Header() {
   const links = [
     { label: "Home", href: "#home" },
@@ -10,7 +11,11 @@ function Header() {
     { label: "About Us", href: "#about" },
     { label: "Pricing", href: "#pricing" },
     { label: "Review", href: "#review" },
+    { label: "Shop", href: "#shop" },
   ];
+
+  const { user, logout } = useAuth();
+  const navigate = useNavigate();
 
   return (
     <header className="site-header glass">
@@ -20,20 +25,33 @@ function Header() {
           <span className="logo__accent">Fitness</span>
         </a>
 
-        <Navigation
-          links={links}
-          onCtaClick={() => {
-            const el = document.getElementById("join-section");
-            if (el) el.scrollIntoView({ behavior: "smooth", block: "start" });
-          }}
-          ctaLabel="Join Us"
-          className="header__nav"
-        />
+        {/* KHÔNG truyền cta nữa */}
+        <Navigation links={links} className="header__nav" />
 
-        <div className="header__extra">
-          <Button as="a" href="#pricing" variant="outline" size="sm">
-            Login
-          </Button>
+        <div className="header__extra" style={{ display: "flex", gap: 8 }}>
+          {!user ? (
+            <Button as={Link} to="/login" variant="outline" size="sm">
+              Login
+            </Button>
+          ) : (
+            <>
+              {user.role === "admin" && (
+                <Button as={Link} to="/admin" variant="outline" size="sm">
+                  Admin
+                </Button>
+              )}
+              <Button
+                variant="secondary"
+                size="sm"
+                onClick={() => {
+                  logout();
+                  navigate("/");
+                }}
+              >
+                Logout
+              </Button>
+            </>
+          )}
         </div>
       </div>
 
