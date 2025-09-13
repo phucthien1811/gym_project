@@ -1,5 +1,6 @@
 import React from "react";
 // Import các icon từ Font Awesome
+import { NavLink } from "react-router-dom";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faUsers, faChartLine, faClock, faBell, faExclamationTriangle, faBan } from '@fortawesome/free-solid-svg-icons';
 
@@ -9,6 +10,8 @@ export default function AdminDashboard() {
       <h2 className="admin__title">Dashboard</h2>
 
       <div className="admin__grid">
+        <NavLink to="/admin/card1">
+
         <div className="admin-card">
           <div className="admin-card__body">
             <div className="admin-card__icon">
@@ -18,6 +21,8 @@ export default function AdminDashboard() {
             <div className="admin-card__value">312</div>
           </div>
         </div>
+        </NavLink>
+        <NavLink to="/admin/card2">
 
         <div className="admin-card">
           <div className="admin-card__body">
@@ -28,6 +33,8 @@ export default function AdminDashboard() {
             <div className="admin-card__value">27</div>
           </div>
         </div>
+        </NavLink>
+        <NavLink to="/admin/card3">
 
         <div className="admin-card admin-card--dark">
           <div className="admin-card__body">
@@ -38,6 +45,8 @@ export default function AdminDashboard() {
             <div className="admin-card__value">5</div>
           </div>
         </div>
+        </NavLink>
+        <NavLink to="/admin/card4">
 
         <div className="admin-card">
           <div className="admin-card__body">
@@ -48,6 +57,8 @@ export default function AdminDashboard() {
             <div className="admin-card__value">12</div>
           </div>
         </div>
+        </NavLink>
+        <NavLink to="/admin/card5">
 
         <div className="admin-card">
           <div className="admin-card__body">
@@ -58,6 +69,8 @@ export default function AdminDashboard() {
             <div className="admin-card__value">9</div>
           </div>
         </div>
+        </NavLink>
+        <NavLink to="/admin/card6">
 
         <div className="admin-card">
           <div className="admin-card__body">
@@ -68,6 +81,7 @@ export default function AdminDashboard() {
             <div className="admin-card__value">3</div>
           </div>
         </div>
+        </NavLink>
       </div>
     </div>
   );

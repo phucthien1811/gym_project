@@ -15,7 +15,12 @@ import LoginPage from "./pages/LoginPage.jsx";
 import AdminLayout from "./pages/admin/AdminLayout.jsx";
 import AdminDashboard from "./pages/admin/Dashboard.jsx";
 import AdminMembers from "./pages/admin/Members.jsx";
-
+import Card1 from "./pages/admin/Card/Card1.jsx";
+import Card2 from "./pages/admin/Card/Card2.jsx";
+import Card3 from "./pages/admin/Card/Card3.jsx";
+import Card4 from "./pages/admin/Card/Card4.jsx";
+import Card5 from "./pages/admin/Card/Card5.jsx";
+import Card6 from "./pages/admin/Card/Card6.jsx";
 function Landing() {
   return (
     <>
@@ -56,6 +61,36 @@ function AdminRoute({ children }) {
   return children;
 }
 
+// export default function App() {
+//   return (
+//     <AuthProvider>
+//       <BrowserRouter>
+//         <Routes>
+//           <Route path="/" element={<Landing />} />
+//           <Route path="/login" element={<LoginPage />} />
+//           <Route
+//             path="/admin"
+//             element={
+//               <AdminRoute>
+//                 <AdminLayout />
+//               </AdminRoute>
+//             }
+//           >
+//             <Route index element={<AdminDashboard />} />
+//             <Route path="members" element={<AdminMembers />} />
+//           </Route>
+//           <Route path="*" element={<Landing />} />
+//         </Routes>
+//         <Routes path="card1" element={<Card1/>}></Routes>
+//         <Routes path="card2" element={<Card2/>}></Routes>
+//         <Routes path="card3" element={<Card3/>}></Routes>
+//         <Routes path="card4" element={<Card4/>}></Routes>
+//         <Routes path="card5" element={<Card5/>}></Routes>
+//         <Routes path="card6" element={<Card6/>}></Routes>
+//       </BrowserRouter>
+//     </AuthProvider>
+//   );
+// }
 export default function App() {
   return (
     <AuthProvider>
@@ -73,6 +108,12 @@ export default function App() {
           >
             <Route index element={<AdminDashboard />} />
             <Route path="members" element={<AdminMembers />} />
+            <Route path="card1" element={<Card1 />} />
+            <Route path="card2" element={<Card2 />} />
+            <Route path="card3" element={<Card3 />} />
+            <Route path="card4" element={<Card4 />} />
+            <Route path="card5" element={<Card5 />} />
+            <Route path="card6" element={<Card6 />} />
           </Route>
           <Route path="*" element={<Landing />} />
         </Routes>

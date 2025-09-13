@@ -353,3 +353,70 @@ body {
 /* Hoặc áp dụng cụ thể hơn */
 .admin__brand, .admin__title { font-family: 'Poppins', sans-serif; }
 .admin__link, .admin-card__title, .admin-card__value, .admin__table th, .admin__table td { font-family: 'Poppins', sans-serif; }
+
+.card2-container {
+  margin-bottom: 20px; /* Khoảng cách dưới card */
+}
+
+.card-title {
+  font-size: 1.5rem; /* Kích thước chữ tiêu đề */
+  margin-bottom: 10px; /* Khoảng cách dưới tiêu đề */
+  text-align: center; /* Căn giữa tiêu đề */
+}
+.card2-row {
+  margin: 10px;
+  display: flex; /* Sử dụng Flexbox để sắp xếp hàng ngang */
+  justify-content: space-around; /* Căn giữa các card */
+  flex-wrap: wrap; /* Cho phép các card xuống dòng nếu không đủ không gian */
+}
+.card2 {
+  margin :10px;
+  background-color: #fff;
+  border-radius: 10px;
+  padding: 20px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  text-align: center;
+  width: 250px; /* Kích thước card */
+  dev{
+    background:#fff;  
+  }
+  p{
+    background:#fff;
+    color:#0b0f19
+  }
+  h3{
+    background:#fff;
+    color:#0b0f19
+  }
+}
+.card2:hover{
+  transform: translateY(-5px); /* Nâng lên khi hover */
+  border:#00ffcc;
+  box-shadow:0 0 25px #00ffcc; /* Thêm shadow khi hover */
+  transition: all 0.3s ease; /* Transition cho card */
+  transform: scale(1.1); /* Phóng to nhẹ khi hover */
+  
+}
+
+.member-image {
+   background:#fff; 
+  position: relative;
+  margin-bottom: 15px; /* Khoảng cách giữa hình và thông tin */
+}
+
+.member-image img {
+  border-radius: 50%;
+  width: 100px; /* Kích thước hình ảnh */
+  height: 100px; /* Kích thước hình ảnh */
+}
+
+.status-indicator {
+  position: absolute;
+  top: 75%; /* Điều chỉnh vị trí */
+  right: 10%; /* Điều chỉnh vị trí */
+  width: 15px;
+  height: 15px;
+  background-color: #ffffff; /* Màu xanh lá */
+  border-radius: 50%;
+  border: 2px solid white; /* Đường viền trắng */
+}
