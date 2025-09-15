@@ -420,3 +420,7 @@ body {
   border-radius: 50%;
   border: 2px solid white; /* Đường viền trắng */
 }
+.admin-card {
+  text-decoration: none; /* Loại bỏ gạch chân */
+  color: inherit; /* Kế thừa màu chữ */
+}

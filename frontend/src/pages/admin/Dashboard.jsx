@@ -10,9 +10,9 @@ export default function AdminDashboard() {
       <h2 className="admin__title">Dashboard</h2>
 
       <div className="admin__grid">
-        <NavLink to="/admin/card1">
+        <NavLink to="/admin/card1" className="admin-card">
 
-        <div className="admin-card">
+        <div >
           <div className="admin-card__body">
             <div className="admin-card__icon">
               <FontAwesomeIcon icon={faUsers} /> {/* Icon Users */}
@@ -22,9 +22,9 @@ export default function AdminDashboard() {
           </div>
         </div>
         </NavLink>
-        <NavLink to="/admin/card2">
+        <NavLink to="/admin/card2" className="admin-card">
 
-        <div className="admin-card">
+        <div >
           <div className="admin-card__body">
             <div className="admin-card__icon">
               <FontAwesomeIcon icon={faChartLine} /> {/* Icon Chart */}
@@ -34,9 +34,9 @@ export default function AdminDashboard() {
           </div>
         </div>
         </NavLink>
-        <NavLink to="/admin/card3">
+        <NavLink to="/admin/card3" className="admin-card">
 
-        <div className="admin-card admin-card--dark">
+        <div className=" admin-card--dark">
           <div className="admin-card__body">
             <div className="admin-card__icon">
               <FontAwesomeIcon icon={faClock} /> {/* Icon Clock */}
@@ -46,9 +46,9 @@ export default function AdminDashboard() {
           </div>
         </div>
         </NavLink>
-        <NavLink to="/admin/card4">
+        <NavLink to="/admin/card4" className="admin-card">
 
-        <div className="admin-card">
+        <div >
           <div className="admin-card__body">
             <div className="admin-card__icon">
               <FontAwesomeIcon icon={faBell} /> {/* Icon Bell */}
@@ -58,9 +58,9 @@ export default function AdminDashboard() {
           </div>
         </div>
         </NavLink>
-        <NavLink to="/admin/card5">
+        <NavLink to="/admin/card5" className="admin-card">
 
-        <div className="admin-card">
+        <div >
           <div className="admin-card__body">
             <div className="admin-card__icon">
               <FontAwesomeIcon icon={faExclamationTriangle} /> {/* Icon Warning */}
@@ -70,9 +70,9 @@ export default function AdminDashboard() {
           </div>
         </div>
         </NavLink>
-        <NavLink to="/admin/card6">
+        <NavLink to="/admin/card6" className="admin-card">
 
-        <div className="admin-card">
+        <div >
           <div className="admin-card__body">
             <div className="admin-card__icon">
               <FontAwesomeIcon icon={faBan} /> {/* Icon Ban */}
