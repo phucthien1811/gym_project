@@ -1,0 +1,426 @@
+:root {
+  /* Màu nền chính và màu panel */
+  --bg: #121826; /* Nền tối sang trọng */
+  --panel: #1f2937; /* Nền card/panel tối hơn */
+
+  /* Màu chữ */
+  --text: #e0e7ff; /* Chữ trắng hoặc trắng ngà */
+  --muted: #94a3b8; /* Chữ phụ, nhạt hơn */
+  --ring: #334155; /* Viền nhạt */
+
+  /* Shadow tinh tế hơn */
+  --shadow: 0 10px 30px rgba(0, 0, 0, 0.2); /* Shadow sâu hơn */
+
+  /* Gradient cho sidebar và KPI */
+  --grad-1: linear-gradient(90deg, #6b21a8, #9d174d, #d97706); /* Tím - Đỏ - Cam */
+  --grad-2: linear-gradient(90deg, #2dd4bf, #22d3ee, #60a5fa); /* Xanh dương ngọc bích */
+}
+
+/* Nền tối cho toàn bộ layout */
+.admin.admin-theme {
+  min-height: 100vh;
+  display: grid;
+  grid-template-columns: 280px 1fr; /* Sidebar cố định */
+  background: var(--bg);
+  color: var(--text); /* Màu chữ mặc định cho toàn bộ layout */
+}
+
+/* Sidebar */
+.admin__side {
+  background: #0b0f19; /* Giữ màu tối cho sidebar */
+  color: var(--text);
+  padding: 24px 18px; /* Tăng padding */
+  border-right: 1px solid var(--ring); /* Viền nhẹ */
+}
+.admin__brand {
+  font-weight: 900;
+  letter-spacing: .8px; /* Tăng độ cách chữ */
+  font-size: 24px; /* Tăng kích thước */
+  color: #ffffff;
+  margin: 10px 8px 20px; /* Tăng margin */
+  text-shadow: 0 0 10px rgba(11, 24, 57, 0.5); /* Shadow nhẹ cho chữ brand */
+}
+.admin__nav {
+  display: grid;
+  gap: 12px; /* Tăng khoảng cách giữa các link */
+    /* Thêm các thuộc tính sau để căn giữa nội dung */
+  align-items: center; /* Căn giữa theo chiều dọc */
+  text-align: center; /* Căn giữa theo chiều ngang */
+}
+.admin__link { 
+  display: flex; /* Sử dụng flexbox để căn giữa icon và chữ */
+  align-items: center;
+  justify-content: center; /* Căn giữa theo chiều ngang */
+  padding: 14px 18px; /* Tăng padding */
+  border-radius: 12px; /* Bo tròn góc */
+  background: #101626;
+  color: var(--muted); /* Chữ nhạt hơn */
+  border: 1px solid #2b3a55; /* Viền đậm hơn */
+  font-weight: 700;
+  transition: all 0.3s ease; /* Transition mượt mà hơn */
+  font-size: 15px; /* Tăng font size */
+  text-decoration: none; /* Đảm bảo không có gạch chân mặc định */
+}
+.admin__link-icon {
+  margin-right: 10px;
+  font-size: 1em;
+  width: 1.2em;
+  text-align: center;
+  /* Nếu icon vẫn chưa căn giữa hoàn hảo với chữ, bạn có thể thử thêm: */
+  display: inline-block;
+  vertical-align: middle;
+}
+.admin__link:hover {
+  transform: translateY(-3px); /* Hiệu ứng nhấc lên */
+  box-shadow: var(--shadow); /* Thêm shadow khi hover */
+}
+.admin__link.active {
+  background: #1a2235; /* Nền active sẫm hơn */
+  border-color: #3b4f77;
+  position: relative;
+  overflow: hidden;
+}
+.admin__link.active::after {
+  content: "";
+  position: absolute;
+  inset: 1px 1px auto 1px;
+  height: 8px; /* Tăng độ dày thanh gradient */
+  border-radius: 10px 10px 0 0;
+  background: var(--grad-1);
+}
+.admin__link--danger .admin__link-icon {
+  color: #f87171; /* Màu đỏ cho icon Logout */
+}
+.admin__link--danger:hover .admin__link-icon {
+  color: #dc2626;
+}
+
+/* Header */
+.admin__top {
+  height: 70px; /* Tăng chiều cao header */
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: #0e1422;
+  color: #eaeefb;
+  padding: 0 24px; /* Tăng padding ngang */
+  border-bottom: 1px solid #1e293b; /* Viền sẫm hơn */
+}
+.admin__pill {
+  border: 1px solid #3b4155; /* Viền đậm hơn */
+  color: #e5e7eb;
+  background: #0f172a; /* Nền tối */
+  padding: 10px 16px; /* Tăng padding */
+  border-radius: 999px;
+  text-decoration: none;
+  font-weight: 600;
+  transition: all 0.2s ease;
+}
+.admin__pill-icon {
+  margin-right: 8px; /* Khoảng cách cho icon "Back to site" */
+  font-size: 0.9em;
+}
+.admin__pill:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 5px 15px rgba(0,0,0,.2);
+}
+.admin__user {
+  font-weight: 700;
+  color: var(--text);
+  background: rgba(255, 255, 255, 0.1); /* Nền hơi mờ */
+  padding: 8px 16px;
+  border-radius: 20px; /* Bo tròn nhiều hơn */
+  backdrop-filter: blur(5px); /* Hiệu ứng kính mờ */
+}
+
+/* Vùng nội dung */
+.admin__content {
+  width: 100%;
+  max-width: 1200px;
+  margin: 24px auto; /* Tăng margin trên */
+  padding: 0 24px; /* Tăng padding */
+}
+.admin-card__body {
+  padding: 24px;
+  display: grid;
+  gap: 12px;
+  align-items: center;
+  text-align: center; /* Thêm dòng này để căn giữa */
+}
+
+/* Dashboard Section */
+.admin__section {
+  background: transparent;
+}
+.admin__title {
+  margin: 0 0 20px; /* Tăng margin dưới */
+  color: var(--text);
+  font-size: 28px; /* Tăng kích thước tiêu đề */
+  font-weight: 900;
+  letter-spacing: 0.5px;
+}
+
+/* Grid 3 cột */
+.admin__grid {
+  display: grid;
+  gap: 24px; /* Tăng khoảng cách giữa các card */
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+/* KPI CARD */
+.admin-card {
+  background: var(--panel);
+  border: 1px solid var(--ring);
+  border-radius: 16px; /* Bo tròn góc */
+  box-shadow: var(--shadow);
+  overflow: hidden;
+  transition: all 0.3s ease; /* Transition cho card */
+}
+.admin-card:hover {
+  transform: translateY(-5px); /* Nâng lên khi hover */
+}
+.admin-card::before {
+  content: "";
+  display: block;
+  height: 8px; /* Tăng chiều cao thanh gradient */
+  background: var(--grad-2);
+}
+.admin-card__body {
+  padding: 24px; /* Tăng padding */
+  display: grid;
+  gap: 12px; /* Tăng khoảng cách */
+  align-items: center;
+}
+.admin-card__icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 44px; /* Tăng kích thước icon */
+  line-height: 1;
+  filter: drop-shadow(0 8px 16px rgba(15, 23, 42, 0.1)); /* Shadow icon */
+}
+.admin-card__title {
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: .1em; /* Tăng độ cách chữ */
+  font-size: 13px; /* Tăng font size */
+}
+.admin-card__value {
+  color: var(--text);
+  font-size: 36px; /* Tăng kích thước giá trị */
+  font-weight: 900;
+}
+
+/* KPI biến thể nền tối (ô “Expiring ≤ 3 days”) */
+.admin-card--dark {
+  background: #0f172a; /* Nền tối */
+  color: #e5e7eb;
+  border-color: #1e293b; /* Viền tối hơn */
+}
+.admin-card--dark::before {
+  background: var(--grad-2); /* Vẫn dùng gradient xanh */
+}
+.admin-card--dark .admin-card__title {
+  color: #cbd5e1;
+}
+.admin-card--dark .admin-card__value {
+  color: #ffffff; /* Chữ trắng hẳn */
+}
+
+/* Table */
+.admin__table-wrap {
+  margin-top: 24px; /* Tăng margin */
+  background: var(--panel);
+  border: 1px solid var(--ring);
+  border-radius: 16px;
+  box-shadow: var(--shadow);
+  overflow: hidden;
+}
+.admin__table {
+  width: 100%;
+  border-collapse: collapse;
+  color: var(--text);
+  font-size: 14px;
+}
+.admin__table thead th {
+  background: #1e293b; /* Nền header tối */
+  color: #e2e8f0; /* Chữ header sáng */
+  font-weight: 800;
+  padding: 14px 18px; /* Tăng padding */
+  text-align: left;
+  border-bottom: 1px solid #334155; /* Viền đậm hơn */
+  text-transform: uppercase; /* Chữ hoa */
+  letter-spacing: 0.05em;
+}
+.admin__table tbody td {
+  padding: 14px 18px; /* Tăng padding */
+  border-bottom: 1px solid #334155; /* Viền đậm hơn */
+}
+.admin__table tbody tr:hover {
+  background: #1e293b; /* Nền hover tối */
+}
+.admin__row-actions .link {
+  background: none;
+  border: none;
+  color: #60a5fa; /* Màu xanh dương */
+  cursor: pointer;
+  margin-right: 10px;
+  transition: all 0.2s ease;
+}
+.admin__row-actions .link:hover {
+  color: #2563eb; /* Xanh đậm hơn */
+  text-decoration: underline;
+}
+.link--danger {
+  color: #f87171; /* Màu đỏ nhạt */
+}
+.link--danger:hover {
+  color: #dc2626; /* Màu đỏ đậm hơn */
+}
+
+/* Chip trạng thái */
+.pill {
+  padding: 6px 12px; /* Tăng padding */
+  border-radius: 999px;
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+}
+.pill--ok {
+  background: #10b981; /* Màu xanh lá cây */
+  color: #ffffff; /* Chữ trắng */
+}
+.pill--warn {
+  background: #f43f5e; /* Màu đỏ */
+  color: #ffffff; /* Chữ trắng */
+}
+
+/* Responsive */
+@media (max-width: 1024px) {
+  .admin.admin-theme {
+    grid-template-columns: 240px 1fr; /* Giảm chiều rộng sidebar */
+  }
+  .admin__grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr)); /* 2 cột trên màn hình tablet */
+  }
+}
+@media (max-width: 768px) {
+    .admin__link .admin__link-icon {
+    margin-right: 8px; /* Giảm khoảng cách trên màn hình nhỏ */
+    font-size: 1em;
+  }
+  .admin__brand {
+    font-size: 20px; /* Giảm kích thước brand trên mobile */
+  }
+  .admin.admin-theme {
+    grid-template-columns: 1fr; /* 1 cột trên mobile */
+  }
+  .admin__side {
+    width: 100%;
+    position: fixed; /* Sidebar cố định trên mobile */
+    top: 0;
+    left: 0;
+    height: 100vh;
+    z-index: 1000;
+    transform: translateX(-100%); /* Ẩn đi */
+    transition: transform 0.3s ease-in-out;
+    background: #0b0f19;
+  }
+  .admin__side.open { /* Cần thêm logic JS để toggle class này */
+    transform: translateX(0);
+  }
+  .admin__main {
+    margin-top: 60px; /* Tạo khoảng trống cho header */
+  }
+  .admin__top {
+    position: fixed; /* Header cố định */
+    top: 0;
+    left: 0;
+    width: 100%;
+    z-index: 999;
+  }
+  .admin__content {
+    margin: 18px auto; /* Điều chỉnh margin */
+    padding: 0 18px;
+  }
+  .admin__grid {
+    grid-template-columns: 1fr; /* 1 cột cho card dashboard */
+  }
+}
+body {
+  font-family: 'Poppins', sans-serif; /* Hoặc bạn có thể áp dụng riêng cho các phần tử */
+}
+/* Hoặc áp dụng cụ thể hơn */
+.admin__brand, .admin__title { font-family: 'Poppins', sans-serif; }
+.admin__link, .admin-card__title, .admin-card__value, .admin__table th, .admin__table td { font-family: 'Poppins', sans-serif; }
+
+.card2-container {
+  margin-bottom: 20px; /* Khoảng cách dưới card */
+}
+
+.card-title {
+  font-size: 1.5rem; /* Kích thước chữ tiêu đề */
+  margin-bottom: 10px; /* Khoảng cách dưới tiêu đề */
+  text-align: center; /* Căn giữa tiêu đề */
+}
+.card2-row {
+  margin: 10px;
+  display: flex; /* Sử dụng Flexbox để sắp xếp hàng ngang */
+  justify-content: space-around; /* Căn giữa các card */
+  flex-wrap: wrap; /* Cho phép các card xuống dòng nếu không đủ không gian */
+}
+.card2 {
+  margin :10px;
+  background-color: #fff;
+  border-radius: 10px;
+  padding: 20px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  text-align: center;
+  width: 250px; /* Kích thước card */
+  dev{
+    background:#fff;  
+  }
+  p{
+    background:#fff;
+    color:#0b0f19
+  }
+  h3{
+    background:#fff;
+    color:#0b0f19
+  }
+}
+.card2:hover{
+  transform: translateY(-5px); /* Nâng lên khi hover */
+  border:#00ffcc;
+  box-shadow:0 0 25px #00ffcc; /* Thêm shadow khi hover */
+  transition: all 0.3s ease; /* Transition cho card */
+  transform: scale(1.1); /* Phóng to nhẹ khi hover */
+  
+}
+
+.member-image {
+   background:#fff; 
+  position: relative;
+  margin-bottom: 15px; /* Khoảng cách giữa hình và thông tin */
+}
+
+.member-image img {
+  border-radius: 50%;
+  width: 100px; /* Kích thước hình ảnh */
+  height: 100px; /* Kích thước hình ảnh */
+}
+
+.status-indicator {
+  position: absolute;
+  top: 75%; /* Điều chỉnh vị trí */
+  right: 10%; /* Điều chỉnh vị trí */
+  width: 15px;
+  height: 15px;
+  background-color: #ffffff; /* Màu xanh lá */
+  border-radius: 50%;
+  border: 2px solid white; /* Đường viền trắng */
+}
+.admin-card {
+  text-decoration: none; /* Loại bỏ gạch chân */
+  color: inherit; /* Kế thừa màu chữ */
+}
