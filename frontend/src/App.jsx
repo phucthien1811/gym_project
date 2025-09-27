@@ -1,4 +1,5 @@
-import React, { useEffect } from "react";
+import React from "react";
+import { BrowserRouter, Routes, Route, Navigate, useLocation } from "react-router-dom";
 
 import { AuthProvider, useAuth } from "./context/AuthContext.jsx";
 
@@ -23,49 +24,26 @@ import Card6 from "./pages/admin/Card/Card6.jsx";
 function Landing() {
   return (
     <>
-      
-
       <Header />
-
       <main>
         <HomePage />
         <ServicesPage />
         <AboutPage />
         <PricingPage />
         <ReviewPage />
-
-        {/* Section join (điểm đến của CTA trong Header) */}
         <section id="join-section" className="section">
           <div className="container">
-            <h3 className="section__title">
-              <span className="text-brand">Join</span> Royal Fitness
-            </h3>
+            <h3 className="section__title"><span className="text-brand">Join</span> Royal Fitness</h3>
             <p className="mt-12" style={{ maxWidth: 560, color: "#d0d0d0" }}>
               Leave your email and we’ll contact you for a free trial class.
             </p>
-
-            <form
-              className="join-form"
-              onSubmit={(e) => {
-                e.preventDefault(); // UI-only; sau gắn logic
-                alert("Submitted (UI-only).");
-              }}
-            >
-              <input
-                type="email"
-                required
-                placeholder="Your email"
-                className="join-input"
-                aria-label="Your email"
-              />
-              <button type="submit" className="btn btn--primary btn-md">
-                Get Started
-              </button>
+            <form className="join-form" onSubmit={(e)=>{e.preventDefault(); alert("Submitted (UI-only).");}}>
+              <input type="email" required placeholder="Your email" className="join-input" aria-label="Your email" />
+              <button type="submit" className="btn btn--primary btn-md">Get Started</button>
             </form>
           </div>
         </section>
       </main>
-
       <footer className="site-footer">
         <div className="container">
           <p>© {new Date().getFullYear()} Royal <span className="text-brand">Fitness</span>. All rights reserved.</p>
