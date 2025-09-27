@@ -1,6 +1,7 @@
 import React from "react";
 import Navigation from "./Navigation";
 import Button from "./Button";
+import { useAuth } from "../../context/AuthContext.jsx";
 
 /** Header sticky, nền glass nhẹ, anchor link */
 function Header() {
@@ -30,10 +31,30 @@ function Header() {
           className="header__nav"
         />
 
-        <div className="header__extra">
-          <Button as="a" href="#pricing" variant="outline" size="sm">
-            Login
-          </Button>
+        <div className="header__extra" style={{ display: "flex", gap: 8 }}>
+          {!user ? (
+            <Button as={Link} to="/login" variant="outline" size="sm">
+              Login
+            </Button>
+          ) : (
+            <>
+              {user.role === "admin" && (
+                <Button as={Link} to="/admin" variant="outline" size="sm">
+                  Admin
+                </Button>
+              )}
+              <Button
+                variant="secondary"
+                size="sm"
+                onClick={() => {
+                  logout();
+                  navigate("/");
+                }}
+              >
+                Logout
+              </Button>
+            </>
+          )}
         </div>
       </div>
 

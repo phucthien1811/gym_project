@@ -1,41 +1,26 @@
 import React, { useEffect } from "react";
 
-// Common components (UI-only, bạn đã có)
-import Header from "./componets/common/Header";
+import { AuthProvider, useAuth } from "./context/AuthContext.jsx";
 
-// Các section pages (UI-only mình đã viết)
-import HomePage from "./pages/HomePage";
-import ServicesPage from "./pages/ServicesPage";
-import AboutPage from "./pages/AboutPage";
-import PricingPage from "./pages/PricingPage";
-import ReviewPage from "./pages/ReviewPage";
+import Header from "./componets/common/Header.jsx";
+import HomePage from "./pages/HomePage.jsx";
+import ServicesPage from "./pages/ServicesPage.jsx";
+import AboutPage from "./pages/AboutPage.jsx";
+import PricingPage from "./pages/PricingPage.jsx";
+import ReviewPage from "./pages/ReviewPage.jsx";
 
-/**
- * App one-page với anchor navigation.
- * - Render tất cả section trên 1 trang
- * - Nếu không có hash khi vào lần đầu -> tự set #home
- * - Hỗ trợ scroll-margin-top để tránh che bởi header sticky (khai báo trong CSS)
- */
-export default function App() {
-  // Nếu URL chưa có hash, set mặc định #home (để active nav đúng)
-  useEffect(() => {
-    if (!window.location.hash) {
-      window.history.replaceState(null, "", "#home");
-    }
-  }, []);
+import LoginPage from "./pages/LoginPage.jsx";
 
-  // (Tuỳ chọn) Smooth scroll khi thay hash (nếu CSS chưa bật)
-  // CSS bạn có thể dùng: html { scroll-behavior: smooth; }
-  useEffect(() => {
-    const onHashChange = () => {
-      const id = window.location.hash.slice(1);
-      const el = document.getElementById(id);
-      if (el) el.scrollIntoView({ behavior: "smooth", block: "start" });
-    };
-    window.addEventListener("hashchange", onHashChange);
-    return () => window.removeEventListener("hashchange", onHashChange);
-  }, []);
-
+import AdminLayout from "./pages/admin/AdminLayout.jsx";
+import AdminDashboard from "./pages/admin/Dashboard.jsx";
+import AdminMembers from "./pages/admin/Members.jsx";
+import Card1 from "./pages/admin/Card/Card1.jsx";
+import Card2 from "./pages/admin/Card/Card2.jsx";
+import Card3 from "./pages/admin/Card/Card3.jsx";
+import Card4 from "./pages/admin/Card/Card4.jsx";
+import Card5 from "./pages/admin/Card/Card5.jsx";
+import Card6 from "./pages/admin/Card/Card6.jsx";
+function Landing() {
   return (
     <>
       
@@ -87,5 +72,74 @@ export default function App() {
         </div>
       </footer>
     </>
+  );
+}
+
+function AdminRoute({ children }) {
+  const { user } = useAuth();
+  const location = useLocation();
+  if (!user) return <Navigate to="/login" replace state={{ from: location }} />;
+  if (user.role !== "admin") return <Navigate to="/" replace />;
+  return children;
+}
+
+// export default function App() {
+//   return (
+//     <AuthProvider>
+//       <BrowserRouter>
+//         <Routes>
+//           <Route path="/" element={<Landing />} />
+//           <Route path="/login" element={<LoginPage />} />
+//           <Route
+//             path="/admin"
+//             element={
+//               <AdminRoute>
+//                 <AdminLayout />
+//               </AdminRoute>
+//             }
+//           >
+//             <Route index element={<AdminDashboard />} />
+//             <Route path="members" element={<AdminMembers />} />
+//           </Route>
+//           <Route path="*" element={<Landing />} />
+//         </Routes>
+//         <Routes path="card1" element={<Card1/>}></Routes>
+//         <Routes path="card2" element={<Card2/>}></Routes>
+//         <Routes path="card3" element={<Card3/>}></Routes>
+//         <Routes path="card4" element={<Card4/>}></Routes>
+//         <Routes path="card5" element={<Card5/>}></Routes>
+//         <Routes path="card6" element={<Card6/>}></Routes>
+//       </BrowserRouter>
+//     </AuthProvider>
+//   );
+// }
+export default function App() {
+  return (
+    <AuthProvider>
+      <BrowserRouter>
+        <Routes>
+          <Route path="/" element={<Landing />} />
+          <Route path="/login" element={<LoginPage />} />
+          <Route
+            path="/admin"
+            element={
+              <AdminRoute>
+                <AdminLayout />
+              </AdminRoute>
+            }
+          >
+            <Route index element={<AdminDashboard />} />
+            <Route path="members" element={<AdminMembers />} />
+            <Route path="card1" element={<Card1 />} />
+            <Route path="card2" element={<Card2 />} />
+            <Route path="card3" element={<Card3 />} />
+            <Route path="card4" element={<Card4 />} />
+            <Route path="card5" element={<Card5 />} />
+            <Route path="card6" element={<Card6 />} />
+          </Route>
+          <Route path="*" element={<Landing />} />
+        </Routes>
+      </BrowserRouter>
+    </AuthProvider>
   );
 }
