@@ -1,0 +1,164 @@
+/* === ADMIN LAYOUT STYLES === */
+
+:root {
+    --admin-bg: #111827; /* Dark blue-gray */
+    --admin-sidebar-bg: #1f2937; /* Lighter blue-gray */
+    --admin-content-bg: #111827;
+    --admin-card-bg: #1f2937;
+    --admin-border-color: #374151;
+    --admin-text-primary: #f9fafb; /* Off-white */
+    --admin-text-secondary: #9ca3af; /* Gray */
+    --admin-brand-color: #3b82f6; /* Blue */
+    --admin-danger-color: #ef4444; /* Red */
+}
+
+.admin {
+    display: flex;
+    min-height: 100vh;
+    background-color: var(--admin-bg);
+    color: var(--admin-text-primary);
+}
+
+/* --- SIDEBAR --- */
+.admin__side {
+    width: 260px;
+    background-color: var(--admin-sidebar-bg);
+    border-right: 1px solid var(--admin-border-color);
+    display: flex;
+    flex-direction: column;
+    position: fixed;
+    height: 100%;
+    z-index: 100;
+}
+
+.admin__brand {
+    padding: 16px 24px;
+    font-size: 24px;
+    font-weight: 700;
+    text-align: center;
+    color: var(--admin-brand-color);
+    border-bottom: 1px solid var(--admin-border-color);
+}
+
+.admin__nav {
+    flex-grow: 1;
+    overflow-y: auto;
+    padding: 16px 0;
+}
+
+.admin__nav-title {
+    padding: 12px 24px 8px;
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+    color: var(--admin-text-secondary);
+    letter-spacing: 0.5px;
+}
+
+.admin__link {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 24px;
+    margin: 4px 16px;
+    color: var(--admin-text-secondary);
+    text-decoration: none;
+    border-radius: 8px;
+    transition: all 0.2s ease-in-out;
+    white-space: nowrap;
+}
+
+.admin__link-icon {
+    width: 18px;
+    height: 18px;
+    flex-shrink: 0;
+}
+
+.admin__link:hover {
+    background-color: #374151;
+    color: var(--admin-text-primary);
+}
+
+.admin__link.active {
+    background-color: var(--admin-brand-color);
+    color: #ffffff;
+    font-weight: 500;
+}
+
+.admin__link--danger {
+    margin-top: auto; /* Push to the bottom */
+}
+
+.admin__link--danger,
+.admin__link--danger:hover {
+    color: var(--admin-danger-color);
+}
+.admin__link--danger:hover {
+    background-color: rgba(239, 68, 68, 0.1);
+}
+
+
+/* --- MAIN CONTENT AREA --- */
+.admin__main {
+    margin-left: 260px;
+    width: calc(100% - 260px);
+    display: flex;
+    flex-direction: column;
+}
+
+.admin__top {
+    height: 60px;
+    background-color: var(--admin-sidebar-bg);
+    border-bottom: 1px solid var(--admin-border-color);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 24px;
+    flex-shrink: 0;
+}
+
+.admin__pill {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background-color: #374151;
+    color: var(--admin-text-secondary);
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-size: 14px;
+    text-decoration: none;
+    transition: all 0.2s;
+}
+.admin__pill:hover {
+    background-color: var(--admin-brand-color);
+    color: #ffffff;
+}
+
+.admin__user {
+    font-weight: 500;
+}
+
+.admin__content {
+    flex-grow: 1;
+    padding: 24px;
+    overflow-y: auto; /* Cho phép chỉ khu vực này cuộn */
+}
+
+/* --- SCROLLBAR --- */
+.admin__nav::-webkit-scrollbar,
+.admin__content::-webkit-scrollbar {
+    width: 8px;
+}
+.admin__nav::-webkit-scrollbar-track,
+.admin__content::-webkit-scrollbar-track {
+    background: transparent;
+}
+.admin__nav::-webkit-scrollbar-thumb,
+.admin__content::-webkit-scrollbar-thumb {
+    background: #4b5563; /* Gray */
+    border-radius: 4px;
+}
+.admin__nav::-webkit-scrollbar-thumb:hover,
+.admin__content::-webkit-scrollbar-thumb:hover {
+    background: #6b7280;
+}

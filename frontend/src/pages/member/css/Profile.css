@@ -1,0 +1,152 @@
+/* --- PROFILE PAGE STYLES --- */
+.profile-container {
+    padding: 24px;
+}
+
+.page-title {
+    font-size: 28px;
+    font-weight: 600;
+    margin-bottom: 24px;
+    color: #ffffff;
+}
+
+.profile-grid {
+    display: grid;
+    grid-template-columns: 1fr 2fr; /* Cột trái nhỏ hơn cột phải */
+    gap: 24px;
+}
+
+/* --- Cột Trái: Tóm tắt thông tin --- */
+.profile-summary-card {
+    background-color: #1e1e1e;
+    border-radius: 16px;
+    padding: 32px;
+    text-align: center;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    align-self: start; /* Giữ card này ở trên cùng */
+}
+
+.avatar-container {
+    position: relative;
+    width: 120px;
+    height: 120px;
+    margin: 0 auto 20px;
+}
+
+.profile-avatar {
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 3px solid #4CAF50;
+}
+
+.change-avatar-btn {
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    background-color: #4CAF50;
+    color: white;
+    border: 2px solid #1e1e1e;
+    border-radius: 50%;
+    width: 36px;
+    height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+.change-avatar-btn:hover {
+    background-color: #43a047;
+}
+
+.user-name {
+    font-size: 24px;
+    font-weight: 600;
+    margin: 0 0 8px 0;
+    color: #ffffff;
+}
+
+.user-email {
+    font-size: 14px;
+    color: #b0b0b0;
+    margin: 0;
+}
+
+/* --- Cột Phải: Thông tin chi tiết --- */
+.profile-details-card {
+    background-color: #1e1e1e;
+    border-radius: 16px;
+    padding: 16px 32px 32px 32px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.info-section {
+    padding: 24px 0;
+}
+.info-section:not(:last-child) {
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.info-section-title {
+    font-size: 18px;
+    font-weight: 600;
+    margin: 0 0 20px 0;
+    color: #ffffff;
+}
+
+.info-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 0;
+}
+
+.info-row label {
+    font-size: 15px;
+    color: #b0b0b0;
+}
+
+.info-row .value {
+    font-size: 15px;
+    font-weight: 500;
+    color: #e0e0e0;
+}
+
+.package-highlight {
+    color: #4CAF50;
+    font-weight: bold;
+}
+
+.days-left-highlight {
+    color: #FFC107;
+    font-weight: bold;
+}
+
+.update-btn-container {
+    margin-top: 24px;
+    text-align: right;
+}
+
+.update-btn {
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    padding: 12px 24px;
+    border-radius: 8px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease-in-out;
+}
+.update-btn:hover {
+    background-color: #43a047;
+    transform: translateY(-2px);
+}
+
+/* --- Responsive cho trang Profile --- */
+@media (max-width: 992px) {
+    .profile-grid {
+        grid-template-columns: 1fr; /* Chuyển thành 1 cột */
+    }
+}

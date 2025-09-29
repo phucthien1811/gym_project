@@ -1,0 +1,230 @@
+/* --- BỐ CỤC CHUNG --- */
+.member-layout {
+    display: flex;
+    min-height: 100vh;
+    background-color: #121212;
+    color: #e0e0e0;
+}
+
+/* === SỬA LỖI HEADER BỊ BỂ === */
+.member-header {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 60px;
+    background-color: #1e1e1e;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    display: flex;
+    align-items: center;
+    padding: 0 24px; /* Giữ padding */
+    z-index: 1000;
+    box-sizing: border-box; /* Đảm bảo padding không làm tăng kích thước */
+}
+
+.header-brand {
+    flex-shrink: 0; /* Ngăn logo bị co lại */
+}
+
+.header-brand span {
+    font-size: 22px;
+    font-weight: 700;
+    color: #4CAF50;
+    letter-spacing: 1px;
+}
+
+.header-actions {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    margin-left: auto; /* Tự động đẩy cụm action sang phải */
+}
+/* === KẾT THÚC PHẦN SỬA LỖI HEADER === */
+
+
+.notification-bell {
+    background: transparent;
+    border: none;
+    color: #b0b0b0;
+    font-size: 20px;
+    cursor: pointer;
+    position: relative;
+    padding: 8px;
+}
+.notification-bell:hover {
+    color: #ffffff;
+}
+
+.notification-dot {
+    position: absolute;
+    top: 5px;
+    right: 5px;
+    width: 8px;
+    height: 8px;
+    background-color: #f44336;
+    border-radius: 50%;
+    border: 2px solid #1e1e1e;
+}
+
+.user-menu {
+    position: relative;
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+}
+
+.header-avatar {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid transparent;
+    transition: border-color 0.2s;
+}
+.user-menu:hover .header-avatar {
+    border-color: #4CAF50;
+}
+
+.user-dropdown {
+    position: absolute;
+    top: 130%;
+    right: 0;
+    background-color: #2a2a2a;
+    border-radius: 8px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    width: 220px;
+    overflow: hidden;
+    z-index: 1001;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+}
+.dropdown-user-info {
+    padding: 12px 16px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+.dropdown-user-info strong {
+    color: #ffffff;
+    font-size: 15px;
+}
+.dropdown-user-info small {
+    color: #b0b0b0;
+    font-size: 12px;
+}
+.dropdown-item {
+    background: none;
+    border: none;
+    width: 100%;
+    padding: 12px 16px;
+    color: #e0e0e0;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    text-align: left;
+    cursor: pointer;
+    font-size: 14px;
+}
+.dropdown-item:hover {
+    background-color: #3c3c3c;
+}
+.dropdown-item svg {
+    color: #f44336;
+}
+
+/* --- SIDEBAR --- */
+.member-sidebar {
+    width: 260px;
+    background-color: #1e1e1e;
+    display: flex;
+    flex-direction: column;
+    position: fixed;
+    top: 60px;
+    height: calc(100vh - 60px);
+    border-right: 1px solid rgba(255, 255, 255, 0.1);
+    z-index: 999;
+}
+
+.member-nav {
+    padding-top: 16px;
+    flex-grow: 1;
+    overflow-y: auto;
+}
+.nav-section {
+    margin-bottom: 16px;
+}
+.nav-section-title {
+    padding: 16px 24px 8px;
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+    color: #9e9e9e;
+    letter-spacing: 0.5px;
+}
+.nav-section-items {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+.nav-item-link {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 24px;
+    margin: 0 16px;
+    color: #b0b0b0;
+    text-decoration: none;
+    border-radius: 8px;
+    transition: all 0.2s ease-in-out;
+    white-space: nowrap;
+}
+.nav-item-icon {
+    width: 18px;
+    height: 18px;
+    flex-shrink: 0;
+}
+.nav-item-link:hover {
+    background-color: #2a2a2a;
+    color: #ffffff;
+}
+.nav-item-link.active {
+    background-color: #4CAF50;
+    color: #ffffff;
+    font-weight: 500;
+}
+
+
+/* --- KHU VỰC NỘI DUNG CHÍNH (SỬA LỖI SCROLLBAR) --- */
+.member-content {
+    margin-left: 260px;
+    width: calc(100% - 260px);
+    margin-top: 60px;
+    padding: 0;
+    position: relative;
+    z-index: 1;
+    height: calc(100vh - 60px);
+    overflow-y: auto;
+}
+
+/* --- TÙY CHỈNH THANH SCROLLBAR CHO ĐẸP HƠN --- */
+.member-content::-webkit-scrollbar {
+    width: 8px;
+}
+.member-content::-webkit-scrollbar-track {
+    background: #2a2a2a;
+}
+.member-content::-webkit-scrollbar-thumb {
+    background: #555;
+    border-radius: 4px;
+}
+.member-content::-webkit-scrollbar-thumb:hover {
+    background: #777;
+}
+
+/* --- Tiêu đề chung cho các trang con --- */
+.page-title {
+    font-size: 28px;
+    font-weight: 600;
+    color: #ffffff;
+    margin-bottom: 24px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    padding-bottom: 16px;
+}
+
