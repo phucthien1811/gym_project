@@ -11,6 +11,8 @@ import PricingPage from "./pages/PricingPage.jsx";
 import ReviewPage from "./pages/ReviewPage.jsx";
 
 import LoginPage from "./pages/LoginPage.jsx";
+import RegisterPage from "./pages/Register.Page.jsx";
+
 
 import AdminLayout from "./pages/admin/AdminLayout.jsx";
 import AdminDashboard from "./pages/admin/Dashboard.jsx";
@@ -98,6 +100,8 @@ export default function App() {
         <Routes>
           <Route path="/" element={<Landing />} />
           <Route path="/login" element={<LoginPage />} />
+          <Route path="/register" element={<RegisterPage />} />
+
           <Route
             path="/admin"
             element={

@@ -25,14 +25,19 @@ function Header() {
           <span className="logo__accent">Fitness</span>
         </a>
 
-        {/* KHÔNG truyền cta nữa */}
+        {/* Menu */}
         <Navigation links={links} className="header__nav" />
 
         <div className="header__extra" style={{ display: "flex", gap: 8 }}>
           {!user ? (
-            <Button as={Link} to="/login" variant="outline" size="sm">
-              Login
-            </Button>
+            <>
+              <Button as={Link} to="/login" variant="outline" size="sm">
+                Login
+              </Button>
+              <Button as={Link} to="/register" variant="outline" size="sm">
+                Register
+              </Button>
+            </>
           ) : (
             <>
               {user.role === "admin" && (
