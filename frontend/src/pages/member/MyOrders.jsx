@@ -1,115 +1,237 @@
-import React, { useState } from 'react';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faSearch, faReceipt } from '@fortawesome/free-solid-svg-icons';
-import './css/MyOrders.css'; // Import file CSS mới
+import React, { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
+import { useOrders } from '../../hooks/useOrders';
+import '../../styles/MyOrders.css';
 
 const MyOrders = () => {
-    const [activeTab, setActiveTab] = useState('Tất cả');
+  const { 
+    orders, 
+    loading, 
+    error, 
+    pagination, 
+    fetchOrders, 
+    cancelOrder,
+    formatCurrency,
+    getStatusText,
+    getStatusColor 
+  } = useOrders();
 
-    // Dữ liệu giả lập chi tiết hơn
-    const allOrders = [
-        {
-            id: '#ORD001', date: '2025-09-20', status: 'Hoàn thành',
-            items: [
-                { id: 1, name: 'Whey Protein Gold Standard 5Lbs', image: 'https://placehold.co/100x100/333333/FFFFFF?text=Whey', quantity: 1, price: 1850000 },
-                { id: 2, name: 'BCAA Xtend 30 Servings', image: 'https://placehold.co/100x100/333333/FFFFFF?text=BCAA', quantity: 2, price: 650000 }
-            ]
-        },
-        {
-            id: '#ORD002', date: '2025-09-25', status: 'Đang xử lý',
-            items: [
-                { id: 3, name: 'Creatine Monohydrate 300g', image: 'https://placehold.co/100x100/333333/FFFFFF?text=Creatine', quantity: 1, price: 450000 }
-            ]
-        },
-        {
-            id: '#ORD003', date: '2025-09-15', status: 'Đã hủy',
-            items: [
-                { id: 4, name: 'Găng tay tập gym', image: 'https://placehold.co/100x100/333333/FFFFFF?text=Glove', quantity: 1, price: 250000 }
-            ]
-        }
-    ];
-    
-    // Lọc đơn hàng dựa trên tab đang hoạt động
-    const filteredOrders = activeTab === 'Tất cả'
-        ? allOrders
-        : allOrders.filter(order => order.status === activeTab);
+  const [statusFilter, setStatusFilter] = useState('');
+  const [currentPage, setCurrentPage] = useState(1);
 
-    // Tính tổng tiền cho mỗi đơn hàng
-    const calculateTotal = (items) => {
-        return items.reduce((total, item) => total + (item.price * item.quantity), 0);
+  // Fetch orders when filters change
+  useEffect(() => {
+    const params = {
+      page: currentPage,
+      limit: 10
     };
+    
+    if (statusFilter) {
+      params.status = statusFilter;
+    }
+    
+    fetchOrders(params);
+  }, [currentPage, statusFilter, fetchOrders]);
 
-    const tabs = ['Tất cả', 'Đang xử lý', 'Hoàn thành', 'Đã hủy'];
+  const handleCancelOrder = async (orderId) => {
+    if (window.confirm('Bạn có chắc chắn muốn hủy đơn hàng này?')) {
+      try {
+        await cancelOrder(orderId);
+        alert('Hủy đơn hàng thành công!');
+      } catch (error) {
+        alert(`Lỗi: ${error.message}`);
+      }
+    }
+  };
 
+  const handlePageChange = (page) => {
+    setCurrentPage(page);
+  };
+
+  const canCancelOrder = (order) => {
+    return order.status === 'pending' && order.payment_status !== 'paid';
+  };
+
+  if (loading && orders.length === 0) {
     return (
-        <div className="orders-page-container fade-in">
-            <h1 className="page-title">Đơn Hàng Của Tôi</h1>
-
-            {/* Thanh điều hướng và tìm kiếm */}
-            <div className="orders-header">
-                <div className="tabs-container">
-                    {tabs.map(tab => (
-                        <button
-                            key={tab}
-                            className={`tab-btn ${activeTab === tab ? 'active' : ''}`}
-                            onClick={() => setActiveTab(tab)}
-                        >
-                            {tab}
-                        </button>
-                    ))}
-                </div>
-                <div className="search-bar">
-                    <FontAwesomeIcon icon={faSearch} className="search-icon" />
-                    <input type="text" placeholder="Tìm đơn hàng theo ID, tên sản phẩm..." />
-                </div>
-            </div>
-
-            {/* Danh sách đơn hàng */}
-            <div className="orders-list">
-                {filteredOrders.length > 0 ? (
-                    filteredOrders.map(order => (
-                        <div key={order.id} className="order-card">
-                            <div className="order-card-header">
-                                <span>Mã đơn hàng: <strong>{order.id}</strong></span>
-                                <span className={`order-status status-${order.status.replace(/\s+/g, '-').toLowerCase()}`}>
-                                    {order.status}
-                                </span>
-                            </div>
-                            <div className="order-items-list">
-                                {order.items.map(item => (
-                                    <div key={item.id} className="order-item">
-                                        <img src={item.image} alt={item.name} className="item-image" />
-                                        <div className="item-details">
-                                            <p className="item-name">{item.name}</p>
-                                            <p className="item-quantity">x{item.quantity}</p>
-                                        </div>
-                                        <span className="item-price">{item.price.toLocaleString('vi-VN')}đ</span>
-                                    </div>
-                                ))}
-                            </div>
-                            <div className="order-card-footer">
-                                <span className="order-date">Ngày đặt: {order.date}</span>
-                                <div className="order-total">
-                                    <FontAwesomeIcon icon={faReceipt} />
-                                    <span>Thành tiền:</span>
-                                    <strong>{calculateTotal(order.items).toLocaleString('vi-VN')}đ</strong>
-                                </div>
-                            </div>
-                             <div className="order-card-actions">
-                                <button className="btn-secondary">Xem chi tiết</button>
-                                {order.status === 'Hoàn thành' && <button className="btn-primary">Đánh giá</button>}
-                                {order.status === 'Đang xử lý' && <button className="btn-danger">Hủy đơn</button>}
-                            </div>
-                        </div>
-                    ))
-                ) : (
-                    <div className="no-orders-found">
-                        <p>Không có đơn hàng nào trong mục này.</p>
-                    </div>
-                )}
-            </div>
+      <div className="my-orders-page">
+        <div className="orders-container">
+          <div className="loading">Đang tải đơn hàng...</div>
         </div>
+      </div>
     );
+  }
+
+  return (
+    <div className="my-orders-page">
+      <div className="orders-container">
+        <div className="page-header">
+          <h1>Đơn hàng của tôi</h1>
+          <div className="order-filters">
+            <select 
+              value={statusFilter} 
+              onChange={(e) => {
+                setStatusFilter(e.target.value);
+                setCurrentPage(1);
+              }}
+            >
+              <option value="">Tất cả trạng thái</option>
+              <option value="pending">Chờ xác nhận</option>
+              <option value="confirmed">Đã xác nhận</option>
+              <option value="processing">Đang xử lý</option>
+              <option value="shipped">Đang giao hàng</option>
+              <option value="delivered">Đã giao hàng</option>
+            <option value="cancelled">Đã hủy</option>
+          </select>
+        </div>
+      </div>
+
+      {error && (
+        <div className="error-message">
+          {error}
+        </div>
+      )}
+
+      {orders.length === 0 && !loading ? (
+        <div className="empty-orders">
+          <h3>Chưa có đơn hàng nào</h3>
+          <p>Bạn chưa có đơn hàng nào. Hãy bắt đầu mua sắm ngay!</p>
+          <Link to="/shop" className="btn btn-primary">
+            Mua sắm ngay
+          </Link>
+        </div>
+      ) : (
+        <>
+          <div className="orders-list">
+            {orders.map(order => (
+              <div key={order.id} className="order-card">
+                <div className="order-header">
+                  <div className="order-info">
+                    <h3>Đơn hàng #{order.order_number}</h3>
+                    <span className="order-date">
+                      {new Date(order.created_at).toLocaleDateString('vi-VN')}
+                    </span>
+                  </div>
+                  <div className="order-status">
+                    <span 
+                      className="status-badge"
+                      style={{ backgroundColor: getStatusColor(order.status) }}
+                    >
+                      {getStatusText(order.status)}
+                    </span>
+                  </div>
+                </div>
+
+                <div className="order-items">
+                  {order.items && order.items.slice(0, 3).map(item => (
+                    <div key={item.id} className="order-item">
+                      <img 
+                        src={item.product_image} 
+                        alt={item.product_name}
+                        onError={(e) => {
+                          e.target.src = '/images/placeholder.jpg';
+                        }}
+                      />
+                      <div className="item-details">
+                        <h4>{item.product_name}</h4>
+                        <p>Số lượng: {item.quantity}</p>
+                      </div>
+                      <div className="item-price">
+                        {formatCurrency(item.total_price)}
+                      </div>
+                    </div>
+                  ))}
+                  
+                  {order.items && order.items.length > 3 && (
+                    <div className="more-items">
+                      +{order.items.length - 3} sản phẩm khác
+                    </div>
+                  )}
+                </div>
+
+                <div className="order-summary">
+                  <div className="payment-info">
+                    <span>Thanh toán: {order.payment_method === 'COD' ? 'COD' : order.payment_method}</span>
+                    <span className={`payment-status ${order.payment_status}`}>
+                      {order.payment_status === 'pending' ? 'Chờ thanh toán' : 
+                       order.payment_status === 'paid' ? 'Đã thanh toán' : 
+                       order.payment_status}
+                    </span>
+                  </div>
+                  <div className="total-amount">
+                    <strong>Tổng: {formatCurrency(order.total_amount)}</strong>
+                  </div>
+                </div>
+
+                <div className="order-actions">
+                  <Link 
+                    to={`/member/orders/${order.id}`}
+                    className="btn btn-secondary"
+                  >
+                    Xem chi tiết
+                  </Link>
+                  
+                  {canCancelOrder(order) && (
+                    <button
+                      onClick={() => handleCancelOrder(order.id)}
+                      className="btn btn-danger"
+                      disabled={loading}
+                    >
+                      Hủy đơn hàng
+                    </button>
+                  )}
+
+                  {order.status === 'delivered' && (
+                    <button className="btn btn-primary">
+                      Đánh giá
+                    </button>
+                  )}
+                </div>
+              </div>
+            ))}
+          </div>
+
+          {/* Pagination */}
+          {pagination.totalPages > 1 && (
+            <div className="pagination">
+              <button
+                onClick={() => handlePageChange(currentPage - 1)}
+                disabled={currentPage === 1}
+                className="btn btn-secondary"
+              >
+                Trước
+              </button>
+              
+              <div className="page-numbers">
+                {Array.from({ length: pagination.totalPages }, (_, i) => i + 1).map(page => (
+                  <button
+                    key={page}
+                    onClick={() => handlePageChange(page)}
+                    className={`btn ${currentPage === page ? 'btn-primary' : 'btn-secondary'}`}
+                  >
+                    {page}
+                  </button>
+                ))}
+              </div>
+              
+              <button
+                onClick={() => handlePageChange(currentPage + 1)}
+                disabled={currentPage === pagination.totalPages}
+                className="btn btn-secondary"
+              >
+                Sau
+              </button>
+            </div>
+          )}
+
+          <div className="pagination-info">
+            Hiển thị {orders.length} trong tổng số {pagination.total} đơn hàng
+          </div>
+        </>
+      )}
+      </div>
+    </div>
+  );
 };
 
 export default MyOrders;

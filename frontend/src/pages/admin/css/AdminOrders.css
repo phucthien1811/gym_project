@@ -1,0 +1,108 @@
+.order-id {
+    font-weight: 500;
+    color: var(--admin-brand-color);
+}
+
+.total-amount {
+    font-weight: 500;
+}
+
+/* Kế thừa .status-pill từ Members.css nếu có */
+.status-pill {
+    padding: 4px 10px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+}
+
+.status-processing {
+    background-color: rgba(59, 130, 246, 0.2);
+    color: #60a5fa;
+}
+
+.status-shipped {
+    background-color: rgba(245, 158, 11, 0.2);
+    color: #fbbf24;
+}
+
+.status-delivered {
+    background-color: rgba(16, 185, 129, 0.2);
+    color: #34d399;
+}
+
+.status-cancelled {
+    background-color: rgba(107, 114, 128, 0.2);
+    color: #9ca3af;
+}
+
+/* Action Buttons */
+.action-buttons {
+    display: flex;
+    gap: 8px;
+    justify-content: center;
+}
+
+.action-btn {
+    padding: 6px 8px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 12px;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.view-btn {
+    background: #3b82f6;
+    color: white;
+}
+
+.view-btn:hover {
+    background: #2563eb;
+}
+
+.confirm-btn {
+    background: #10b981;
+    color: white;
+}
+
+.confirm-btn:hover {
+    background: #059669;
+}
+
+.processing-btn {
+    background: #f59e0b;
+    color: white;
+}
+
+.processing-btn:hover {
+    background: #d97706;
+}
+
+.ship-btn {
+    background: #6366f1;
+    color: white;
+}
+
+.ship-btn:hover {
+    background: #4f46e5;
+}
+
+.cancel-btn {
+    background: #ef4444;
+    color: white;
+}
+
+.cancel-btn:hover {
+    background: #dc2626;
+}
+
+.loading {
+    text-align: center;
+    padding: 40px;
+    font-size: 18px;
+    color: #666;
+}

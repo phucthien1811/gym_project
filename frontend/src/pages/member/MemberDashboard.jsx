@@ -1,22 +1,85 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import './css/MemberDashboard.css'; // Đường dẫn đến file CSS mới
 import { QRCodeSVG } from 'qrcode.react';
 import { useAuth } from '../../context/AuthContext';
+import memberProfileService from '../../services/memberProfileService.js';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCrown, faClock, faCalendarCheck, faDumbbell, faPersonRunning } from '@fortawesome/free-solid-svg-icons';
 
 const Dashboard = () => {
     const { user } = useAuth();
+    const [userProfile, setUserProfile] = useState(null);
+    const [loading, setLoading] = useState(true);
 
-    // Dữ liệu giả lập chi tiết
-    const membership = {
-        packageName: 'Gói Gold',
-        startDate: '2025-09-01',
-        endDate: '2026-08-31',
-        daysRemaining: 340,
-        totalDays: 365
+    // Fetch user profile data
+    useEffect(() => {
+        const fetchProfile = async () => {
+            try {
+                console.log('🔍 Dashboard: Fetching user profile...');
+                const response = await memberProfileService.getProfile();
+                console.log('📥 Dashboard: Profile response:', response);
+                
+                if (response.success && response.data) {
+                    setUserProfile(response.data);
+                    console.log('✅ Dashboard: Profile loaded:', response.data);
+                }
+            } catch (error) {
+                console.error('❌ Dashboard: Error fetching profile:', error);
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        if (user) {
+            fetchProfile();
+        }
+    }, [user]);
+
+    // Helper function to get full avatar URL
+    const getAvatarUrl = (avatarPath) => {
+        if (!avatarPath) return 'https://placehold.co/100x100/333333/FFFFFF?text=User';
+        if (avatarPath.startsWith('blob:') || avatarPath.startsWith('http')) return avatarPath;
+        const filename = avatarPath.replace('/uploads/avatars/', '');
+        return `http://localhost:4000/api/v1/uploads/avatars/${filename}`;
     };
-    const membershipProgress = ((membership.totalDays - membership.daysRemaining) / membership.totalDays) * 100;
+
+    // Lấy thông tin gói tập từ profile
+    const getMembershipInfo = () => {
+        if (!userProfile?.membership_plan) {
+            return {
+                packageName: 'Chưa đăng ký',
+                startDate: null,
+                endDate: null,
+                daysRemaining: 0,
+                totalDays: 0,
+                isActive: false
+            };
+        }
+
+        const startDate = new Date(userProfile.membership_start_date);
+        const endDate = new Date(userProfile.membership_end_date);
+        const today = new Date();
+        
+        const timeDiff = endDate.getTime() - today.getTime();
+        const daysRemaining = Math.max(0, Math.ceil(timeDiff / (1000 * 3600 * 24)));
+        
+        const totalTimeDiff = endDate.getTime() - startDate.getTime();
+        const totalDays = Math.ceil(totalTimeDiff / (1000 * 3600 * 24));
+
+        return {
+            packageName: userProfile.membership_plan,
+            startDate: startDate.toLocaleDateString('vi-VN'),
+            endDate: endDate.toLocaleDateString('vi-VN'),
+            daysRemaining,
+            totalDays,
+            isActive: daysRemaining > 0
+        };
+    };
+
+    const membership = getMembershipInfo();
+    const membershipProgress = membership.totalDays > 0 
+        ? ((membership.totalDays - membership.daysRemaining) / membership.totalDays) * 100 
+        : 0;
 
     const todaysClasses = [
         { time: '18:00', name: 'Lớp Yoga Flow', type: 'yoga', trainer: 'HLV Anna' },
@@ -34,11 +97,24 @@ const Dashboard = () => {
 
     return (
         <div className="dashboard-container fade-in">
-            {/* --- KHU VỰC CHÀO MỪNG --- */}
+            {loading ? (
+                <div className="loading-dashboard">
+                    <p>Đang tải thông tin...</p>
+                </div>
+            ) : (
+                <>
+                    {/* --- KHU VỰC CHÀO MỪNG --- */}
             <div className="dash-header">
-                <img src={user?.avatar || 'https://placehold.co/100x100/333333/FFFFFF?text=User'} alt="Avatar" className="header-avatar-dash" />
+                <img 
+                    src={getAvatarUrl(userProfile?.avatar_url)} 
+                    alt="Avatar" 
+                    className="header-avatar-dash"
+                    onError={(e) => {
+                        e.target.src = 'https://placehold.co/100x100/333333/FFFFFF?text=User';
+                    }}
+                />
                 <div className="header-text">
-                    <h1>Chào, {user?.name || 'huhuh'}!</h1>
+                    <h1>Chào, {userProfile?.name || user?.name || 'bạn'}!</h1>
                     <p>Sẵn sàng cho một buổi tập tuyệt vời nào!</p>
                 </div>
             </div>
@@ -48,20 +124,31 @@ const Dashboard = () => {
                 {/* THẺ GÓI TẬP */}
                 <div className="dash-card membership-card">
                     <h3><FontAwesomeIcon icon={faCrown} /> Gói tập của bạn</h3>
-                    <div className="package-details">
-                        <span className="package-name-main">{membership.packageName}</span>
-                        <div className="days-remaining">
-                            <FontAwesomeIcon icon={faClock} />
-                            <span>Còn <strong>{membership.daysRemaining}</strong> ngày</span>
+                    {membership.isActive ? (
+                        <>
+                            <div className="package-details">
+                                <span className="package-name-main">{membership.packageName}</span>
+                                <div className="days-remaining">
+                                    <FontAwesomeIcon icon={faClock} />
+                                    <span>Còn <strong>{membership.daysRemaining}</strong> ngày</span>
+                                </div>
+                            </div>
+                            <div className="progress-bar-container">
+                                <div className="progress-bar" style={{ width: `${membershipProgress}%` }}></div>
+                            </div>
+                            <div className="date-range">
+                                <span>{membership.startDate}</span>
+                                <span>{membership.endDate}</span>
+                            </div>
+                        </>
+                    ) : (
+                        <div className="no-membership">
+                            <p>Bạn chưa đăng ký gói tập nào</p>
+                            <button className="btn-primary" onClick={() => window.location.href = '/member/packages'}>
+                                Đăng ký ngay
+                            </button>
                         </div>
-                    </div>
-                    <div className="progress-bar-container">
-                        <div className="progress-bar" style={{ width: `${membershipProgress}%` }}></div>
-                    </div>
-                    <div className="date-range">
-                        <span>{membership.startDate}</span>
-                        <span>{membership.endDate}</span>
-                    </div>
+                    )}
                 </div>
 
                 {/* THẺ LỊCH TẬP HÔM NAY */}
@@ -106,6 +193,8 @@ const Dashboard = () => {
                     <p>Sử dụng mã này tại quầy lễ tân</p>
                 </div>
             </div>
+                </>
+            )}
         </div>
     );
 };

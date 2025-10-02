@@ -1,0 +1,164 @@
+/* === BIẾN MÀU CHO GIAO DIỆN ADMIN === */
+:root {
+    --admin-bg: #111827; /* Nền chính (Xanh đen đậm) */
+    --admin-sidebar-bg: #1f2937; /* Nền sidebar (Xanh đen nhạt hơn) */
+    --admin-card-bg: #1f2937;
+    --admin-border-color: #374151; /* Màu đường viền */
+    --admin-text-primary: #f9fafb; /* Chữ trắng ngà */
+    --admin-text-secondary: #9ca3af; /* Chữ xám */
+    --admin-brand-color: #3b82f6; /* Màu xanh dương thương hiệu */
+    --admin-danger-color: #ef4444; /* Màu đỏ cho cảnh báo/nút nguy hiểm */
+}
+
+/* --- BỐ CỤC CHUNG --- */
+.admin {
+    display: flex;
+    min-height: 100vh;
+    background-color: var(--admin-bg);
+    color: var(--admin-text-primary);
+}
+
+/* --- THANH SIDEBAR --- */
+.admin__side {
+    width: 260px;
+    background-color: var(--admin-sidebar-bg);
+    border-right: 1px solid var(--admin-border-color);
+    display: flex;
+    flex-direction: column;
+    position: fixed;
+    height: 100%;
+    z-index: 100;
+}
+
+.admin__brand {
+    padding: 16px 24px;
+    font-size: 24px;
+    font-weight: 700;
+    text-align: center;
+    color: var(--admin-brand-color);
+    border-bottom: 1px solid var(--admin-border-color);
+    flex-shrink: 0; /* Không co lại */
+}
+
+.admin__nav {
+    flex-grow: 1; /* Lấp đầy không gian còn lại */
+    overflow-y: auto; /* Cho phép cuộn khi menu dài */
+    padding: 16px 0;
+    display: flex;
+    flex-direction: column; /* Đảm bảo các mục xếp chồng lên nhau */
+}
+
+.admin__nav-title {
+    padding: 12px 24px 8px;
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+    color: var(--admin-text-secondary);
+    letter-spacing: 0.5px;
+}
+
+.admin__link {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 24px;
+    margin: 4px 16px;
+    color: var(--admin-text-secondary);
+    text-decoration: none;
+    border-radius: 8px;
+    transition: all 0.2s ease-in-out;
+    white-space: nowrap; /* Ngăn chữ bị xuống dòng */
+}
+
+.admin__link-icon {
+    width: 18px;
+    height: 18px;
+    flex-shrink: 0;
+}
+
+.admin__link:hover {
+    background-color: #374151;
+    color: var(--admin-text-primary);
+}
+
+/* Style cho link đang active */
+.admin__link.active {
+    background-color: var(--admin-brand-color);
+    color: #ffffff;
+    font-weight: 500;
+}
+
+/* Nút Logout ở cuối */
+.admin__link.admin__link--danger {
+    margin-top: auto; /* Đẩy nút này xuống cuối cùng */
+    color: var(--admin-danger-color);
+}
+.admin__link.admin__link--danger:hover {
+    background-color: rgba(239, 68, 68, 0.1);
+}
+
+/* --- KHU VỰC NỘI DUNG CHÍNH --- */
+.admin__main {
+    margin-left: 260px; /* Bằng chiều rộng của sidebar */
+    width: calc(100% - 260px);
+    display: flex;
+    flex-direction: column;
+    height: 100vh; /* Giới hạn chiều cao bằng màn hình */
+}
+
+.admin__top {
+    height: 60px;
+    background-color: var(--admin-sidebar-bg);
+    border-bottom: 1px solid var(--admin-border-color);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 24px;
+    flex-shrink: 0; /* Không co lại */
+}
+
+.admin__pill {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background-color: #374151;
+    color: var(--admin-text-secondary);
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-size: 14px;
+    text-decoration: none;
+    transition: all 0.2s;
+}
+.admin__pill:hover {
+    background-color: var(--admin-brand-color);
+    color: #ffffff;
+}
+
+.admin__user {
+    font-weight: 500;
+}
+
+.admin__content {
+    flex-grow: 1; /* Lấp đầy không gian còn lại */
+    padding: 24px;
+    overflow-y: auto; /* Chỉ cho phép khu vực này cuộn */
+}
+
+/* --- THANH CUỘN (SCROLLBAR) TÙY CHỈNH --- */
+.admin__nav::-webkit-scrollbar,
+.admin__content::-webkit-scrollbar {
+    width: 8px;
+}
+.admin__nav::-webkit-scrollbar-track,
+.admin__content::-webkit-scrollbar-track {
+    background: transparent;
+}
+.admin__nav::-webkit-scrollbar-thumb,
+.admin__content::-webkit-scrollbar-thumb {
+    background: #4b5563;
+    border-radius: 4px;
+}
+.admin__nav::-webkit-scrollbar-thumb:hover,
+.admin__content::-webkit-scrollbar-thumb:hover {
+    background: #6b7280;
+}

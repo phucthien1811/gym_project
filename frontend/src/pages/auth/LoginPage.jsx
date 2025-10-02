@@ -24,12 +24,12 @@ export default function LoginPage() {
     setLoading(true);
 
     try {
-      const u = await login(form);
-      // Điều hướng dựa trên role
-      if (u.role === "admin") {
+      const data = await login(form);
+      // Điều hướng dựa trên role của user
+      if (data.user.role === "admin") {
         navigate("/admin", { replace: true });
-      } else if (u.role === "member") {
-        navigate("/member", { replace: true });
+      } else if (data.user.role === "member") {
+        navigate("/member/dashboard", { replace: true });
       } else {
         navigate(from, { replace: true });
       }

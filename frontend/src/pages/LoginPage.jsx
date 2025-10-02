@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { useAuth } from "../context/AuthContext.jsx";
-import Button from "../componets/common/Button.jsx";
+import Button from "../components/common/Button.jsx";
 
 export default function LoginPage() {
   const { login } = useAuth();
@@ -18,18 +18,21 @@ export default function LoginPage() {
     e.preventDefault();
     setError("");
     try {
-      const u = await login(form);
-      // nếu là admin chuyển tới /admin, không thì về trang trước
-      if (u.role === "admin") navigate("/admin", { replace: true });
-      else navigate(from, { replace: true });
+      const data = await login(form);
+      // Chuyển hướng dựa vào role
+      if (data.user.role === "admin") {
+        navigate("/admin");
+      } else if (data.user.role === "member") {
+        navigate("/member/dashboard");
+      }
     } catch (err) {
-      setError(err.message || "Đăng nhập thất bại");
+      setError(err.response?.data?.message || "Đăng nhập thất bại");
     }
   };
 
   return (
     <section className="section">
-      <div className="container" style={{display:"grid", placeItems:"center"}}>
+      <div className="container" style={{ display: "grid", placeItems: "center" }}>
         <div className="auth-card">
           <h1 className="auth-title">Login</h1>
           {error && <div className="auth-error">{error}</div>}
@@ -60,7 +63,9 @@ export default function LoginPage() {
               />
             </label>
 
-            <Button type="submit" className="w-full btn-lg">Sign in</Button>
+            <Button type="submit" className="w-full btn-lg">
+              Sign in
+            </Button>
 
             <div className="auth-hint">
               Demo: <code>admin@royal.fit</code> / <code>123456</code>

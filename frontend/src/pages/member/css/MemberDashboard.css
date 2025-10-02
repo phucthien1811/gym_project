@@ -3,6 +3,15 @@
     background-color: #121212;
 }
 
+.loading-dashboard {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 200px;
+    color: #b0b0b0;
+    font-size: 16px;
+}
+
 .fade-in {
     animation: fadeIn 0.6s cubic-bezier(0.25, 1, 0.5, 1);
 }

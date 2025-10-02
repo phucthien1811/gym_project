@@ -1,0 +1,19 @@
+.invoice-id {
+    font-weight: 500;
+    color: var(--admin-brand-color);
+}
+.amount {
+    font-weight: 500;
+}
+.status-paid {
+    background-color: rgba(16, 185, 129, 0.2);
+    color: #34d399;
+}
+.status-unpaid {
+    background-color: rgba(245, 158, 11, 0.2);
+    color: #fbbf24;
+}
+.status-overdue {
+    background-color: rgba(239, 68, 68, 0.2);
+    color: #f87171;
+}

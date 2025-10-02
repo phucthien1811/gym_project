@@ -1,0 +1,226 @@
+/* --- TRANG QUẢN LÝ CHUNG --- */
+.admin-page-container {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+}
+
+.admin-page-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 16px;
+}
+
+.admin-page-title {
+    margin: 0;
+    font-size: 28px;
+    font-weight: 700;
+    color: var(--admin-text-primary);
+}
+
+.admin-page-actions {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+
+/* --- THANH TÌM KIẾM VÀ BỘ LỌC --- */
+.search-bar {
+    position: relative;
+}
+.search-icon {
+    position: absolute;
+    left: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--admin-text-secondary);
+}
+.search-bar input {
+    background-color: var(--admin-sidebar-bg);
+    border: 1px solid var(--admin-border-color);
+    border-radius: 8px;
+    color: var(--admin-text-primary);
+    padding: 10px 12px 10px 36px;
+    width: 280px;
+    transition: all 0.2s;
+}
+.search-bar input:focus {
+    outline: none;
+    border-color: var(--admin-brand-color);
+    background-color: var(--admin-bg);
+}
+
+.filter-group {
+    position: relative;
+}
+.filter-icon {
+    position: absolute;
+    left: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--admin-text-secondary);
+    pointer-events: none;
+}
+.filter-group select {
+    background-color: var(--admin-sidebar-bg);
+    border: 1px solid var(--admin-border-color);
+    border-radius: 8px;
+    color: var(--admin-text-primary);
+    padding: 10px 12px 10px 36px;
+    appearance: none;
+    -webkit-appearance: none;
+    cursor: pointer;
+}
+
+/* --- NÚT BẤM --- */
+.btn-primary {
+    background-color: var(--admin-brand-color);
+    color: #ffffff;
+    border: none;
+    border-radius: 8px;
+    padding: 10px 16px;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+.btn-primary:hover {
+    background-color: #2563eb;
+}
+
+/* --- BẢNG DỮ LIỆU --- */
+.admin-table-container {
+    background-color: var(--admin-card-bg);
+    border-radius: 12px;
+    border: 1px solid var(--admin-border-color);
+    overflow: hidden; /* Giúp bo góc cho bảng */
+}
+
+.admin-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.admin-table th, .admin-table td {
+    padding: 16px 20px;
+    text-align: left;
+    border-bottom: 1px solid var(--admin-border-color);
+}
+.admin-table tbody tr:last-child td {
+    border-bottom: none;
+}
+.admin-table thead {
+    background-color: #2a3547;
+}
+.admin-table th {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--admin-text-secondary);
+    text-transform: uppercase;
+}
+
+/* Ô thông tin người dùng */
+.user-info-cell {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+.user-avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    object-fit: cover;
+}
+.user-details {
+    display: flex;
+    flex-direction: column;
+}
+.user-name {
+    font-weight: 500;
+    color: var(--admin-text-primary);
+}
+.user-email {
+    font-size: 13px;
+    color: var(--admin-text-secondary);
+}
+
+/* Trạng thái */
+.status-pill {
+    padding: 4px 10px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+}
+.status-active {
+    background-color: rgba(16, 185, 129, 0.2);
+    color: #34d399;
+}
+.status-expired {
+    background-color: rgba(245, 158, 11, 0.2);
+    color: #fbbf24;
+}
+
+/* Nút hành động */
+.action-buttons {
+    display: flex;
+    gap: 8px;
+}
+.action-btn {
+    background: none;
+    border: 1px solid var(--admin-border-color);
+    color: var(--admin-text-secondary);
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+.action-btn:hover {
+    background-color: #374151;
+}
+.btn-edit:hover { color: var(--admin-brand-color); }
+.btn-delete:hover { color: var(--admin-danger-color); }
+
+/* --- PHÂN TRANG --- */
+.pagination-container {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    gap: 8px;
+}
+.pagination-btn {
+    background-color: var(--admin-sidebar-bg);
+    border: 1px solid var(--admin-border-color);
+    color: var(--admin-text-secondary);
+    width: 36px;
+    height: 36px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+.pagination-btn:hover:not(:disabled) {
+    border-color: var(--admin-brand-color);
+    color: var(--admin-brand-color);
+}
+.pagination-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.page-number {
+    padding: 0 14px;
+    height: 36px;
+    line-height: 36px;
+    border-radius: 8px;
+    color: var(--admin-text-secondary);
+}
+.page-number.active {
+    background-color: var(--admin-brand-color);
+    color: #ffffff;
+    font-weight: 500;
+}
