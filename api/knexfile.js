@@ -2,7 +2,7 @@
 /**
  * @type { Object.<string, import("knex").Knex.Config> }
  */
-module.exports = {
+export default {
   development: {
     client: 'mysql2',
     connection: {
@@ -15,6 +15,9 @@ module.exports = {
     migrations: {
       directory: './migrations',
       tableName: 'knex_migrations'
+    },
+    seeds: {
+      directory: './seeds'
     }
   }
 };
