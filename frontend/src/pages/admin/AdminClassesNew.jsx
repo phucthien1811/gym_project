@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { 
   faPlus, 
@@ -14,7 +14,9 @@ import {
   faMapMarkerAlt
 } from '@fortawesome/free-solid-svg-icons';
 import './css/AdminClasses.css';
-import SimpleClassForm from './components/SimpleClassForm';
+import ClassFormModal from './components/ClassFormModal';
+import ClassDetailsModal from './components/ClassDetailsModal';
+import EnrollmentModal from './components/EnrollmentModal';
 
 const AdminClasses = () => {
   const [classes, setClasses] = useState([]);
@@ -28,8 +30,6 @@ const AdminClasses = () => {
   const [showEnrollment, setShowEnrollment] = useState(false);
   const [selectedClass, setSelectedClass] = useState(null);
   const [editingClass, setEditingClass] = useState(null);
-  const [enrolledUsers, setEnrolledUsers] = useState([]);
-  const [loadingEnrollments, setLoadingEnrollments] = useState(false);
   
   // Filter states
   const [filters, setFilters] = useState({
@@ -49,7 +49,12 @@ const AdminClasses = () => {
     totalPages: 0
   });
 
-  const loadClasses = useCallback(async () => {
+  useEffect(() => {
+    loadClasses();
+    loadTrainers();
+  }, [pagination.page, filters]);
+
+  const loadClasses = async () => {
     try {
       setLoading(true);
       const token = localStorage.getItem('token');
@@ -80,9 +85,9 @@ const AdminClasses = () => {
     } finally {
       setLoading(false);
     }
-  }, [pagination.page, pagination.limit, filters]);
+  };
 
-  const loadTrainers = useCallback(async () => {
+  const loadTrainers = async () => {
     try {
       const token = localStorage.getItem('token');
       const response = await fetch('/api/v1/trainers', {
@@ -98,12 +103,7 @@ const AdminClasses = () => {
     } catch (err) {
       console.error('Failed to load trainers:', err);
     }
-  }, []);
-
-  useEffect(() => {
-    loadClasses();
-    loadTrainers();
-  }, [loadClasses, loadTrainers]);
+  };
 
   const handleCreateClass = () => {
     setEditingClass(null);
@@ -144,58 +144,9 @@ const AdminClasses = () => {
     setShowClassDetails(true);
   };
 
-  const handleManageEnrollment = async (classItem) => {
+  const handleManageEnrollment = (classItem) => {
     setSelectedClass(classItem);
     setShowEnrollment(true);
-    await loadEnrolledUsers(classItem.id);
-  };
-
-  const loadEnrolledUsers = async (scheduleId) => {
-    try {
-      setLoadingEnrollments(true);
-      const token = localStorage.getItem('token');
-      const response = await fetch(`/api/v1/schedules/${scheduleId}`, {
-        headers: {
-          'Authorization': `Bearer ${token}`
-        }
-      });
-
-      if (!response.ok) throw new Error('Failed to load enrolled users');
-      
-      const data = await response.json();
-      setEnrolledUsers(data.data?.enrollments || []);
-    } catch (err) {
-      console.error('Failed to load enrolled users:', err);
-      setEnrolledUsers([]);
-    } finally {
-      setLoadingEnrollments(false);
-    }
-  };
-
-  const handleRemoveUser = async (userId) => {
-    if (!window.confirm('Bạn có chắc chắn muốn hủy đăng ký của học viên này?')) return;
-
-    try {
-      const token = localStorage.getItem('token');
-      const response = await fetch(`/api/v1/schedules/${selectedClass.id}/users/${userId}`, {
-        method: 'DELETE',
-        headers: {
-          'Authorization': `Bearer ${token}`
-        }
-      });
-
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.message || 'Failed to remove user');
-      }
-
-      // Reload enrolled users and classes
-      await loadEnrolledUsers(selectedClass.id);
-      await loadClasses();
-      alert('Đã hủy đăng ký thành công!');
-    } catch (err) {
-      alert(err.message || 'Không thể hủy đăng ký');
-    }
   };
 
   const handleFilterChange = (key, value) => {
@@ -287,7 +238,7 @@ const AdminClasses = () => {
               <option value="">Tất cả HLV</option>
               {trainers.map(trainer => (
                 <option key={trainer.id} value={trainer.id}>
-                  {trainer.full_name}
+                  {trainer.trainer_name || trainer.full_name}
                 </option>
               ))}
             </select>
@@ -478,12 +429,12 @@ const AdminClasses = () => {
         </div>
       )}
 
-      {/* Modal với SimpleClassForm */}
+      {/* Modals */}
       {showClassForm && (
-        <SimpleClassForm
+        <ClassFormModal
           isOpen={showClassForm}
           onClose={() => setShowClassForm(false)}
-          editingClass={editingClass}
+          classData={editingClass}
           trainers={trainers}
           onSuccess={() => {
             loadClasses();
@@ -493,105 +444,23 @@ const AdminClasses = () => {
       )}
 
       {showClassDetails && (
-        <div className="modal-overlay" onClick={() => setShowClassDetails(false)}>
-          <div className="modal-content" onClick={e => e.stopPropagation()}>
-            <div className="modal-header">
-              <h3>Chi tiết lớp học</h3>
-              <button onClick={() => setShowClassDetails(false)}>×</button>
-            </div>
-            <div style={{padding: '2rem', textAlign: 'center'}}>
-              <p>Chi tiết lớp học sẽ được hoàn thiện sau</p>
-            </div>
-          </div>
-        </div>
+        <ClassDetailsModal
+          isOpen={showClassDetails}
+          onClose={() => setShowClassDetails(false)}
+          classData={selectedClass}
+        />
       )}
 
       {showEnrollment && (
-        <div className="modal-overlay" onClick={() => setShowEnrollment(false)}>
-          <div className="modal-content large-modal" onClick={e => e.stopPropagation()}>
-            <div className="modal-header">
-              <h3>Quản lý học viên - {selectedClass?.class_name}</h3>
-              <button onClick={() => setShowEnrollment(false)}>×</button>
-            </div>
-            <div className="modal-body">
-              {loadingEnrollments ? (
-                <div className="loading-spinner">Đang tải danh sách học viên...</div>
-              ) : (
-                <div className="enrollments-container">
-                  <div className="enrollment-summary">
-                    <h4>Tổng quan</h4>
-                    <div className="summary-stats">
-                      <div className="stat-item">
-                        <span className="stat-label">Đã đăng ký:</span>
-                        <span className="stat-value">{enrolledUsers.length}</span>
-                      </div>
-                      <div className="stat-item">
-                        <span className="stat-label">Sức chứa tối đa:</span>
-                        <span className="stat-value">{selectedClass?.max_participants || 0}</span>
-                      </div>
-                      <div className="stat-item">
-                        <span className="stat-label">Còn lại:</span>
-                        <span className="stat-value">
-                          {(selectedClass?.max_participants || 0) - enrolledUsers.length}
-                        </span>
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className="enrolled-users-list">
-                    <h4>Danh sách học viên đã đăng ký</h4>
-                    {enrolledUsers.length === 0 ? (
-                      <div className="empty-state">
-                        <p>Chưa có học viên nào đăng ký lớp học này</p>
-                      </div>
-                    ) : (
-                      <div className="users-table">
-                        <div className="table-header">
-                          <div className="col-name">Tên học viên</div>
-                          <div className="col-email">Email</div>
-                          <div className="col-enrolled">Ngày đăng ký</div>
-                          <div className="col-status">Trạng thái</div>
-                          <div className="col-actions">Thao tác</div>
-                        </div>
-                        <div className="table-body">
-                          {enrolledUsers.map(user => (
-                            <div key={user.id} className="table-row">
-                              <div className="col-name">
-                                <FontAwesomeIcon icon={faUsers} />
-                                {user.name || user.full_name || 'N/A'}
-                              </div>
-                              <div className="col-email">{user.email || 'N/A'}</div>
-                              <div className="col-enrolled">
-                                {user.enrolled_at ? 
-                                  new Date(user.enrolled_at).toLocaleDateString('vi-VN') : 
-                                  'N/A'
-                                }
-                              </div>
-                              <div className="col-status">
-                                <span className="status-badge enrolled">
-                                  Đã đăng ký
-                                </span>
-                              </div>
-                              <div className="col-actions">
-                                <button 
-                                  className="action-btn delete-btn"
-                                  onClick={() => handleRemoveUser(user.id)}
-                                  title="Hủy đăng ký"
-                                >
-                                  <FontAwesomeIcon icon={faTrash} />
-                                </button>
-                              </div>
-                            </div>
-                          ))}
-                        </div>
-                      </div>
-                    )}
-                  </div>
-                </div>
-              )}
-            </div>
-          </div>
-        </div>
+        <EnrollmentModal
+          isOpen={showEnrollment}
+          onClose={() => setShowEnrollment(false)}
+          classData={selectedClass}
+          onSuccess={() => {
+            loadClasses();
+            setShowEnrollment(false);
+          }}
+        />
       )}
     </div>
   );

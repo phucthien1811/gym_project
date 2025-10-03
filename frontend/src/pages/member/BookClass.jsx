@@ -1,127 +1,328 @@
-import React, { useState } from 'react';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faChevronLeft, faChevronRight, faUsers, faDumbbell, faPersonRunning, faFire, faTimes } from '@fortawesome/free-solid-svg-icons';
-import './css/BookClass.css'; // Import file CSS mới
+import React, { useState, useEffect } from 'react';
+import './css/MemberBookClass.css';
 
 const BookClass = () => {
-    // State để quản lý modal
-    const [isModalOpen, setIsModalOpen] = useState(false);
-    const [selectedClass, setSelectedClass] = useState(null);
+    const [classes, setClasses] = useState([]);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
+    const [filter, setFilter] = useState('all');
+    const [searchTerm, setSearchTerm] = useState('');
 
-    // Dữ liệu giả lập cho các lớp học có sẵn
-    const availableClasses = [
-        { id: 1, day: 1, startTime: '08:00', endTime: '09:00', name: "Yoga Chào Buổi Sáng", trainer: "Anna", spots: 5, maxSpots: 15, color: "green" },
-        { id: 2, day: 2, startTime: '17:30', endTime: '18:30', name: "Zumba Dance", trainer: "Sarah", spots: 10, maxSpots: 20, color: "purple" },
-        { id: 3, day: 3, startTime: '09:00', endTime: '10:30', name: "Yoga Flow Nâng Cao", trainer: "Anna", spots: 2, maxSpots: 15, color: "green" },
-        { id: 4, day: 4, startTime: '19:00', endTime: '20:30', name: "Strength Training", trainer: "John", spots: 8, maxSpots: 12, color: "blue" },
-        { id: 5, day: 5, startTime: '18:00', endTime: '19:00', name: "HIIT Cardio", trainer: "Mike", spots: 0, maxSpots: 10, color: "orange" },
-        { id: 6, day: 1, startTime: '17:30', endTime: '19:00', name: "Boxing Cơ Bản", trainer: "Dũng Võ", spots: 3, maxSpots: 10, color: "red" },
-    ];
+    // Load danh sách lớp học từ API
+    const loadAvailableClasses = async () => {
+        try {
+            setLoading(true);
+            const token = localStorage.getItem('token');
+            
+            const response = await fetch('/api/v1/schedules?status=scheduled', {
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'application/json'
+                }
+            });
 
-    const daysOfWeek = ['Thứ 2', 'Thứ 3', 'Thứ 4', 'Thứ 5', 'Thứ 6', 'Thứ 7', 'Chủ Nhật'];
-    const timeSlots = Array.from({ length: 15 }, (_, i) => `${i + 7}:00`); // 7:00 -> 21:00
-
-    const calculateGridPosition = (item) => {
-        const startHour = parseInt(item.startTime.split(':')[0]);
-        const startMinute = parseInt(item.startTime.split(':')[1]);
-        const endHour = parseInt(item.endTime.split(':')[0]);
-        const endMinute = parseInt(item.endTime.split(':')[1]);
-
-        const gridStartRow = ((startHour - 7) * 2) + (startMinute / 30) + 1;
-        const gridEndRow = ((endHour - 7) * 2) + (endMinute / 30) + 1;
-
-        return {
-            gridColumn: item.day + 1,
-            gridRow: `${gridStartRow} / ${gridEndRow}`
-        };
+            if (response.ok) {
+                const result = await response.json();
+                // Data nằm trong result.data
+                const classesData = result.data || result || [];
+                setClasses(Array.isArray(classesData) ? classesData : []);
+            } else {
+                throw new Error('Không thể tải danh sách lớp học');
+            }
+        } catch (err) {
+            console.error('Error loading classes:', err);
+            setError(err.message);
+            setClasses([]);
+        } finally {
+            setLoading(false);
+        }
     };
 
-    // Hàm xử lý khi nhấn nút đặt chỗ
-    const handleBookClick = (classItem) => {
-        setSelectedClass(classItem);
-        setIsModalOpen(true);
+    // Đăng ký lớp học
+    const enrollInClass = async (classId) => {
+        try {
+            const token = localStorage.getItem('token');
+            
+            const response = await fetch(`/api/v1/schedules/${classId}/enroll`, {
+                method: 'POST',
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'application/json'
+                }
+            });
+
+            if (response.ok) {
+                alert('Đăng ký lớp học thành công!');
+                loadAvailableClasses(); // Reload để cập nhật số lượng
+            } else {
+                const errorData = await response.json();
+                alert(errorData.message || 'Có lỗi xảy ra khi đăng ký');
+            }
+        } catch (err) {
+            console.error('Error enrolling:', err);
+            alert('Có lỗi xảy ra khi đăng ký');
+        }
     };
 
-    // Hàm xác nhận đặt chỗ
-    const confirmBooking = () => {
-        alert(`Xác nhận đặt chỗ thành công cho lớp: ${selectedClass.name}`);
-        setIsModalOpen(false);
-        setSelectedClass(null);
+    // Hủy đăng ký lớp học
+    const unenrollFromClass = async (classId) => {
+        try {
+            const token = localStorage.getItem('token');
+            
+            const response = await fetch(`/api/v1/schedules/${classId}/unenroll`, {
+                method: 'POST',
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'application/json'
+                }
+            });
+
+            if (response.ok) {
+                alert('Hủy đăng ký thành công!');
+                loadAvailableClasses(); // Reload để cập nhật số lượng
+            } else {
+                const errorData = await response.json();
+                alert(errorData.message || 'Có lỗi xảy ra khi hủy đăng ký');
+            }
+        } catch (err) {
+            console.error('Error unenrolling:', err);
+            alert('Có lỗi xảy ra khi hủy đăng ký');
+        }
     };
+
+    // Format thời gian
+    const formatDateTime = (classDate, startTime, endTime) => {
+        try {
+            // Sử dụng class_date thực tế từ database
+            let dateObj;
+            
+            if (classDate) {
+                // Parse class_date (YYYY-MM-DD format)
+                dateObj = new Date(classDate);
+            } else {
+                // Fallback nếu không có class_date
+                dateObj = new Date();
+            }
+            
+            // Format ngày
+            const formattedDate = dateObj.toLocaleDateString('vi-VN', {
+                weekday: 'long',
+                year: 'numeric', 
+                month: 'long', 
+                day: 'numeric'
+            });
+            
+            // Format thời gian
+            let formattedTime = 'Chưa xác định';
+            if (startTime) {
+                formattedTime = startTime.substring(0, 5);
+                if (endTime) {
+                    formattedTime += ` - ${endTime.substring(0, 5)}`;
+                }
+            }
+            
+            return {
+                date: formattedDate,
+                time: formattedTime
+            };
+        } catch (error) {
+            console.error('Error formatting date:', error, classDate, startTime);
+            return {
+                date: 'Chưa xác định',
+                time: 'Chưa xác định'
+            };
+        }
+    };
+
+    // Filter classes
+    const filteredClasses = classes.filter(classItem => {
+        const matchesSearch = classItem.class_name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                            classItem.trainer_name?.toLowerCase().includes(searchTerm.toLowerCase());
+        
+        if (filter === 'all') return matchesSearch;
+        if (filter === 'available') return matchesSearch && classItem.current_participants < classItem.max_participants;
+        if (filter === 'full') return matchesSearch && classItem.current_participants >= classItem.max_participants;
+        
+        return matchesSearch;
+    });
+
+    useEffect(() => {
+        loadAvailableClasses();
+    }, []);
+
+    if (loading) {
+        return (
+            <div className="book-class-container">
+                <div className="loading-message">
+                    <i className="fas fa-spinner fa-spin"></i>
+                    <p>Đang tải danh sách lớp học...</p>
+                </div>
+            </div>
+        );
+    }
 
     return (
-        <div className="book-class-page-container fade-in">
-            {/* Header */}
-            <div className="schedule-header">
-                <h1 className="page-title">Đặt Lịch Tập</h1>
-                <div className="week-navigation">
-                    <button className="nav-btn"><FontAwesomeIcon icon={faChevronLeft} /></button>
-                    <span>22/09 - 28/09/2025</span>
-                    <button className="nav-btn"><FontAwesomeIcon icon={faChevronRight} /></button>
+        <div className="book-class-container">
+            <div className="book-class-header">
+                <h1>
+                    <i className="fas fa-calendar-plus"></i>
+                    Đặt Lớp Học
+                </h1>
+                <p>Chọn và đăng ký các lớp học phù hợp với bạn</p>
+            </div>
+
+            {/* Filter và Search */}
+            <div className="book-class-controls">
+                <div className="search-bar">
+                    <i className="fas fa-search"></i>
+                    <input
+                        type="text"
+                        placeholder="Tìm kiếm lớp học hoặc huấn luyện viên..."
+                        value={searchTerm}
+                        onChange={(e) => setSearchTerm(e.target.value)}
+                    />
+                </div>
+                
+                <div className="filter-buttons">
+                    <button 
+                        className={`filter-btn ${filter === 'all' ? 'active' : ''}`}
+                        onClick={() => setFilter('all')}
+                    >
+                        <i className="fas fa-list"></i>
+                        Tất cả
+                    </button>
+                    <button 
+                        className={`filter-btn ${filter === 'available' ? 'active' : ''}`}
+                        onClick={() => setFilter('available')}
+                    >
+                        <i className="fas fa-check-circle"></i>
+                        Còn chỗ
+                    </button>
+                    <button 
+                        className={`filter-btn ${filter === 'full' ? 'active' : ''}`}
+                        onClick={() => setFilter('full')}
+                    >
+                        <i className="fas fa-times-circle"></i>
+                        Đã đầy
+                    </button>
                 </div>
             </div>
 
-            {/* Filter */}
-            <div className="filter-bar">
-                <button className="filter-btn active">Tất cả</button>
-                <button className="filter-btn">Yoga</button>
-                <button className="filter-btn">Cardio</button>
-                <button className="filter-btn">Sức mạnh</button>
-                <button className="filter-btn">Boxing</button>
-            </div>
-
-            {/* Lịch tập */}
-            <div className="schedule-grid-container">
-                <div className="grid-header"></div>
-                {daysOfWeek.map(day => <div key={day} className="day-header">{day}</div>)}
-                <div className="time-column">
-                    {timeSlots.map(time => <div key={time} className="time-slot-label">{time}</div>)}
+            {/* Danh sách lớp học */}
+            {error ? (
+                <div className="error-message">
+                    <i className="fas fa-exclamation-triangle"></i>
+                    <p>{error}</p>
+                    <button onClick={loadAvailableClasses} className="retry-btn">
+                        <i className="fas fa-redo"></i>
+                        Thử lại
+                    </button>
                 </div>
-                <div className="schedule-main-grid">
-                    {Array.from({ length: 30 }).map((_, i) => <div key={i} className="grid-line"></div>)}
-                    {availableClasses.map(item => {
-                        const style = calculateGridPosition(item);
-                        const isFull = item.spots === 0;
+            ) : filteredClasses.length === 0 ? (
+                <div className="empty-message">
+                    <i className="fas fa-calendar-times"></i>
+                    <h3>Không có lớp học nào</h3>
+                    <p>
+                        {searchTerm ? 'Không tìm thấy lớp học phù hợp với từ khóa tìm kiếm' : 
+                         'Hiện tại chưa có lớp học nào được mở'}
+                    </p>
+                </div>
+            ) : (
+                <div className="classes-grid">
+                    {filteredClasses.map(classItem => {
+                        const { date, time } = formatDateTime(classItem.class_date, classItem.start_time, classItem.end_time);
+                        const isAvailable = classItem.current_participants < classItem.max_participants;
+                        const isEnrolled = classItem.is_enrolled || false;
+                        
+                        console.log(`Class ${classItem.class_name} - isEnrolled:`, isEnrolled, 'Raw value:', classItem.is_enrolled);
+                        
                         return (
-                            <div key={item.id} className={`bookable-item event-${item.color} ${isFull ? 'full' : ''}`} style={style}>
-                                <p className="event-name">{item.name}</p>
-                                <p className="event-details">HLV: {item.trainer}</p>
-                                <div className="event-footer">
-                                    <span className="spots-info">
-                                        <FontAwesomeIcon icon={faUsers} /> {item.spots}/{item.maxSpots}
+                            <div key={classItem.id} className={`class-card ${!isAvailable ? 'full' : ''} ${isEnrolled ? 'enrolled' : ''}`}>
+                                <div className="class-header">
+                                    <h3 className="class-name">
+                                        <i className="fas fa-dumbbell"></i>
+                                        {classItem.class_name}
+                                    </h3>
+                                    <span className={`status-badge ${isEnrolled ? 'enrolled' : isAvailable ? 'available' : 'full'}`}>
+                                        {isEnrolled ? 'Đã đăng ký' : isAvailable ? 'Còn chỗ' : 'Đã đầy'}
                                     </span>
-                                    <button 
-                                        className="book-now-btn" 
-                                        onClick={() => handleBookClick(item)}
-                                        disabled={isFull}
-                                    >
-                                        {isFull ? 'Hết chỗ' : 'Đặt ngay'}
-                                    </button>
+                                </div>
+
+                                <div className="class-info">
+                                    <div className="info-row">
+                                        <i className="fas fa-user-tie"></i>
+                                        <span>HLV: {classItem.trainer_name || 'Chưa có'}</span>
+                                    </div>
+                                    
+                                    <div className="info-row">
+                                        <i className="fas fa-calendar-alt"></i>
+                                        <span>{date}</span>
+                                    </div>
+                                    
+                                    <div className="info-row">
+                                        <i className="fas fa-clock"></i>
+                                        <span>{time}</span>
+                                    </div>
+                                    
+                                    <div className="info-row">
+                                        <i className="fas fa-users"></i>
+                                        <span>
+                                            {classItem.current_participants || 0}/{classItem.max_participants} người
+                                        </span>
+                                    </div>
+                                    
+                                    {classItem.price && classItem.price > 0 ? (
+                                        <div className="info-row">
+                                            <i className="fas fa-tag"></i>
+                                            <span className="price">
+                                                {parseInt(classItem.price).toLocaleString('vi-VN')} VNĐ
+                                            </span>
+                                        </div>
+                                    ) : (
+                                        <div className="info-row">
+                                            <i className="fas fa-gift"></i>
+                                            <span className="price free">
+                                                Miễn phí
+                                            </span>
+                                        </div>
+                                    )}
+                                </div>
+
+                                {classItem.description && (
+                                    <div className="class-description">
+                                        <p>{classItem.description}</p>
+                                    </div>
+                                )}
+
+                                <div className="class-actions">
+                                    {isEnrolled ? (
+                                        <button 
+                                            className="unenroll-btn"
+                                            onClick={() => {
+                                                console.log('Clicking unenroll for class:', classItem.id);
+                                                unenrollFromClass(classItem.id);
+                                            }}
+                                        >
+                                            <i className="fas fa-minus"></i>
+                                            Hủy đăng ký
+                                        </button>
+                                    ) : (
+                                        <button 
+                                            className={`enroll-btn ${!isAvailable ? 'disabled' : ''}`}
+                                            onClick={() => {
+                                                console.log('Clicking enroll for class:', classItem.id);
+                                                enrollInClass(classItem.id);
+                                            }}
+                                            disabled={!isAvailable}
+                                        >
+                                            <i className={`fas ${isAvailable ? 'fa-plus' : 'fa-times'}`}></i>
+                                            {isAvailable ? 'Đăng ký' : 'Đã đầy'}
+                                        </button>
+                                    )}
                                 </div>
                             </div>
                         );
                     })}
-                </div>
-            </div>
-
-            {/* Modal xác nhận */}
-            {isModalOpen && selectedClass && (
-                <div className="modal-overlay">
-                    <div className="modal-content">
-                        <button className="close-modal-btn" onClick={() => setIsModalOpen(false)}>
-                            <FontAwesomeIcon icon={faTimes} />
-                        </button>
-                        <h2>Xác nhận đặt chỗ</h2>
-                        <p className="modal-class-name">{selectedClass.name}</p>
-                        <div className="modal-class-details">
-                            <span><strong>Thời gian:</strong> {selectedClass.startTime} - {selectedClass.endTime}</span>
-                            <span><strong>HLV:</strong> {selectedClass.trainer}</span>
-                        </div>
-                        <div className="modal-actions">
-                            <button className="modal-btn cancel" onClick={() => setIsModalOpen(false)}>Hủy</button>
-                            <button className="modal-btn confirm" onClick={confirmBooking}>Xác nhận</button>
-                        </div>
-                    </div>
                 </div>
             )}
         </div>

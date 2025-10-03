@@ -192,7 +192,8 @@ const Trainers = () => {
   };
 
   const handleDelete = async (trainer) => {
-    if (window.confirm(`Bạn có chắc muốn xóa huấn luyện viên "${trainer.name}"?`)) {
+    const trainerName = trainer.name || 'huấn luyện viên này';
+    if (window.confirm(`Bạn có chắc muốn xóa huấn luyện viên "${trainerName}"?`)) {
       try {
         const response = await trainerService.deleteTrainer(trainer.id);
         if (response.success) {
@@ -311,16 +312,16 @@ const Trainers = () => {
                       <div className="trainer-info">
                         <div className="trainer-avatar">
                           {trainer.avatar_url ? (
-                            <img src={trainer.avatar_url} alt={trainer.name} />
+                            <img src={trainer.avatar_url} alt={trainer.name || 'Trainer'} />
                           ) : (
                             <div className="avatar-placeholder">
-                              {trainer.name.charAt(0).toUpperCase()}
+                              {trainer.name ? trainer.name.charAt(0).toUpperCase() : 'T'}
                             </div>
                           )}
                         </div>
                         <div>
-                          <div className="trainer-name">{trainer.name}</div>
-                          <div className="trainer-email">{trainer.email}</div>
+                          <div className="trainer-name">{trainer.name || 'Chưa có tên'}</div>
+                          <div className="trainer-email">{trainer.email || 'Chưa có email'}</div>
                         </div>
                       </div>
                     </td>

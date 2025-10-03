@@ -3,6 +3,7 @@ import { BrowserRouter, Routes, Route, Navigate, useLocation } from "react-route
 
 import { AuthProvider, useAuth } from "./context/AuthContext.jsx";
 import { CartProvider } from "./context/CartContext.jsx";
+import NotificationPopup from "./components/NotificationPopup.jsx";
 
 import Header from "./components/common/Header.jsx";
 import HomePage from "./pages/public/HomePage.jsx";
@@ -94,6 +95,7 @@ export default function App() {
     <AuthProvider>
       <CartProvider>
         <BrowserRouter>
+        <NotificationPopup />
         <Routes>
           <Route path="/" element={<Landing />} />
           <Route path="/login" element={<LoginPage />} />
