@@ -13,6 +13,7 @@ import uploadsRoutes from "./uploads.js";
 import packageRoutes from "./package.js";
 import memberPackageRoutes from "./member-package.js";
 import trainerRoutes from "./trainer.js";
+import scheduleRoutes from "./schedule.js";
 // import userRoutes from "./user.js";      // Giả sử file của bạn là user.js
  // Giả sử file của bạn là workout.js
 ;// Giả sử file của bạn là schedule.js
@@ -31,6 +32,7 @@ r.use("/uploads", uploadsRoutes);
 r.use("/packages", packageRoutes);
 r.use("/member-packages", memberPackageRoutes);
 r.use("/trainers", trainerRoutes);
+r.use("/schedules", scheduleRoutes);
 
 // Các routes này bây giờ sẽ hoạt động
 // r.use("/users", userRoutes);

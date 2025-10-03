@@ -3,26 +3,54 @@ import db from '../config/knex.js';
 class TrainerRepository {
   // Lấy tất cả trainers
   async findAll(filters = {}) {
-    let query = db('trainers').select('*');
+    let query = db('trainers')
+      .select(
+        'trainers.id',
+        'trainers.name as full_name',
+        'trainers.email',
+        'trainers.phone',
+        'trainers.specialization as specializations',
+        'trainers.bio',
+        'trainers.certifications as certification',
+        'trainers.experience_years',
+        'trainers.hourly_rate',
+        'trainers.avatar_url as avatar',
+        'trainers.status'
+      );
     
     if (filters.status) {
-      query = query.where('status', filters.status);
+      query = query.where('trainers.status', filters.status);
     }
     
     if (filters.search) {
       query = query.where(function() {
-        this.where('name', 'like', `%${filters.search}%`)
-            .orWhere('email', 'like', `%${filters.search}%`)
-            .orWhere('specialization', 'like', `%${filters.search}%`);
+        this.where('trainers.name', 'like', `%${filters.search}%`)
+            .orWhere('trainers.email', 'like', `%${filters.search}%`)
+            .orWhere('trainers.specialization', 'like', `%${filters.search}%`);
       });
     }
     
-    return query.orderBy('created_at', 'desc');
+    return query.orderBy('trainers.created_at', 'desc');
   }
 
   // Lấy trainer theo ID
   async findById(id) {
-    return db('trainers').where('id', id).first();
+    return db('trainers')
+      .select(
+        'trainers.id',
+        'trainers.name as full_name',
+        'trainers.email',
+        'trainers.phone',
+        'trainers.specialization as specializations',
+        'trainers.bio',
+        'trainers.certifications as certification',
+        'trainers.experience_years',
+        'trainers.hourly_rate',
+        'trainers.avatar_url as avatar',
+        'trainers.status'
+      )
+      .where('trainers.id', id)
+      .first();
   }
 
   // Lấy trainer theo email
@@ -80,7 +108,21 @@ class TrainerRepository {
   async findWithPagination({ page = 1, limit = 10, search = null, status = null } = {}) {
     const offset = (page - 1) * limit;
     
-    let query = db('trainers');
+    let query = db('trainers')
+      .select(
+        'trainers.id',
+        'trainers.name as full_name',
+        'trainers.email',
+        'trainers.phone',
+        'trainers.specialization as specializations',
+        'trainers.bio',
+        'trainers.certifications as certification',
+        'trainers.experience_years',
+        'trainers.hourly_rate',
+        'trainers.avatar_url as avatar',
+        'trainers.status'
+      );
+    
     let countQuery = db('trainers');
     
     if (status) {
@@ -100,7 +142,6 @@ class TrainerRepository {
     
     const [{ total }] = await countQuery.count('* as total');
     const trainers = await query
-      .select('*')
       .orderBy('created_at', 'desc')
       .limit(limit)
       .offset(offset);

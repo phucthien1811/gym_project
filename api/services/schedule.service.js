@@ -1,10 +1,10 @@
-import { scheduleRepo } from "../repositories/schedule.repo.js";
+import scheduleRepo from "../repositories/schedule.repo.js";
 
 export const scheduleService = {
-  list: (filters) => scheduleRepo.list(filters),
-  count: (filters) => scheduleRepo.count(filters),
-  byId: (id) => scheduleRepo.byId(id),
+  list: (filters) => scheduleRepo.findAll(filters),
+  count: (filters) => scheduleRepo.findAll(filters).then(data => data.length),
+  byId: (id) => scheduleRepo.findById(id),
   create: (data) => scheduleRepo.create(data),
   update: (id, data) => scheduleRepo.update(id, data),
-  remove: (id) => scheduleRepo.remove(id),
+  remove: (id) => scheduleRepo.delete(id),
 };
