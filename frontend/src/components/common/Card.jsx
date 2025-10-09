@@ -1,5 +1,6 @@
 import React from "react";
 import PropTypes from "prop-types";
+import "./Card.css";
 
 /**
  * Card layout đơn giản: Header/Media/Content/Footer

@@ -5,6 +5,7 @@ import Button from "./Button";
 import { useAuth } from "../../context/AuthContext.jsx";
 import { useCart } from "../../context/CartContext.jsx";
 import memberProfileService from "../../services/memberProfileService.js";
+import "./Header.css";
 
 function Header() {
   const links = [

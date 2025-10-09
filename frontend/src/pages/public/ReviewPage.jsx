@@ -1,4 +1,5 @@
 import React from "react";
+import "./ReviewPage.css";
 
 const reviews = [
   {

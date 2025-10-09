@@ -1,5 +1,6 @@
 import React, { forwardRef } from "react";
 import PropTypes from "prop-types";
+import "./Button.css";
 
 const VARIANT = {
   primary: "btn btn--primary",

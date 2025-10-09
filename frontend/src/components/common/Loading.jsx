@@ -1,4 +1,5 @@
 import React from "react";
+import "./Loading.css";
 
 export const Spinner = ({ label = "Loading…" }) => (
   <div className="flex items-center gap-3 text-zinc-300" role="status" aria-live="polite">

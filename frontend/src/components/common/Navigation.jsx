@@ -1,9 +1,11 @@
 import React, { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import PropTypes from "prop-types";
+import "./Navigation.css";
 
 function Navigation({ links = [], className = "", onNavigate }) {
   const [open, setOpen] = useState(false);
+  const location = useLocation();
   const [hash, setHash] = useState(
     typeof window !== "undefined" ? window.location.hash || "#home" : "#home"
   );
@@ -14,6 +16,16 @@ function Navigation({ links = [], className = "", onNavigate }) {
     return () => window.removeEventListener("hashchange", onHash);
   }, []);
 
+  // Function to check if link is active
+  const isLinkActive = (link) => {
+    if (link.isRoute) {
+      return location.pathname === link.href;
+    } else {
+      // For hash links, only consider active if we're on home page and hash matches
+      return location.pathname === "/" && hash === link.href;
+    }
+  };
+
   return (
     <nav className={`nav ${className}`}>
       <div className="nav__bar">
@@ -22,14 +34,14 @@ function Navigation({ links = [], className = "", onNavigate }) {
             <li key={l.href}>
               {l.isRoute ? (
                 <Link
-                  className="nav-link"
+                  className={`nav-link ${isLinkActive(l) ? "nav-link--active" : ""}`}
                   to={l.href}
                 >
                   {l.label}
                 </Link>
               ) : (
                 <a
-                  className={`nav-link ${hash === l.href ? "nav-link--active" : ""}`}
+                  className={`nav-link ${isLinkActive(l) ? "nav-link--active" : ""}`}
                   href={l.href}
                   onClick={(e) => {
                     if (onNavigate) {
@@ -63,22 +75,35 @@ function Navigation({ links = [], className = "", onNavigate }) {
         <div className="nav__sheet" onClick={() => setOpen(false)}>
           <div className="nav__sheet-panel" onClick={(e) => e.stopPropagation()}>
             {links.map((l) => (
-              <a
-                key={l.href}
-                href={l.href}
-                className={`nav-link nav-link--block ${
-                  hash === l.href ? "nav-link--active" : ""
-                }`}
-                onClick={(e) => {
-                  if (onNavigate) {
-                    e.preventDefault();
-                    onNavigate(l.href);
-                  }
-                  setOpen(false);
-                }}
-              >
-                {l.label}
-              </a>
+              l.isRoute ? (
+                <Link
+                  key={l.href}
+                  to={l.href}
+                  className={`nav-link nav-link--block ${
+                    isLinkActive(l) ? "nav-link--active" : ""
+                  }`}
+                  onClick={() => setOpen(false)}
+                >
+                  {l.label}
+                </Link>
+              ) : (
+                <a
+                  key={l.href}
+                  href={l.href}
+                  className={`nav-link nav-link--block ${
+                    isLinkActive(l) ? "nav-link--active" : ""
+                  }`}
+                  onClick={(e) => {
+                    if (onNavigate) {
+                      e.preventDefault();
+                      onNavigate(l.href);
+                    }
+                    setOpen(false);
+                  }}
+                >
+                  {l.label}
+                </a>
+              )
             ))}
           </div>
         </div>

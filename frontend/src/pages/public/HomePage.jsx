@@ -1,5 +1,6 @@
 import React from "react";
 import Button from "../../components/common/Button.jsx";
+import "./HomePage.css";
 
 export default function HomePage() {
   const scrollToJoin = () => {
@@ -18,8 +19,7 @@ export default function HomePage() {
           <h2 className="hero__subtitle">Weight Training • Cardio • Nutrition</h2>
 
           <p className="hero__desc">
-            Lorem ipsum dolor sit, bus earum, aliquam ipsa repellat iusto esse laudantium
-            animi vitae consectetur obcaecati.
+            Dynamic fitness hub, equipped with cutting-edge machines, vibrant atmosphere, and expert trainers for optimal workouts.
           </p>
 
           <div className="hero__actions">
@@ -28,7 +28,7 @@ export default function HomePage() {
             </Button>
 
             {/* 👉 Giống Header: click là scroll mượt tới #join-section */}
-            <Button size="lg" onClick={scrollToJoin}>
+            <Button variant="primary" size="lg" onClick={scrollToJoin}>
               Join Us
             </Button>
           </div>

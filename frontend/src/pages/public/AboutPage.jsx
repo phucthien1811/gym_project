@@ -23,7 +23,7 @@ export default function AboutPage() {
             <li>Supportive management for your success.</li>
           </ul>
 
-          <Button as="a" href="#pricing" size="md">
+          <Button as="a" href="#pricing" variant="primary" size="md">
             Book A Free Class
           </Button>
         </div>
