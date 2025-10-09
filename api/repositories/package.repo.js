@@ -1,6 +1,21 @@
 import db from '../config/knex.js';
 
 export const packageRepo = {
+  // Helper function để parse JSON features
+  parsePackageFeatures(pkg) {
+    if (pkg && pkg.features) {
+      try {
+        pkg.features = typeof pkg.features === 'string' 
+          ? JSON.parse(pkg.features) 
+          : pkg.features;
+      } catch (error) {
+        console.error('Error parsing features:', error);
+        pkg.features = [];
+      }
+    }
+    return pkg;
+  },
+
   // Lấy tất cả packages
   async findAll(filters = {}) {
     let query = db('packages').select('*');
@@ -13,12 +28,14 @@ export const packageRepo = {
       query = query.where('is_published', filters.isPublished);
     }
     
-    return query.orderBy('sort_order', 'asc').orderBy('created_at', 'desc');
+    const packages = await query.orderBy('sort_order', 'asc').orderBy('created_at', 'desc');
+    return packages.map(pkg => this.parsePackageFeatures(pkg));
   },
 
   // Lấy package theo ID
   async findById(id) {
-    return db('packages').where('id', id).first();
+    const pkg = await db('packages').where('id', id).first();
+    return pkg ? this.parsePackageFeatures(pkg) : pkg;
   },
 
   // Tạo package mới
@@ -43,7 +60,7 @@ export const packageRepo = {
 
   // Lấy packages có thống kê số lượng member đã đăng ký
   async findAllWithStats() {
-    return db('packages as p')
+    const packages = await db('packages as p')
       .leftJoin('member_packages as mp', 'p.id', 'mp.package_id')
       .select(
         'p.*',
@@ -52,6 +69,8 @@ export const packageRepo = {
       )
       .groupBy('p.id')
       .orderBy('p.sort_order', 'asc');
+    
+    return packages.map(pkg => this.parsePackageFeatures(pkg));
   },
 
   // Lấy danh sách member đã đăng ký package

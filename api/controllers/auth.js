@@ -1,5 +1,27 @@
-import { loginUserWithEmailAndPassword, refreshAuthToken } from '../service/auth.js'; // Import các function cần thiết
-import { loginSchema } from '../validations/auth.js'; // Sửa lại cách import
+import { registerUser, loginUserWithEmailAndPassword, refreshAuthToken } from '../service/auth.js';
+import { loginSchema, registerSchema } from '../validations/auth.js';
+
+// Register controller
+export const register = async (req, res) => {
+    try {
+        const { error, value } = registerSchema.validate(req.body);
+        if (error) {
+            return res.status(400).json({ 
+                success: false,
+                message: error.details[0].message 
+            });
+        }
+        
+        const result = await registerUser(value);
+        res.status(201).json(result);
+    } catch (error) {
+        console.error('Register error:', error);
+        res.status(400).json({ 
+            success: false,
+            message: error.message 
+        });
+    }
+};
 
 // Sử dụng export const thay vì gán vào object
 export const login = async (req, res) => {

@@ -6,7 +6,7 @@ class TrainerRepository {
     let query = db('trainers')
       .select(
         'trainers.id',
-        'trainers.name as full_name',
+        'trainers.name',
         'trainers.email',
         'trainers.phone',
         'trainers.specialization as specializations',
@@ -38,7 +38,7 @@ class TrainerRepository {
     return db('trainers')
       .select(
         'trainers.id',
-        'trainers.name as full_name',
+        'trainers.name',
         'trainers.email',
         'trainers.phone',
         'trainers.specialization as specializations',
@@ -111,7 +111,7 @@ class TrainerRepository {
     let query = db('trainers')
       .select(
         'trainers.id',
-        'trainers.name as full_name',
+        'trainers.name',
         'trainers.email',
         'trainers.phone',
         'trainers.specialization as specializations',

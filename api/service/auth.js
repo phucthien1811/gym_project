@@ -3,6 +3,55 @@ import { generateTokens, verifyToken } from '../utils/jwt.js';
 import bcrypt from 'bcrypt';
 import crypto from 'crypto';
 
+const registerUser = async (userData) => {
+    try {
+        const { name, email, password, role = 'member' } = userData;
+
+        // Kiểm tra email đã tồn tại chưa
+        const [existingUsers] = await db.execute(
+            'SELECT id FROM users WHERE email = ?',
+            [email]
+        );
+
+        if (existingUsers.length > 0) {
+            throw new Error('Email đã được sử dụng');
+        }
+
+        // Hash password
+        const saltRounds = 10;
+        const hashedPassword = await bcrypt.hash(password, saltRounds);
+
+        // Tạo user mới
+        const [result] = await db.execute(
+            'INSERT INTO users (name, email, password_hash, role, created_at, updated_at) VALUES (?, ?, ?, ?, NOW(), NOW())',
+            [name, email, hashedPassword, role]
+        );
+
+        const userId = result.insertId;
+
+        // Lấy thông tin user vừa tạo
+        const [newUserRows] = await db.execute(
+            'SELECT id, name, email, role FROM users WHERE id = ?',
+            [userId]
+        );
+
+        const newUser = newUserRows[0];
+        
+        return {
+            success: true,
+            message: 'Đăng ký thành công',
+            data: {
+                id: newUser.id,
+                name: newUser.name,
+                email: newUser.email,
+                role: newUser.role
+            }
+        };
+    } catch (error) {
+        throw error;
+    }
+};
+
 const loginUserWithEmailAndPassword = async (email, password) => {
     try {
         // Tìm user theo email
@@ -26,7 +75,7 @@ const loginUserWithEmailAndPassword = async (email, password) => {
             id: user.id, 
             sub: user.id, // Để tương thích 
             email: user.email,
-            name: user.full_name,
+            name: user.name,
             role: user.role 
         };
         const tokens = generateTokens(payload);
@@ -44,7 +93,7 @@ const loginUserWithEmailAndPassword = async (email, password) => {
         const userResponse = {
             id: user.id,
             email: user.email,
-            name: user.full_name, // Fix: use full_name from database
+            name: user.name, // Fix: use name from database
             role: user.role
         };
 
@@ -109,7 +158,7 @@ const refreshAuthToken = async (refreshToken) => {
         const userResponse = {
             id: user.id,
             email: user.email,
-            name: user.full_name, // Fix: use full_name from database
+            name: user.name, // Fix: use name from database
             role: user.role
         };
 
@@ -121,7 +170,8 @@ const refreshAuthToken = async (refreshToken) => {
 
 
 export {
+    registerUser,
     loginUserWithEmailAndPassword,
-    refreshAuthToken // Xuất service mới
+    refreshAuthToken
 };
 

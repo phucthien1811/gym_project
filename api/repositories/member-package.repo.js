@@ -1,5 +1,21 @@
 import db from '../config/knex.js';
 
+// Helper function để parse package features
+const parseMemberPackageFeatures = (memberPackagesPkg) => {
+  if (Array.isArray(memberPackagesPkg)) {
+    return memberPackagesPkg.map(pkg => ({
+      ...pkg,
+      features: typeof pkg.features === 'string' ? JSON.parse(pkg.features) : pkg.features
+    }));
+  } else if (memberPackagesPkg && typeof memberPackagesPkg.features === 'string') {
+    return {
+      ...memberPackagesPkg,
+      features: JSON.parse(memberPackagesPkg.features)
+    };
+  }
+  return memberPackagesPkg;
+};
+
 export const memberPackageRepo = {
   // Lấy packages của member
   async findByMemberId(memberId, filters = {}) {
@@ -18,12 +34,13 @@ export const memberPackageRepo = {
       query = query.where('mp.status', filters.status);
     }
 
-    return query.orderBy('mp.created_at', 'desc');
+    const result = await query.orderBy('mp.created_at', 'desc');
+    return parseMemberPackageFeatures(result);
   },
 
   // Lấy package hiện tại đang active của member
   async getCurrentPackage(memberId) {
-    return db('member_packages as mp')
+    const result = await db('member_packages as mp')
       .join('packages as p', 'mp.package_id', 'p.id')
       .where('mp.user_id', memberId) // Changed from member_id to user_id
       .where('mp.status', 'active')
@@ -36,6 +53,8 @@ export const memberPackageRepo = {
         'p.duration_days'
       )
       .first();
+    
+    return parseMemberPackageFeatures(result);
   },
 
   // Tạo đăng ký package mới
@@ -46,7 +65,7 @@ export const memberPackageRepo = {
 
   // Lấy theo ID
   async findById(id) {
-    return db('member_packages as mp')
+    const result = await db('member_packages as mp')
       .join('packages as p', 'mp.package_id', 'p.id')
       .join('users as u', 'mp.user_id', 'u.id') // Changed from members to users
       .where('mp.id', id)
@@ -59,6 +78,8 @@ export const memberPackageRepo = {
         'u.email'              // Changed from m.email to u.email
       )
       .first();
+    
+    return parseMemberPackageFeatures(result);
   },
 
   // Cập nhật trạng thái
@@ -79,6 +100,7 @@ export const memberPackageRepo = {
         'mp.*',
         'p.name as package_name',
         'p.price',
+        'p.features',
         'u.name as full_name', // Changed from m.full_name to u.name
         'u.email'              // Changed from m.email to u.email, removed phone
       );
@@ -95,7 +117,8 @@ export const memberPackageRepo = {
       query = query.where('mp.member_id', filters.memberId);
     }
 
-    return query.orderBy('mp.created_at', 'desc');
+    const result = await query.orderBy('mp.created_at', 'desc');
+    return parseMemberPackageFeatures(result);
   },
 
   // Gia hạn package
