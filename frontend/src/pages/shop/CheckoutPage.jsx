@@ -207,24 +207,6 @@ const CheckoutPage = () => {
     <div className="checkout-page">
       <div className="checkout-container">
         <h1>Thanh toán đơn hàng</h1>
-        
-        {/* Debug button - remove in production */}
-        <button 
-          type="button" 
-          onClick={debugAuth}
-          style={{
-            background: '#ff6b6b',
-            color: 'white',
-            padding: '5px 10px',
-            border: 'none',
-            borderRadius: '3px',
-            marginBottom: '10px',
-            fontSize: '12px'
-          }}
-        >
-          🐛 Debug Auth
-        </button>
-
         <div className="checkout-content">
           {/* Order Summary */}
           <div className="order-summary">
