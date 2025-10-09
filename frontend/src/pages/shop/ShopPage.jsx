@@ -77,14 +77,6 @@ const ShopPage = () => {
       <Header />
       
       <div className="shop-container">
-        {/* Hero Section */}
-        <section className="shop-hero">
-          <div className="hero-content">
-            <h1>🏪 Royal Fitness Store</h1>
-            <p>Khám phá bộ sưu tập sản phẩm thể thao chất lượng cao</p>
-          </div>
-        </section>
-
         <div className="shop-main">
           {/* Sidebar Filters */}
           <aside className="shop-sidebar">
@@ -115,23 +107,7 @@ const ShopPage = () => {
               </div>
             </div>
 
-            <div className="filter-section">
-              <h3>💰 Khoảng giá</h3>
-              <div className="price-range">
-                <input
-                  type="range"
-                  min="0"
-                  max="5000000"
-                  step="50000"
-                  value={priceRange[1]}
-                  onChange={(e) => setPriceRange([0, parseInt(e.target.value)])}
-                  className="price-slider"
-                />
-                <div className="price-display">
-                  {formatPrice(0)} - {formatPrice(priceRange[1])}
-                </div>
-              </div>
-            </div>
+            
           </aside>
 
           {/* Main Content */}

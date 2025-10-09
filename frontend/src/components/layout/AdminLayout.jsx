@@ -2,7 +2,7 @@
 
 import React from "react";
 import { NavLink, Outlet, useNavigate, Link } from "react-router-dom";
-import "../../styles/AdminLayout.css";
+import "./css/AdminLayout.css";
 import { useAuth } from "../../context/AuthContext.jsx";
 
 // Import Font Awesome icons
@@ -47,7 +47,7 @@ export default function AdminLayout() {
           </NavLink>
           <NavLink to="/admin/classes" className="admin__link">
             <FontAwesomeIcon icon={faCalendarDays} className="admin__link-icon" />
-            Classes & Schedule
+            Schedule
           </NavLink>
           <NavLink to="/admin/plans" className="admin__link">
             <FontAwesomeIcon icon={faIdCard} className="admin__link-icon" />

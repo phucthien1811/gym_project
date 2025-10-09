@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import Navigation from "./Navigation";
-import Button from "./Button";
+import Navigation from "./Navigation.jsx";
+import Button from "./Button.js";
 import { useAuth } from "../../context/AuthContext.jsx";
 import { useCart } from "../../context/CartContext.jsx";
 import memberProfileService from "../../services/memberProfileService.js";

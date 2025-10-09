@@ -174,10 +174,10 @@ const Trainers = () => {
       name: trainer.name || '',
       email: trainer.email || '',
       phone: trainer.phone || '',
-      specialization: trainer.specialization || '',
+      specialization: trainer.specializations || '',
       bio: trainer.bio || '',
       experience_years: trainer.experience_years || 0,
-      certifications: trainer.certifications || '',
+      certifications: trainer.certification || '',
       hourly_rate: trainer.hourly_rate || 0,
       status: trainer.status || 'active'
     });
@@ -326,7 +326,7 @@ const Trainers = () => {
                       </div>
                     </td>
                     <td>
-                      <span className="specialization">{trainer.specialization}</span>
+                      <span className="specialization">{trainer.specializations}</span>
                     </td>
                     <td>{trainer.phone || 'Chưa cập nhật'}</td>
                     <td>{trainer.experience_years} năm</td>
@@ -411,7 +411,7 @@ const Trainers = () => {
                   </div>
                   <div className="detail-row">
                     <label>Chuyên môn:</label>
-                    <span>{selectedTrainer?.specialization}</span>
+                    <span>{selectedTrainer?.specializations}</span>
                   </div>
                   <div className="detail-row">
                     <label>Kinh nghiệm:</label>
@@ -419,7 +419,7 @@ const Trainers = () => {
                   </div>
                   <div className="detail-row">
                     <label>Chứng chỉ:</label>
-                    <span>{selectedTrainer?.certifications || 'Chưa cập nhật'}</span>
+                    <span>{selectedTrainer?.certification || 'Chưa cập nhật'}</span>
                   </div>
                   <div className="detail-row">
                     <label>Giá theo giờ:</label>

@@ -4,7 +4,6 @@ import { BrowserRouter, Routes, Route, Navigate, useLocation } from "react-route
 import { AuthProvider, useAuth } from "./context/AuthContext.jsx";
 import { CartProvider } from "./context/CartContext.jsx";
 import NotificationPopup from "./components/NotificationPopup.jsx";
-
 import Header from "./components/common/Header.jsx";
 import HomePage from "./pages/public/HomePage.jsx";
 import ServicesPage from "./pages/public/ServicesPage.jsx";
@@ -13,11 +12,10 @@ import PricingPage from "./pages/public/PricingPage.jsx";
 import ReviewPage from "./pages/public/ReviewPage.jsx";
 import ShopPage from "./pages/shop/ShopPage.jsx";
 import CartPage from "./pages/shop/CartPage.jsx";
-import CheckoutPage from "./pages/CheckoutPage.jsx";
-import OrderSuccessPage from "./pages/OrderSuccessPage.jsx";
-
-import LoginPage from "./pages/LoginPage.jsx";
-
+import CheckoutPage from "./pages/shop/CheckoutPage.jsx";
+import OrderSuccessPage from "./pages/shop/OrderSuccessPage.jsx";
+import LoginPage from "./pages/auth/LoginPage.jsx";
+import RegisterPage from "./pages/auth/RegisterPage.jsx";
 import AdminLayout from "./components/layout/AdminLayout.jsx";
 import MemberLayout from "./components/layout/MemberLayout.jsx";
 import AdminDashboard from "./pages/admin/Dashboard.jsx";
@@ -31,7 +29,6 @@ import AdminProducts from "./pages/admin/AdminProducts.jsx";
 import AdminOrders from "./pages/admin/AdminOrders.jsx";
 import AdminStaff from "./pages/admin/AdminStaff.jsx";
 import AdminSettings from "./pages/admin/AdminSettings.jsx";
-
 import MemberDashboard from "./pages/member/MemberDashboard.jsx";
 import MemberProfile from "./pages/member/Profile.jsx";
 import MemberSchedule from "./pages/member/MemberSchedule.jsx";
@@ -99,6 +96,7 @@ export default function App() {
         <Routes>
           <Route path="/" element={<Landing />} />
           <Route path="/login" element={<LoginPage />} />
+          <Route path="/register" element={<RegisterPage />} />
           <Route path="/shop" element={<ShopPage />} />
           <Route path="/cart" element={<CartPage />} />
           <Route path="/checkout" element={<CheckoutPage />} />

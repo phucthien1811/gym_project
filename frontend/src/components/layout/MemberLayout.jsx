@@ -2,12 +2,12 @@ import React, { useState, useEffect } from 'react';
 import { NavLink, Outlet, useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import memberProfileService from '../../services/memberProfileService.js';
-import '../../styles/MemberLayout.css'; // Import file CSS
+import './css/MemberLayout.css'; 
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { 
     faTachometerAlt, faUserCircle, faCalendarAlt, faClipboardCheck, 
     faChartLine, faBoxOpen, faReceipt, faSignOutAlt, faBell,
-    faIdCard, faHouse // Thêm icon home
+    faIdCard, faHouse 
 } from '@fortawesome/free-solid-svg-icons';
 
 const MemberLayout = () => {
@@ -21,7 +21,7 @@ const MemberLayout = () => {
         navigate('/login');
     };
 
-    // Fetch user avatar
+
     useEffect(() => {
         if (user) {
             const fetchUserProfile = async () => {
@@ -38,7 +38,6 @@ const MemberLayout = () => {
         }
     }, [user]);
 
-    // Helper function to get full avatar URL
     const getAvatarUrl = (avatarPath) => {
         if (!avatarPath) return null;
         if (avatarPath.startsWith('blob:') || avatarPath.startsWith('http')) return avatarPath;
@@ -65,7 +64,6 @@ const MemberLayout = () => {
         {
             title: "Đơn hàng & Giao dịch",
             items: [
-                // Đã thêm mục mới ở đây
                 { name: "Gói tập", path: "/member/packages", icon: faIdCard },
                 { name: "Đơn hàng của tôi", path: "/member/orders", icon: faBoxOpen },
                 { name: "Lịch sử giao dịch", path: "/member/transactions", icon: faReceipt }

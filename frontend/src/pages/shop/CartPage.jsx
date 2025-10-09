@@ -3,7 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import Header from '../../components/common/Header';
 import { useCart } from '../../context/CartContext';
 import { useAuth } from '../../context/AuthContext';
-import '../../styles/CartPage.css';
+import './css/CartPage.css';
 
 const CartPage = () => {
   const { 

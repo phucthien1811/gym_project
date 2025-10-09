@@ -1,22 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import './css/Register.css'; 
-
-// --- Bắt đầu phần giả lập API để ví dụ chạy được ---
-const authAPI = {
-  register: async (data) => {
-    console.log("Registering with:", data);
-    if (data.email.includes("existing")) {
-      await new Promise(res => setTimeout(res, 500));
-      const error = new Error("Conflict");
-      error.response = { data: { message: "Email đã tồn tại." } };
-      throw error;
-    }
-    await new Promise(res => setTimeout(res, 1000));
-    return { data: { message: "User created successfully" } };
-  }
-};
-// --- Kết thúc phần giả lập API ---
+import authService from '../../services/authService';
+import './css/Register.css';
 
 export default function RegisterPage() {
   const [formData, setFormData] = useState({
@@ -50,7 +35,7 @@ export default function RegisterPage() {
     }
 
     try {
-      const response = await authAPI.register({
+      const response = await authService.register({
         name: formData.name,
         email: formData.email,
         password: formData.password,
