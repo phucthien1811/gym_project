@@ -4,11 +4,11 @@ import { faSearch, faFilter, faPlus, faPen, faTrash, faChevronLeft, faChevronRig
 import './css/AdminMembers.css'; // Import file CSS mới
 
 const mockMembers = [
-    { id: "M001", name: "Alex Carter", email: "alex.c@example.com", plan: "Pro", startDate: "2025-08-10", endDate: "2025-09-10", status: "Active", avatar: "https://placehold.co/40x40/60a5fa/FFFFFF?text=A" },
-    { id: "M002", name: "Mia Nguyen", email: "mia.n@example.com", plan: "Basic", startDate: "2025-08-01", endDate: "2025-08-31", status: "Expired", avatar: "https://placehold.co/40x40/f87171/FFFFFF?text=M" },
-    { id: "M003", name: "Kenji Park", email: "kenji.p@example.com", plan: "Premium", startDate: "2025-08-20", endDate: "2026-08-20", status: "Active", avatar: "https://placehold.co/40x40/34d399/FFFFFF?text=K" },
-    { id: "M004", name: "Sophia Rossi", email: "sophia.r@example.com", plan: "Pro", startDate: "2025-09-01", endDate: "2025-10-01", status: "Active", avatar: "https://placehold.co/40x40/fbbf24/FFFFFF?text=S" },
-    { id: "M005", name: "Liam Chen", email: "liam.c@example.com", plan: "Basic", startDate: "2025-07-15", endDate: "2025-08-15", status: "Expired", avatar: "https://placehold.co/40x40/a78bfa/FFFFFF?text=L" },
+    { id: "M001", name: "Alex Carter", email: "alex.c@example.com", plan: "Pro", startDate: "2025-08-10", endDate: "2025-09-10", status: "Có", avatar: "https://placehold.co/40x40/60a5fa/FFFFFF?text=A" },
+    { id: "M002", name: "Mia Nguyen", email: "mia.n@example.com", plan: "Basic", startDate: "2025-08-01", endDate: "2025-08-31", status: "Không", avatar: "https://placehold.co/40x40/f87171/FFFFFF?text=M" },
+    { id: "M003", name: "Kenji Park", email: "kenji.p@example.com", plan: "Premium", startDate: "2025-08-20", endDate: "2026-08-20", status: "Có", avatar: "https://placehold.co/40x40/34d399/FFFFFF?text=K" },
+    { id: "M004", name: "Sophia Rossi", email: "sophia.r@example.com", plan: "Pro", startDate: "2025-09-01", endDate: "2025-10-01", status: "Có", avatar: "https://placehold.co/40x40/fbbf24/FFFFFF?text=S" },
+    { id: "M005", name: "Liam Chen", email: "liam.c@example.com", plan: "Basic", startDate: "2025-07-15", endDate: "2025-08-15", status: "Không", avatar: "https://placehold.co/40x40/a78bfa/FFFFFF?text=L" },
 ];
 
 export default function AdminMembers() {
@@ -29,8 +29,8 @@ export default function AdminMembers() {
     
     const getStatusClass = (status) => {
         switch (status) {
-            case 'Active': return 'status-active';
-            case 'Expired': return 'status-expired';
+            case 'Có': return 'status-active';
+            case 'Không': return 'status-expired';
             default: return 'status-inactive';
         }
     };
@@ -39,7 +39,7 @@ export default function AdminMembers() {
         <div className="admin-page-container">
             {/* Header của trang */}
             <div className="admin-page-header">
-                <h2 className="admin-page-title">Quản Lý Hội Viên</h2>
+                <h3 className="admin-page-title">Quản Lý Hội Viên</h3>
                 <div className="admin-page-actions">
                     <div className="search-bar">
                         <FontAwesomeIcon icon={faSearch} className="search-icon" />

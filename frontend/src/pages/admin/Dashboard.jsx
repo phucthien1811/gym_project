@@ -2,9 +2,9 @@ import React from 'react';
 import { Bar, Line } from 'react-chartjs-2';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faUsers, faDollarSign, faUserPlus, faArrowUp } from '@fortawesome/free-solid-svg-icons';
-import './css/Dashboard.css'; // Import file CSS mới
+import './css/Dashboard.css'; 
 
-// Đăng ký các thành phần ChartJS (quan trọng!)
+
 import {
     Chart as ChartJS, CategoryScale, LinearScale, BarElement, PointElement,
     LineElement, Title, Tooltip, Legend
@@ -135,7 +135,7 @@ const AdminDashboard = () => {
                         <tbody>
                             {recentMembers.map(member => (
                                 <tr key={member.id}>
-                                    <td>{member.name}</td>
+                                    <td className="member-name">{member.name}</td>
                                     <td>{member.joinDate}</td>
                                     <td><span className="plan-badge">{member.plan}</span></td>
                                 </tr>

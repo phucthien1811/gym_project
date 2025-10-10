@@ -129,20 +129,20 @@ const ClassFormModal = ({ isOpen, onClose, classData, trainers, onSuccess }) => 
   if (!isOpen) return null;
 
   return (
-    <div className="modal-overlay" onClick={onClose}>
-      <div className="modal-content class-form-modal" onClick={e => e.stopPropagation()}>
-        <div className="modal-header">
+    <div className="ad-class-modal-overlay" onClick={onClose}>
+      <div className="ad-class-modal-content ad-class-class-form-modal" onClick={e => e.stopPropagation()}>
+        <div className="ad-class-modal-header">
           <h3>{classData ? 'Chỉnh sửa lớp học' : 'Thêm lớp học mới'}</h3>
-          <button className="modal-close-btn" onClick={onClose}>
+          <button className="ad-class-modal-close-btn" onClick={onClose}>
             <FontAwesomeIcon icon={faTimes} />
           </button>
         </div>
 
-        <form onSubmit={handleSubmit} className="class-form">
-          {error && <div className="error-message">{error}</div>}
+        <form onSubmit={handleSubmit} className="ad-class-class-form">
+          {error && <div className="ad-class-error-message">{error}</div>}
 
-          <div className="form-grid">
-            <div className="form-group">
+          <div className="ad-class-form-grid">
+            <div className="ad-class-form-group">
               <label>Tên lớp học *</label>
               <input
                 type="text"
@@ -154,7 +154,7 @@ const ClassFormModal = ({ isOpen, onClose, classData, trainers, onSuccess }) => 
               />
             </div>
 
-            <div className="form-group">
+            <div className="ad-class-form-group">
               <label>Huấn luyện viên</label>
               <select
                 name="trainer_id"
@@ -170,7 +170,7 @@ const ClassFormModal = ({ isOpen, onClose, classData, trainers, onSuccess }) => 
               </select>
             </div>
 
-            <div className="form-group">
+            <div className="ad-class-form-group">
               <label>Ngày học *</label>
               <input
                 type="date"
@@ -181,7 +181,7 @@ const ClassFormModal = ({ isOpen, onClose, classData, trainers, onSuccess }) => 
               />
             </div>
 
-            <div className="form-group">
+            <div className="ad-class-form-group">
               <label>Thứ trong tuần</label>
               <select
                 name="day_of_week"
@@ -199,7 +199,7 @@ const ClassFormModal = ({ isOpen, onClose, classData, trainers, onSuccess }) => 
               </select>
             </div>
 
-            <div className="form-group">
+            <div className="ad-class-form-group">
               <label>Giờ bắt đầu *</label>
               <input
                 type="time"
@@ -210,7 +210,7 @@ const ClassFormModal = ({ isOpen, onClose, classData, trainers, onSuccess }) => 
               />
             </div>
 
-            <div className="form-group">
+            <div className="ad-class-form-group">
               <label>Giờ kết thúc *</label>
               <input
                 type="time"
@@ -221,7 +221,7 @@ const ClassFormModal = ({ isOpen, onClose, classData, trainers, onSuccess }) => 
               />
             </div>
 
-            <div className="form-group">
+            <div className="ad-class-form-group">
               <label>Số học viên tối đa</label>
               <input
                 type="number"
@@ -233,7 +233,7 @@ const ClassFormModal = ({ isOpen, onClose, classData, trainers, onSuccess }) => 
               />
             </div>
 
-            <div className="form-group">
+            <div className="ad-class-form-group">
               <label>Giá (VNĐ)</label>
               <input
                 type="number"
@@ -245,7 +245,7 @@ const ClassFormModal = ({ isOpen, onClose, classData, trainers, onSuccess }) => 
               />
             </div>
 
-            <div className="form-group">
+            <div className="ad-class-form-group">
               <label>Phòng tập</label>
               <input
                 type="text"
@@ -256,7 +256,7 @@ const ClassFormModal = ({ isOpen, onClose, classData, trainers, onSuccess }) => 
               />
             </div>
 
-            <div className="form-group">
+            <div className="ad-class-form-group">
               <label>Địa điểm</label>
               <input
                 type="text"
@@ -267,7 +267,7 @@ const ClassFormModal = ({ isOpen, onClose, classData, trainers, onSuccess }) => 
               />
             </div>
 
-            <div className="form-group">
+            <div className="ad-class-form-group">
               <label>Trạng thái</label>
               <select
                 name="status"
@@ -281,7 +281,7 @@ const ClassFormModal = ({ isOpen, onClose, classData, trainers, onSuccess }) => 
               </select>
             </div>
 
-            <div className="form-group">
+            <div className="ad-class-form-group">
               <label>Độ khó</label>
               <select
                 name="difficulty_level"
@@ -295,7 +295,7 @@ const ClassFormModal = ({ isOpen, onClose, classData, trainers, onSuccess }) => 
             </div>
           </div>
 
-          <div className="form-group full-width">
+          <div className="ad-class-form-group ad-class-full-width">
             <label>Mô tả</label>
             <textarea
               name="description"
@@ -306,11 +306,11 @@ const ClassFormModal = ({ isOpen, onClose, classData, trainers, onSuccess }) => 
             />
           </div>
 
-          <div className="form-group full-width">
+          <div className="ad-class-form-group ad-class-full-width">
             <label>Thiết bị cần thiết</label>
-            <div className="equipment-grid">
+            <div className="ad-class-equipment-grid">
               {equipmentOptions.map(equipment => (
-                <label key={equipment} className="equipment-item">
+                <label key={equipment} className="ad-class-equipment-item">
                   <input
                     type="checkbox"
                     checked={formData.equipment_needed.includes(equipment)}
@@ -322,8 +322,8 @@ const ClassFormModal = ({ isOpen, onClose, classData, trainers, onSuccess }) => 
             </div>
           </div>
 
-          <div className="form-group full-width">
-            <label className="checkbox-label">
+          <div className="ad-class-form-group ad-class-full-width">
+            <label className="ad-class-checkbox-label">
               <input
                 type="checkbox"
                 name="is_recurring"
@@ -334,11 +334,11 @@ const ClassFormModal = ({ isOpen, onClose, classData, trainers, onSuccess }) => 
             </label>
           </div>
 
-          <div className="form-actions">
-            <button type="button" className="btn-secondary" onClick={onClose}>
+          <div className="ad-class-form-actions">
+            <button type="button" className="ad-class-btn-secondary" onClick={onClose}>
               Hủy
             </button>
-            <button type="submit" className="btn-primary" disabled={loading}>
+            <button type="submit" className="ad-class-btn-primary" disabled={loading}>
               {loading ? (
                 <>
                   <FontAwesomeIcon icon={faSpinner} spin />

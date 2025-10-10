@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import '../css/SimpleClassForm.css';
 
 const SimpleClassForm = ({ isOpen, onClose, onSuccess, editingClass, trainers = [] }) => {
   const [formData, setFormData] = useState({
@@ -11,9 +12,9 @@ const SimpleClassForm = ({ isOpen, onClose, onSuccess, editingClass, trainers = 
     class_date: editingClass?.class_date?.split('T')[0] || '',
     status: editingClass?.status || 'scheduled',
     difficulty_level: editingClass?.difficulty_level || 'beginner',
-    floor: editingClass?.floor || 1, // Thêm trường tầng
-    room: editingClass?.room || '', // Thêm trường phòng
-    location: editingClass?.location || '' // Thêm trường vị trí
+    floor: editingClass?.floor || 1, 
+    room: editingClass?.room || '',
+    location: editingClass?.location || '' 
   });
 
   const [loading, setLoading] = useState(false);
@@ -61,171 +62,171 @@ const SimpleClassForm = ({ isOpen, onClose, onSuccess, editingClass, trainers = 
   if (!isOpen) return null;
 
   return (
-    <div className="modal-overlay" onClick={onClose}>
-      <div className="modal-content class-form-modal" onClick={e => e.stopPropagation()}>
-        <div className="modal-header">
+    <div className="simple-modal-overlay" onClick={onClose}>
+      <div className="simple-modal-content" onClick={e => e.stopPropagation()}>
+        <div className="simple-modal-header">
           <h3>{editingClass ? 'Chỉnh sửa lớp học' : 'Thêm lớp học mới'}</h3>
-          <button className="modal-close-btn" onClick={onClose}>×</button>
+          <button className="simple-modal-close-btn" onClick={onClose}>×</button>
         </div>
 
-        <form onSubmit={handleSubmit} style={{padding: '1.5rem', background: 'white', color: '#2c3e50'}}>
-          <div style={{display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', gap: '1rem'}}>
-            <div>
-              <label style={{color: '#2c3e50', fontWeight: '500', marginBottom: '0.5rem', display: 'block'}}>Tên lớp học *</label>
-              <input
-                type="text"
-                value={formData.class_name}
-                onChange={(e) => setFormData(prev => ({...prev, class_name: e.target.value}))}
-                required
-                style={{width: '100%', padding: '0.75rem', marginTop: '0.5rem', border: '1px solid #dee2e6', borderRadius: '0.5rem', backgroundColor: 'white', color: '#495057'}}
-              />
+        <div className="simple-modal-body">
+          <form onSubmit={handleSubmit}>
+            <div className="simple-form-grid">
+              <div className="simple-form-group">
+                <label>Tên lớp học *</label>
+                <input
+                  type="text"
+                  value={formData.class_name}
+                  onChange={(e) => setFormData(prev => ({...prev, class_name: e.target.value}))}
+                  required
+                  placeholder="Ví dụ: Yoga Flow, Boxing..."
+                />
+              </div>
+
+              <div className="simple-form-group">
+                <label>Số học viên tối đa</label>
+                <input
+                  type="number"
+                  value={formData.max_participants}
+                  onChange={(e) => setFormData(prev => ({...prev, max_participants: e.target.value}))}
+                  min="1"
+                  max="100"
+                />
+              </div>
+
+              <div className="simple-form-group">
+                <label>Huấn luyện viên</label>
+                <select
+                  value={formData.trainer_id}
+                  onChange={(e) => setFormData(prev => ({...prev, trainer_id: e.target.value}))}
+                >
+                  <option value="">Chọn HLV</option>
+                  {trainers.map(trainer => (
+                    <option key={trainer.id} value={trainer.id}>
+                      {trainer.full_name || trainer.name}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              <div className="simple-form-group">
+                <label>Ngày học *</label>
+                <input
+                  type="date"
+                  value={formData.class_date}
+                  onChange={(e) => setFormData(prev => ({...prev, class_date: e.target.value}))}
+                  required
+                />
+              </div>
+
+              <div className="simple-form-group">
+                <label>Giờ bắt đầu *</label>
+                <input
+                  type="time"
+                  value={formData.start_time}
+                  onChange={(e) => setFormData(prev => ({...prev, start_time: e.target.value}))}
+                  required
+                />
+              </div>
+
+              <div className="simple-form-group">
+                <label>Giờ kết thúc *</label>
+                <input
+                  type="time"
+                  value={formData.end_time}
+                  onChange={(e) => setFormData(prev => ({...prev, end_time: e.target.value}))}
+                  required
+                />
+              </div>
+
+              <div className="simple-form-group">
+                <label>Trạng thái</label>
+                <select
+                  value={formData.status}
+                  onChange={(e) => setFormData(prev => ({...prev, status: e.target.value}))}
+                >
+                  <option value="scheduled">Đã lên lịch</option>
+                  <option value="ongoing">Đang diễn ra</option>
+                  <option value="completed">Hoàn thành</option>
+                  <option value="cancelled">Đã hủy</option>
+                </select>
+              </div>
+
+              <div className="simple-form-group">
+                <label>Độ khó</label>
+                <select
+                  value={formData.difficulty_level}
+                  onChange={(e) => setFormData(prev => ({...prev, difficulty_level: e.target.value}))}
+                >
+                  <option value="beginner">Cơ bản</option>
+                  <option value="intermediate">Trung cấp</option>
+                  <option value="advanced">Nâng cao</option>
+                </select>
+              </div>
+
+              <div className="simple-form-group">
+                <label>Tầng *</label>
+                <select
+                  value={formData.floor}
+                  onChange={(e) => setFormData(prev => ({...prev, floor: e.target.value}))}
+                  required
+                >
+                  <option value={1}>Tầng 1</option>
+                  <option value={2}>Tầng 2</option>
+                  <option value={3}>Tầng 3</option>
+                  <option value={4}>Tầng 4</option>
+                </select>
+              </div>
+
+              <div className="simple-form-group">
+                <label>Phòng tập *</label>
+                <input
+                  type="text"
+                  value={formData.room}
+                  onChange={(e) => setFormData(prev => ({...prev, room: e.target.value}))}
+                  placeholder="VD: Phòng A1, Studio Yoga, Phòng Cardio..."
+                  required
+                />
+              </div>
+
+              <div className="simple-form-group">
+                <label>Vị trí chi tiết</label>
+                <input
+                  type="text"
+                  value={formData.location}
+                  onChange={(e) => setFormData(prev => ({...prev, location: e.target.value}))}
+                  placeholder="VD: Gần thang máy, cuối hành lang..."
+                />
+              </div>
+
+              <div className="simple-form-group simple-form-description">
+                <label>Mô tả</label>
+                <textarea
+                  value={formData.description}
+                  onChange={(e) => setFormData(prev => ({...prev, description: e.target.value}))}
+                  rows="3"
+                  placeholder="Mô tả về lớp học..."
+                />
+              </div>
             </div>
 
-            <div>
-              <label style={{color: '#2c3e50', fontWeight: '500', marginBottom: '0.5rem', display: 'block'}}>Số học viên tối đa</label>
-              <input
-                type="number"
-                value={formData.max_participants}
-                onChange={(e) => setFormData(prev => ({...prev, max_participants: e.target.value}))}
-                min="1"
-                style={{width: '100%', padding: '0.75rem', marginTop: '0.5rem', border: '1px solid #dee2e6', borderRadius: '0.5rem', backgroundColor: 'white', color: '#495057'}}
-              />
+            <div className="simple-form-actions">
+              <button type="button" className="simple-btn simple-btn-secondary" onClick={onClose}>
+                Hủy
+              </button>
+              <button type="submit" className="simple-btn simple-btn-primary" disabled={loading}>
+                {loading ? (
+                  <>
+                    <span className="loading-spinner">⟳</span>
+                    Đang lưu...
+                  </>
+                ) : (
+                  editingClass ? 'Cập nhật' : 'Tạo mới'
+                )}
+              </button>
             </div>
-
-            <div>
-              <label style={{color: '#2c3e50', fontWeight: '500', marginBottom: '0.5rem', display: 'block'}}>Huấn luyện viên</label>
-              <select
-                value={formData.trainer_id}
-                onChange={(e) => setFormData(prev => ({...prev, trainer_id: e.target.value}))}
-                style={{width: '100%', padding: '0.75rem', marginTop: '0.5rem', border: '1px solid #dee2e6', borderRadius: '0.5rem', backgroundColor: 'white', color: '#495057'}}
-              >
-                <option value="">Chọn HLV</option>
-                {trainers.map(trainer => (
-                  <option key={trainer.id} value={trainer.id}>
-                    {trainer.full_name || trainer.name}
-                  </option>
-                ))}
-              </select>
-            </div>
-
-            <div>
-              <label style={{color: '#2c3e50', fontWeight: '500', marginBottom: '0.5rem', display: 'block'}}>Ngày học *</label>
-              <input
-                type="date"
-                value={formData.class_date}
-                onChange={(e) => setFormData(prev => ({...prev, class_date: e.target.value}))}
-                required
-                style={{width: '100%', padding: '0.75rem', marginTop: '0.5rem', border: '1px solid #dee2e6', borderRadius: '0.5rem', backgroundColor: 'white', color: '#495057'}}
-              />
-            </div>
-
-            <div>
-              <label style={{color: '#2c3e50', fontWeight: '500', marginBottom: '0.5rem', display: 'block'}}>Giờ bắt đầu *</label>
-              <input
-                type="time"
-                value={formData.start_time}
-                onChange={(e) => setFormData(prev => ({...prev, start_time: e.target.value}))}
-                required
-                style={{width: '100%', padding: '0.75rem', marginTop: '0.5rem', border: '1px solid #dee2e6', borderRadius: '0.5rem', backgroundColor: 'white', color: '#495057'}}
-              />
-            </div>
-
-            <div>
-              <label style={{color: '#2c3e50', fontWeight: '500', marginBottom: '0.5rem', display: 'block'}}>Giờ kết thúc *</label>
-              <input
-                type="time"
-                value={formData.end_time}
-                onChange={(e) => setFormData(prev => ({...prev, end_time: e.target.value}))}
-                required
-                style={{width: '100%', padding: '0.75rem', marginTop: '0.5rem', border: '1px solid #dee2e6', borderRadius: '0.5rem', backgroundColor: 'white', color: '#495057'}}
-              />
-            </div>
-
-            <div>
-              <label style={{color: '#2c3e50', fontWeight: '500', marginBottom: '0.5rem', display: 'block'}}>Trạng thái</label>
-              <select
-                value={formData.status}
-                onChange={(e) => setFormData(prev => ({...prev, status: e.target.value}))}
-                style={{width: '100%', padding: '0.75rem', marginTop: '0.5rem', border: '1px solid #dee2e6', borderRadius: '0.5rem', backgroundColor: 'white', color: '#495057'}}
-              >
-                <option value="scheduled">Đã lên lịch</option>
-                <option value="ongoing">Đang diễn ra</option>
-                <option value="completed">Hoàn thành</option>
-                <option value="cancelled">Đã hủy</option>
-              </select>
-            </div>
-
-            <div>
-              <label style={{color: '#2c3e50', fontWeight: '500', marginBottom: '0.5rem', display: 'block'}}>Độ khó</label>
-              <select
-                value={formData.difficulty_level}
-                onChange={(e) => setFormData(prev => ({...prev, difficulty_level: e.target.value}))}
-                style={{width: '100%', padding: '0.75rem', marginTop: '0.5rem', border: '1px solid #dee2e6', borderRadius: '0.5rem', backgroundColor: 'white', color: '#495057'}}
-              >
-                <option value="beginner">Cơ bản</option>
-                <option value="intermediate">Trung cấp</option>
-                <option value="advanced">Nâng cao</option>
-              </select>
-            </div>
-
-            <div>
-              <label style={{color: '#2c3e50', fontWeight: '500', marginBottom: '0.5rem', display: 'block'}}>Tầng *</label>
-              <select
-                value={formData.floor}
-                onChange={(e) => setFormData(prev => ({...prev, floor: e.target.value}))}
-                required
-                style={{width: '100%', padding: '0.75rem', marginTop: '0.5rem', border: '1px solid #dee2e6', borderRadius: '0.5rem', backgroundColor: 'white', color: '#495057'}}
-              >
-                <option value={1}>Tầng 1</option>
-                <option value={2}>Tầng 2</option>
-                <option value={3}>Tầng 3</option>
-                <option value={4}>Tầng 4</option>
-              </select>
-            </div>
-
-            <div>
-              <label style={{color: '#2c3e50', fontWeight: '500', marginBottom: '0.5rem', display: 'block'}}>Phòng tập *</label>
-              <input
-                type="text"
-                value={formData.room}
-                onChange={(e) => setFormData(prev => ({...prev, room: e.target.value}))}
-                placeholder="VD: Phòng A1, Studio Yoga, Phòng Cardio..."
-                required
-                style={{width: '100%', padding: '0.75rem', marginTop: '0.5rem', border: '1px solid #dee2e6', borderRadius: '0.5rem', backgroundColor: 'white', color: '#495057'}}
-              />
-            </div>
-
-            <div>
-              <label style={{color: '#2c3e50', fontWeight: '500', marginBottom: '0.5rem', display: 'block'}}>Vị trí chi tiết</label>
-              <input
-                type="text"
-                value={formData.location}
-                onChange={(e) => setFormData(prev => ({...prev, location: e.target.value}))}
-                placeholder="VD: Gần thang máy, cuối hành lang..."
-                style={{width: '100%', padding: '0.75rem', marginTop: '0.5rem', border: '1px solid #dee2e6', borderRadius: '0.5rem', backgroundColor: 'white', color: '#495057'}}
-              />
-            </div>
-          </div>
-
-          <div style={{marginTop: '1rem'}}>
-            <label style={{color: '#2c3e50', fontWeight: '500', marginBottom: '0.5rem', display: 'block'}}>Mô tả</label>
-            <textarea
-              value={formData.description}
-              onChange={(e) => setFormData(prev => ({...prev, description: e.target.value}))}
-              rows="3"
-              style={{width: '100%', padding: '0.75rem', marginTop: '0.5rem', border: '1px solid #dee2e6', borderRadius: '0.5rem', backgroundColor: 'white', color: '#495057'}}
-            />
-          </div>
-
-          <div style={{display: 'flex', justifyContent: 'flex-end', gap: '1rem', marginTop: '2rem', paddingTop: '1rem', borderTop: '1px solid #e9ecef'}}>
-            <button type="button" className="btn-secondary" onClick={onClose}>
-              Hủy
-            </button>
-            <button type="submit" className="btn-primary" disabled={loading}>
-              {loading ? 'Đang lưu...' : (editingClass ? 'Cập nhật' : 'Tạo mới')}
-            </button>
-          </div>
-        </form>
+          </form>
+        </div>
       </div>
     </div>
   );

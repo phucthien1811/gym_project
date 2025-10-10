@@ -28,7 +28,6 @@ import AdminInvoices from "./pages/admin/AdminInvoices.jsx";
 import AdminReports from "./pages/admin/AdminReports.jsx";
 import AdminProducts from "./pages/admin/AdminProducts.jsx";
 import AdminOrders from "./pages/admin/AdminOrders.jsx";
-import AdminStaff from "./pages/admin/AdminStaff.jsx";
 import AdminSettings from "./pages/admin/AdminSettings.jsx";
 import MemberDashboard from "./pages/member/MemberDashboard.jsx";
 import MemberProfile from "./pages/member/Profile.jsx";
@@ -121,7 +120,6 @@ export default function App() {
             <Route path="reports" element={<AdminReports />} />
             <Route path="products" element={<AdminProducts />} />
             <Route path="orders" element={<AdminOrders />} />
-            <Route path="staff" element={<AdminStaff />} />
             <Route path="settings" element={<AdminSettings />} />
           </Route>
 

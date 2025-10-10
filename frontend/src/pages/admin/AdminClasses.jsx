@@ -216,20 +216,20 @@ const AdminClasses = () => {
 
   const getStatusBadgeClass = (status) => {
     switch (status) {
-      case 'scheduled': return 'badge-scheduled';
-      case 'ongoing': return 'badge-ongoing';
-      case 'completed': return 'badge-completed';
-      case 'cancelled': return 'badge-cancelled';
-      default: return 'badge-scheduled';
+      case 'scheduled': return 'ad-class-badge-scheduled';
+      case 'ongoing': return 'ad-class-badge-ongoing';
+      case 'completed': return 'ad-class-badge-completed';
+      case 'cancelled': return 'ad-class-badge-cancelled';
+      default: return 'ad-class-badge-scheduled';
     }
   };
 
   const getDifficultyBadgeClass = (level) => {
     switch (level) {
-      case 'beginner': return 'badge-beginner';
-      case 'intermediate': return 'badge-intermediate';
-      case 'advanced': return 'badge-advanced';
-      default: return 'badge-beginner';
+      case 'beginner': return 'ad-class-badge-beginner';
+      case 'intermediate': return 'ad-class-badge-intermediate';
+      case 'advanced': return 'ad-class-badge-advanced';
+      default: return 'ad-class-badge-beginner';
     }
   };
 
@@ -243,26 +243,22 @@ const AdminClasses = () => {
 
   if (loading && classes.length === 0) {
     return (
-      <div className="admin-page-container">
+      <div className="ad-class-admin-page-container">
         <div className="loading-spinner">Đang tải...</div>
       </div>
     );
   }
 
   return (
-    <div className="admin-page-container">
-      <div className="admin-page-header">
-        <h2 className="admin-page-title">Quản Lý Lớp Học & Lịch Tập</h2>
-        <button className="btn-primary" onClick={handleCreateClass}>
-          <FontAwesomeIcon icon={faPlus} />
-          <span>Thêm Lớp Học Mới</span>
-        </button>
+    <div className="ad-class-admin-page-container">
+      <div className="ad-class-admin-page-header">
+        <h2 className="ad-class-admin-page-title">Quản Lý Lớp Học & Lịch Tập</h2>
       </div>
 
       {/* Filters */}
-      <div className="filters-section">
-        <div className="filters-grid">
-          <div className="filter-item">
+      <div className="ad-class-filters-section">
+        <div className="ad-class-filters-grid">
+          <div className="ad-class-filter-item">
             <label>
               <FontAwesomeIcon icon={faSearch} />
               Tìm kiếm
@@ -275,7 +271,7 @@ const AdminClasses = () => {
             />
           </div>
           
-          <div className="filter-item">
+          <div className="ad-class-filter-item">
             <label>
               <FontAwesomeIcon icon={faUsers} />
               Huấn luyện viên
@@ -293,7 +289,7 @@ const AdminClasses = () => {
             </select>
           </div>
           
-          <div className="filter-item">
+          <div className="ad-class-filter-item">
             <label>Trạng thái</label>
             <select
               value={filters.status}
@@ -307,7 +303,7 @@ const AdminClasses = () => {
             </select>
           </div>
           
-          <div className="filter-item">
+          <div className="ad-class-filter-item">
             <label>Độ khó</label>
             <select
               value={filters.difficulty_level}
@@ -320,7 +316,7 @@ const AdminClasses = () => {
             </select>
           </div>
           
-          <div className="filter-item">
+          <div className="ad-class-filter-item">
             <label>Từ ngày</label>
             <input
               type="date"
@@ -329,7 +325,7 @@ const AdminClasses = () => {
             />
           </div>
           
-          <div className="filter-item">
+          <div className="ad-class-filter-item">
             <label>Đến ngày</label>
             <input
               type="date"
@@ -339,28 +335,35 @@ const AdminClasses = () => {
           </div>
         </div>
         
-        <button className="btn-secondary" onClick={clearFilters}>
-          <FontAwesomeIcon icon={faFilter} />
-          Xóa bộ lọc
-        </button>
+        <div className="ad-class-filters-actions">
+          <button className="ad-class-btn-secondary" onClick={clearFilters}>
+            <FontAwesomeIcon icon={faFilter} />
+            Xóa bộ lọc
+          </button>
+          
+          <button className="ad-class-btn-primary" onClick={handleCreateClass}>
+            <FontAwesomeIcon icon={faPlus} />
+            <span>Thêm Lớp Học Mới</span>
+          </button>
+        </div>
       </div>
 
       {error && <div className="error-message">{error}</div>}
 
       {/* Classes Grid */}
-      <div className="classes-grid">
+      <div className="ad-class-classes-grid">
         {classes.map(classItem => (
-          <div key={classItem.id} className="class-card">
-            <div className="class-card-header">
-              <h4 className="class-name">{classItem.class_name}</h4>
-              <div className="class-badges">
-                <span className={`badge ${getStatusBadgeClass(classItem.status)}`}>
+          <div key={classItem.id} className="ad-class-class-card">
+            <div className="ad-class-class-card-header">
+              <h4 className="ad-class-class-name">{classItem.class_name}</h4>
+              <div className="ad-class-class-badges">
+                <span className={`ad-class-badge ${getStatusBadgeClass(classItem.status)}`}>
                   {classItem.status === 'scheduled' && 'Đã lên lịch'}
                   {classItem.status === 'ongoing' && 'Đang diễn ra'}
                   {classItem.status === 'completed' && 'Hoàn thành'}
                   {classItem.status === 'cancelled' && 'Đã hủy'}
                 </span>
-                <span className={`badge ${getDifficultyBadgeClass(classItem.difficulty_level)}`}>
+                <span className={`ad-class-badge ${getDifficultyBadgeClass(classItem.difficulty_level)}`}>
                   {classItem.difficulty_level === 'beginner' && 'Cơ bản'}
                   {classItem.difficulty_level === 'intermediate' && 'Trung cấp'}
                   {classItem.difficulty_level === 'advanced' && 'Nâng cao'}
@@ -368,39 +371,39 @@ const AdminClasses = () => {
               </div>
             </div>
 
-            <div className="class-info">
+            <div className="ad-class-class-info">
               {classItem.trainer_name && (
-                <p className="class-trainer">
+                <p className="ad-class-class-trainer">
                   <FontAwesomeIcon icon={faUsers} />
                   HLV: {classItem.trainer_name}
                 </p>
               )}
               
-              <p className="class-time">
+              <p className="ad-class-class-time">
                 <FontAwesomeIcon icon={faClock} />
                 {formatTime(classItem.start_time)} - {formatTime(classItem.end_time)}
               </p>
               
-              <p className="class-date">
+              <p className="ad-class-class-date">
                 <FontAwesomeIcon icon={faCalendar} />
                 {formatDate(classItem.class_date)}
               </p>
               
               {classItem.location && (
-                <p className="class-location">
+                <p className="ad-class-class-location">
                   <FontAwesomeIcon icon={faMapMarkerAlt} />
                   {classItem.location}
                 </p>
               )}
               
-              <div className="class-participants">
+              <div className="ad-class-class-participants">
                 <FontAwesomeIcon icon={faUsers} />
-                <span className="participants-count">
+                <span className="ad-class-participants-count">
                   {classItem.current_participants || 0}/{classItem.max_participants || 0}
                 </span>
-                <div className="participants-bar">
+                <div className="ad-class-participants-bar">
                   <div 
-                    className="participants-fill"
+                    className="ad-class-participants-fill"
                     style={{
                       width: `${((classItem.current_participants || 0) / (classItem.max_participants || 1)) * 100}%`
                     }}
@@ -409,16 +412,16 @@ const AdminClasses = () => {
               </div>
               
               {classItem.price > 0 && (
-                <p className="class-price">
+                <p className="ad-class-class-price">
                   <FontAwesomeIcon icon={faDumbbell} />
                   {classItem.price.toLocaleString('vi-VN')} VNĐ
                 </p>
               )}
             </div>
 
-            <div className="class-actions">
+            <div className="ad-class-class-actions">
               <button 
-                className="action-btn view-btn"
+                className="ad-class-action-btn ad-class-view-btn"
                 onClick={() => handleViewDetails(classItem)}
                 title="Xem chi tiết"
               >
@@ -426,7 +429,7 @@ const AdminClasses = () => {
               </button>
               
               <button 
-                className="action-btn edit-btn"
+                className="ad-class-action-btn ad-class-edit-btn"
                 onClick={() => handleEditClass(classItem)}
                 title="Chỉnh sửa"
               >
@@ -434,7 +437,7 @@ const AdminClasses = () => {
               </button>
               
               <button 
-                className="action-btn enroll-btn"
+                className="ad-class-action-btn ad-class-enroll-btn"
                 onClick={() => handleManageEnrollment(classItem)}
                 title="Quản lý học viên"
               >
@@ -442,7 +445,7 @@ const AdminClasses = () => {
               </button>
               
               <button 
-                className="action-btn delete-btn"
+                className="ad-class-action-btn ad-class-delete-btn"
                 onClick={() => handleDeleteClass(classItem.id)}
                 title="Xóa"
               >
@@ -455,21 +458,21 @@ const AdminClasses = () => {
 
       {/* Pagination */}
       {pagination.totalPages > 1 && (
-        <div className="pagination-container">
+        <div className="ad-class-pagination-container">
           <button
-            className="pagination-btn"
+            className="ad-class-pagination-btn"
             disabled={pagination.page === 1}
             onClick={() => setPagination(prev => ({ ...prev, page: prev.page - 1 }))}
           >
             Trước
           </button>
           
-          <span className="pagination-info">
+          <span className="ad-class-pagination-info">
             Trang {pagination.page} / {pagination.totalPages}
           </span>
           
           <button
-            className="pagination-btn"
+            className="ad-class-pagination-btn"
             disabled={pagination.page === pagination.totalPages}
             onClick={() => setPagination(prev => ({ ...prev, page: prev.page + 1 }))}
           >
@@ -493,9 +496,9 @@ const AdminClasses = () => {
       )}
 
       {showClassDetails && (
-        <div className="modal-overlay" onClick={() => setShowClassDetails(false)}>
-          <div className="modal-content" onClick={e => e.stopPropagation()}>
-            <div className="modal-header">
+        <div className="ad-class-modal-overlay" onClick={() => setShowClassDetails(false)}>
+          <div className="ad-class-modal-content" onClick={e => e.stopPropagation()}>
+            <div className="ad-class-modal-header">
               <h3>Chi tiết lớp học</h3>
               <button onClick={() => setShowClassDetails(false)}>×</button>
             </div>
@@ -507,74 +510,74 @@ const AdminClasses = () => {
       )}
 
       {showEnrollment && (
-        <div className="modal-overlay" onClick={() => setShowEnrollment(false)}>
-          <div className="modal-content large-modal" onClick={e => e.stopPropagation()}>
-            <div className="modal-header">
+        <div className="ad-class-modal-overlay" onClick={() => setShowEnrollment(false)}>
+          <div className="ad-class-modal-content ad-class-large-modal" onClick={e => e.stopPropagation()}>
+            <div className="ad-class-modal-header">
               <h3>Quản lý học viên - {selectedClass?.class_name}</h3>
               <button onClick={() => setShowEnrollment(false)}>×</button>
             </div>
-            <div className="modal-body">
+            <div className="ad-class-modal-body">
               {loadingEnrollments ? (
                 <div className="loading-spinner">Đang tải danh sách học viên...</div>
               ) : (
-                <div className="enrollments-container">
-                  <div className="enrollment-summary">
+                <div className="ad-class-enrollments-container">
+                  <div className="ad-class-enrollment-summary">
                     <h4>Tổng quan</h4>
-                    <div className="summary-stats">
-                      <div className="stat-item">
-                        <span className="stat-label">Đã đăng ký:</span>
-                        <span className="stat-value">{enrolledUsers.length}</span>
+                    <div className="ad-class-summary-stats">
+                      <div className="ad-class-stat-item">
+                        <span className="ad-class-stat-label">Đã đăng ký:</span>
+                        <span className="ad-class-stat-value">{enrolledUsers.length}</span>
                       </div>
-                      <div className="stat-item">
-                        <span className="stat-label">Sức chứa tối đa:</span>
-                        <span className="stat-value">{selectedClass?.max_participants || 0}</span>
+                      <div className="ad-class-stat-item">
+                        <span className="ad-class-stat-label">Sức chứa tối đa:</span>
+                        <span className="ad-class-stat-value">{selectedClass?.max_participants || 0}</span>
                       </div>
-                      <div className="stat-item">
-                        <span className="stat-label">Còn lại:</span>
-                        <span className="stat-value">
+                      <div className="ad-class-stat-item">
+                        <span className="ad-class-stat-label">Còn lại:</span>
+                        <span className="ad-class-stat-value">
                           {(selectedClass?.max_participants || 0) - enrolledUsers.length}
                         </span>
                       </div>
                     </div>
                   </div>
 
-                  <div className="enrolled-users-list">
+                  <div className="ad-class-enrolled-users-list">
                     <h4>Danh sách học viên đã đăng ký</h4>
                     {enrolledUsers.length === 0 ? (
-                      <div className="empty-state">
+                      <div className="ad-class-empty-state">
                         <p>Chưa có học viên nào đăng ký lớp học này</p>
                       </div>
                     ) : (
-                      <div className="users-table">
-                        <div className="table-header">
-                          <div className="col-name">Tên học viên</div>
-                          <div className="col-email">Email</div>
-                          <div className="col-enrolled">Ngày đăng ký</div>
-                          <div className="col-status">Trạng thái</div>
-                          <div className="col-actions">Thao tác</div>
+                      <div className="ad-class-users-table">
+                        <div className="ad-class-table-header">
+                          <div className="ad-class-col-name">Tên học viên</div>
+                          <div className="ad-class-col-email">Email</div>
+                          <div className="ad-class-col-enrolled">Ngày đăng ký</div>
+                          <div className="ad-class-col-status">Trạng thái</div>
+                          <div className="ad-class-col-actions">Thao tác</div>
                         </div>
-                        <div className="table-body">
+                        <div className="ad-class-table-body">
                           {enrolledUsers.map(user => (
-                            <div key={user.id} className="table-row">
-                              <div className="col-name">
+                            <div key={user.id} className="ad-class-table-row">
+                              <div className="ad-class-col-name">
                                 <FontAwesomeIcon icon={faUsers} />
                                 {user.name || user.full_name || 'N/A'}
                               </div>
-                              <div className="col-email">{user.email || 'N/A'}</div>
-                              <div className="col-enrolled">
+                              <div className="ad-class-col-email">{user.email || 'N/A'}</div>
+                              <div className="ad-class-col-enrolled">
                                 {user.enrolled_at ? 
                                   new Date(user.enrolled_at).toLocaleDateString('vi-VN') : 
                                   'N/A'
                                 }
                               </div>
-                              <div className="col-status">
-                                <span className="status-badge enrolled">
+                              <div className="ad-class-col-status">
+                                <span className="ad-class-status-badge ad-class-enrolled">
                                   Đã đăng ký
                                 </span>
                               </div>
-                              <div className="col-actions">
+                              <div className="ad-class-col-actions">
                                 <button 
-                                  className="action-btn delete-btn"
+                                  className="ad-class-action-btn ad-class-delete-btn"
                                   onClick={() => handleRemoveUser(user.id)}
                                   title="Hủy đăng ký"
                                 >

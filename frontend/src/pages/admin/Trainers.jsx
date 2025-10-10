@@ -238,9 +238,6 @@ const Trainers = () => {
     <div className="admin-trainers">
       <div className="page-header">
         <h1>Quản Lý Huấn Luyện Viên (PT)</h1>
-        <button className="btn-primary" onClick={handleCreate}>
-          <FontAwesomeIcon icon={faPlus} /> Thêm HLV
-        </button>
       </div>
 
       {/* Stats Cards */}
@@ -261,24 +258,31 @@ const Trainers = () => {
 
       {/* Filters */}
       <div className="filters">
-        <div className="search-box">
-          <FontAwesomeIcon icon={faSearch} />
-          <input
-            type="text"
-            placeholder="Tìm kiếm theo tên, email, chuyên môn..."
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-          />
+        <div className="filters-left">
+          <div className="search-box">
+            <FontAwesomeIcon icon={faSearch} />
+            <input
+              type="text"
+              placeholder="Tìm kiếm theo tên, email, chuyên môn..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+            />
+          </div>
+          <select 
+            value={statusFilter} 
+            onChange={(e) => setStatusFilter(e.target.value)}
+            className="filter-select"
+          >
+            <option value="">Tất cả trạng thái</option>
+            <option value="active">Đang hoạt động</option>
+            <option value="inactive">Tạm nghỉ</option>
+          </select>
         </div>
-        <select 
-          value={statusFilter} 
-          onChange={(e) => setStatusFilter(e.target.value)}
-          className="filter-select"
-        >
-          <option value="">Tất cả trạng thái</option>
-          <option value="active">Đang hoạt động</option>
-          <option value="inactive">Tạm nghỉ</option>
-        </select>
+        <div className="filters-right">
+          <button className="btn-primary" onClick={handleCreate}>
+            <FontAwesomeIcon icon={faPlus} /> Thêm HLV
+          </button>
+        </div>
       </div>
 
       {/* Trainers Table */}

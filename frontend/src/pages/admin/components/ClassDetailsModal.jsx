@@ -95,7 +95,7 @@ const ClassDetailsModal = ({ isOpen, onClose, classData }) => {
   return (
     <div className="modal-overlay" onClick={onClose}>
       <div className="modal-content class-details-modal" onClick={e => e.stopPropagation()}>
-        <div className="modal-header">
+        <div className="ad-class-modal-header">
           <h3>Chi tiết lớp học</h3>
           <button className="modal-close-btn" onClick={onClose}>
             <FontAwesomeIcon icon={faTimes} />

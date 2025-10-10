@@ -209,15 +209,15 @@ const AdminMemberPackages = () => {
         <div>
           <h2 className="admin-page-title">Quản Lý Gói Tập Thành Viên</h2>
           {stats && (
-            <div className="stats-summary">
-              <span className="stat-item">Tổng: {stats.total}</span>
-              <span className="stat-item active">Hoạt động: {stats.active}</span>
-              <span className="stat-item expired">Hết hạn: {stats.expired}</span>
-              <span className="stat-item cancelled">Đã hủy: {stats.cancelled}</span>
+            <div className="amp-stats-summary">
+              <span className="amp-stat-item">Tổng: {stats.total}</span>
+              <span className="amp-stat-item active">Hoạt động: {stats.active}</span>
+              <span className="amp-stat-item expired">Hết hạn: {stats.expired}</span>
+              <span className="amp-stat-item cancelled">Đã hủy: {stats.cancelled}</span>
             </div>
           )}
         </div>
-        <div className="header-actions">
+        <div className="amp-header-actions">
           <button 
             className="btn-secondary"
             onClick={updateExpiredPackages}
@@ -237,10 +237,10 @@ const AdminMemberPackages = () => {
       </div>
 
       {/* Filters */}
-      <div className="filters-section">
-        <div className="filter-group">
-          <div className="search-input">
-            <FontAwesomeIcon icon={faSearch} className="search-icon" />
+      <div className="amp-filters-section">
+        <div className="amp-filter-group">
+          <div className="amp-search-input">
+            <FontAwesomeIcon icon={faSearch} className="amp-search-icon" />
             <input
               type="text"
               placeholder="Tìm kiếm theo tên, email, gói tập..."
@@ -270,8 +270,8 @@ const AdminMemberPackages = () => {
       </div>
 
       {/* Member Packages Table */}
-      <div className="table-container">
-        <table className="data-table">
+      <div className="amp-table-container">
+        <table className="amp-data-table">
           <thead>
             <tr>
               <th>Thành viên</th>
@@ -287,29 +287,29 @@ const AdminMemberPackages = () => {
             {filteredMemberPackages.map(mp => (
               <tr key={mp.id}>
                 <td>
-                  <div className="member-info">
-                    <div className="member-name">{mp.full_name}</div>
-                    <div className="member-email">{mp.email}</div>
-                    <div className="member-phone">{mp.phone}</div>
+                  <div className="amp-member-info">
+                    <div className="amp-member-name">{mp.full_name}</div>
+                    <div className="amp-member-email">{mp.email}</div>
+                    <div className="amp-member-phone">{mp.phone}</div>
                   </div>
                 </td>
                 <td>
-                  <span className="package-name">{mp.package_name}</span>
+                  <span className="amp-package-name">{mp.package_name}</span>
                 </td>
                 <td>{new Date(mp.start_date).toLocaleDateString('vi-VN')}</td>
                 <td>{new Date(mp.end_date).toLocaleDateString('vi-VN')}</td>
                 <td>
-                  <span className={`status-pill ${getStatusColor(mp.status)}`}>
+                  <span className={`amp-status-pill ${getStatusColor(mp.status)}`}>
                     {getStatusText(mp.status)}
                   </span>
                 </td>
                 <td>{mp.paid_amount.toLocaleString('vi-VN')}đ</td>
                 <td>
-                  <div className="action-buttons">
+                  <div className="amp-action-buttons">
                     {mp.status === 'active' && (
                       <>
                         <button
-                          className="action-btn btn-info"
+                          className="amp-action-btn amp-btn-info"
                           onClick={() => {
                             setSelectedMemberPackage(mp);
                             setShowExtendModal(true);
@@ -319,7 +319,7 @@ const AdminMemberPackages = () => {
                           <FontAwesomeIcon icon={faCalendarPlus} />
                         </button>
                         <button
-                          className="action-btn btn-danger"
+                          className="amp-action-btn amp-btn-danger"
                           onClick={() => handleCancel(mp)}
                           title="Hủy gói"
                         >
@@ -347,7 +347,7 @@ const AdminMemberPackages = () => {
               >×</button>
             </div>
             <form onSubmit={handleRegister}>
-              <div className="form-group">
+              <div className="amp-form-group">
                 <label>Member ID:</label>
                 <input
                   type="number"
@@ -356,7 +356,7 @@ const AdminMemberPackages = () => {
                   required
                 />
               </div>
-              <div className="form-group">
+              <div className="amp-form-group">
                 <label>Gói tập:</label>
                 <select
                   value={registerForm.package_id}
@@ -379,7 +379,7 @@ const AdminMemberPackages = () => {
                   ))}
                 </select>
               </div>
-              <div className="form-group">
+              <div className="amp-form-group">
                 <label>Số tiền thanh toán:</label>
                 <input
                   type="number"
@@ -388,7 +388,7 @@ const AdminMemberPackages = () => {
                   required
                 />
               </div>
-              <div className="form-group">
+              <div className="amp-form-group">
                 <label>Ghi chú:</label>
                 <textarea
                   value={registerForm.notes}
@@ -420,13 +420,13 @@ const AdminMemberPackages = () => {
                 onClick={() => setShowExtendModal(false)}
               >×</button>
             </div>
-            <div className="extend-info">
+            <div className="amp-extend-info">
               <p><strong>Thành viên:</strong> {selectedMemberPackage.full_name}</p>
               <p><strong>Gói tập:</strong> {selectedMemberPackage.package_name}</p>
               <p><strong>Ngày hết hạn hiện tại:</strong> {new Date(selectedMemberPackage.end_date).toLocaleDateString('vi-VN')}</p>
             </div>
             <form onSubmit={handleExtend}>
-              <div className="form-group">
+              <div className="amp-form-group">
                 <label>Số ngày gia hạn:</label>
                 <input
                   type="number"
@@ -436,7 +436,7 @@ const AdminMemberPackages = () => {
                   min="1"
                 />
               </div>
-              <div className="form-group">
+              <div className="amp-form-group">
                 <label>Phí gia hạn (VNĐ):</label>
                 <input
                   type="number"

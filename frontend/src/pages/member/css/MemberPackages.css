@@ -387,6 +387,7 @@ body {
 }
 .modal-header {
   display:flex; justify-content:space-between; align-items:center;
+  background:rgb(98, 104, 102);
   padding:18px 22px; border-bottom:1px solid var(--bd);
 }
 .modal-header h3 {margin:0;font-size:18px;font-weight:700;}

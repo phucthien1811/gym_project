@@ -2,9 +2,9 @@
 
 .admin-trainers {
   padding: 20px;
-  background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
+  background-color: rgb(244, 245, 247);
   min-height: 100vh;
-  color: #ffffff;
+  color: #1f2937;
 }
 
 .page-header {
@@ -13,24 +13,21 @@
   align-items: center;
   margin-bottom: 30px;
   padding-bottom: 20px;
-  border-bottom: 1px solid #333;
+  border-bottom: 1px solid rgb(214, 215, 217);
 }
 
 .page-header h1 {
   margin: 0;
   font-size: 2rem;
   font-weight: 600;
-  background: linear-gradient(135deg, #4ade80, #22c55e);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
+  color: #1f2937;
 }
 
 .btn-primary {
-  background: linear-gradient(135deg, #22c55e, #16a34a);
+  background-color: #22c55e;
   color: white;
   border: none;
-  padding: 12px 24px;
+  padding: 12px 20px;
   border-radius: 8px;
   font-weight: 500;
   cursor: pointer;
@@ -38,17 +35,20 @@
   align-items: center;
   gap: 8px;
   transition: all 0.3s ease;
+  white-space: nowrap;
+  font-size: 14px;
 }
 
 .btn-primary:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 8px 20px rgba(34, 197, 94, 0.3);
+  background-color: #16a34a;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(34, 197, 94, 0.3);
 }
 
 .btn-secondary {
   background: transparent;
-  color: #9ca3af;
-  border: 1px solid #374151;
+  color: #6b7280;
+  border: 1px solid rgb(214, 215, 217);
   padding: 12px 24px;
   border-radius: 8px;
   font-weight: 500;
@@ -57,8 +57,9 @@
 }
 
 .btn-secondary:hover {
-  background: #374151;
-  color: white;
+  background: #f3f4f6;
+  color: #374151;
+  border-color: #9ca3af;
 }
 
 /* Stats Grid */
@@ -70,9 +71,8 @@
 }
 
 .stat-card {
-  background: rgba(255, 255, 255, 0.05);
-  backdrop-filter: blur(10px);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: #ffffff;
+  border: 1px solid rgb(214, 215, 217);
   border-radius: 12px;
   padding: 20px;
   text-align: center;
@@ -81,7 +81,7 @@
 
 .stat-card:hover {
   transform: translateY(-2px);
-  border-color: rgba(34, 197, 94, 0.3);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
 }
 
 .stat-card.active {
@@ -95,7 +95,7 @@
 .stat-card h3 {
   margin: 0 0 10px 0;
   font-size: 0.9rem;
-  color: #9ca3af;
+  color: #6b7280;
   text-transform: uppercase;
   letter-spacing: 1px;
 }
@@ -116,12 +116,27 @@
   gap: 20px;
   margin-bottom: 30px;
   align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+}
+
+.filters-left {
+  display: flex;
+  gap: 20px;
+  align-items: center;
+  flex: 1;
+}
+
+.filters-right {
+  display: flex;
+  gap: 12px;
+  align-items: center;
 }
 
 .search-box {
   position: relative;
   flex: 1;
-  max-width: 400px;
+  max-width: 350px;
 }
 
 .search-box svg {
@@ -136,10 +151,10 @@
 .search-box input {
   width: 100%;
   padding: 12px 12px 12px 40px;
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: #ffffff;
+  border: 1px solid rgb(214, 215, 217);
   border-radius: 8px;
-  color: white;
+  color: #1f2937;
   font-size: 14px;
 }
 
@@ -155,23 +170,61 @@
 
 .filter-select {
   padding: 12px 16px;
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: #ffffff;
+  border: 1px solid rgb(214, 215, 217);
   border-radius: 8px;
-  color: white;
+  color: #1f2937;
   font-size: 14px;
+  cursor: pointer;
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='m6 8 4 4 4-4'/%3e%3c/svg%3e");
+  background-position: right 12px center;
+  background-repeat: no-repeat;
+  background-size: 16px;
+  padding-right: 40px;
+  /* Cố gắng force style cho dropdown */
+  color-scheme: light;
+}
+
+/* Cho Chrome/Safari */
+.filter-select::-webkit-dropdown-arrow {
+  display: none;
+}
+
+/* Force color scheme cho dropdown */
+.filter-select::-webkit-calendar-picker-indicator {
+  display: none;
 }
 
 .filter-select:focus {
   outline: none;
   border-color: #22c55e;
+  box-shadow: 0 0 0 3px rgba(34, 197, 94, 0.1);
+}
+
+.filter-select option {
+  background: #ffffff !important;
+  color: #1f2937 !important;
+  padding: 8px 12px;
+}
+
+/* Fallback cho các browser khác nhau */
+.filter-select option:checked {
+  background: #22c55e !important;
+  color: #ffffff !important;
+}
+
+.filter-select option:hover {
+  background: #f3f4f6 !important;
+  color: #1f2937 !important;
 }
 
 /* Table */
 .trainers-table-container {
-  background: rgba(255, 255, 255, 0.05);
-  backdrop-filter: blur(10px);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: #ffffff;
+  border: 1px solid rgb(214, 215, 217);
   border-radius: 12px;
   overflow: hidden;
 }
@@ -182,12 +235,12 @@
 }
 
 .trainers-table th {
-  background: rgba(0, 0, 0, 0.3);
+  background: rgb(235, 238, 243);
   padding: 16px;
   text-align: left;
   font-weight: 600;
-  color: #22c55e;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  color: #374151;
+  border-bottom: 1px solid rgb(214, 215, 217);
   font-size: 0.9rem;
   text-transform: uppercase;
   letter-spacing: 1px;
@@ -195,11 +248,12 @@
 
 .trainers-table td {
   padding: 16px;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  border-bottom: 1px solid rgb(214, 215, 217);
+  color: #1f2937;
 }
 
 .trainers-table tr:hover {
-  background: rgba(255, 255, 255, 0.02);
+  background: #f8fafc;
 }
 
 .trainer-info {
@@ -236,13 +290,13 @@
 
 .trainer-name {
   font-weight: 600;
-  color: white;
+  color: #1f2937;
   margin-bottom: 2px;
 }
 
 .trainer-email {
   font-size: 0.85rem;
-  color: #9ca3af;
+  color: #6b7280;
 }
 
 .specialization {
@@ -284,7 +338,7 @@
 .btn-action {
   width: 36px;
   height: 36px;
-  border: none;
+  border: 1px solid rgb(214, 215, 217);
   border-radius: 6px;
   cursor: pointer;
   display: flex;
@@ -292,53 +346,50 @@
   justify-content: center;
   transition: all 0.3s ease;
   font-size: 0.9rem;
+  background: #ffffff;
 }
 
 .btn-action.view {
-  background: rgba(59, 130, 246, 0.1);
   color: #3b82f6;
 }
 
 .btn-action.view:hover {
-  background: rgba(59, 130, 246, 0.2);
-  transform: scale(1.1);
+  background: #dbeafe;
+  border-color: #3b82f6;
 }
 
 .btn-action.edit {
-  background: rgba(245, 158, 11, 0.1);
   color: #f59e0b;
 }
 
 .btn-action.edit:hover {
-  background: rgba(245, 158, 11, 0.2);
-  transform: scale(1.1);
+  background: #fef3c7;
+  border-color: #f59e0b;
 }
 
 .btn-action.toggle {
-  background: rgba(139, 92, 246, 0.1);
   color: #8b5cf6;
 }
 
 .btn-action.toggle:hover {
-  background: rgba(139, 92, 246, 0.2);
-  transform: scale(1.1);
+  background: #ede9fe;
+  border-color: #8b5cf6;
 }
 
 .btn-action.delete {
-  background: rgba(239, 68, 68, 0.1);
   color: #ef4444;
 }
 
 .btn-action.delete:hover {
-  background: rgba(239, 68, 68, 0.2);
-  transform: scale(1.1);
+  background: #fee2e2;
+  border-color: #ef4444;
 }
 
 /* Loading and No Data */
 .loading, .no-data {
   text-align: center;
   padding: 40px;
-  color: #9ca3af;
+  color: #6b7280;
   font-size: 1.1rem;
 }
 
@@ -358,36 +409,40 @@
   padding: 20px;
 }
 
-.modal-content {
-  background: linear-gradient(135deg, #1f1f1f 0%, #2d2d2d 100%);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+.admin-trainers .modal-content {
+  background: #ffffff !important;
+  border: 1px solid rgb(214, 215, 217);
   border-radius: 16px;
   max-width: 600px;
   width: 100%;
   max-height: 80vh !important;
-  overflow-y: auto !important;
+  overflow: hidden !important;
   box-shadow: 0 25px 50px rgba(0, 0, 0, 0.5);
+  display: flex;
+  flex-direction: column;
 }
 
-.modal-header {
+.admin-trainers .modal-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
   padding: 24px 24px 0 24px;
   margin-bottom: 20px;
+  border-bottom: 1px solid rgb(214, 215, 217) !important;
+  background: transparent !important;
 }
 
 .modal-header h3 {
   margin: 0;
   font-size: 1.5rem;
   font-weight: 600;
-  color: #22c55e;
+  color: #22c55e !important;
 }
 
 .close-button {
   background: none;
   border: none;
-  color: #9ca3af;
+  color: #6b7280;
   font-size: 1.2rem;
   cursor: pointer;
   padding: 8px;
@@ -396,14 +451,15 @@
 }
 
 .close-button:hover {
-  background: rgba(255, 255, 255, 0.1);
-  color: white;
+  background: #f3f4f6;
+  color: #374151;
 }
 
 .modal-body {
   padding: 0 24px 24px 24px;
-  max-height: calc(80vh - 80px);
-  overflow-y: auto;
+  flex: 1;
+  overflow-y: auto !important;
+  max-height: calc(80vh - 120px);
 }
 
 /* Trainer Details (View Mode) */
@@ -417,18 +473,18 @@
   display: flex;
   gap: 16px;
   padding: 12px 0;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  border-bottom: 1px solid rgb(214, 215, 217);
 }
 
 .detail-row label {
   font-weight: 600;
-  color: #9ca3af;
+  color: #6b7280;
   min-width: 120px;
   flex-shrink: 0;
 }
 
 .detail-row span {
-  color: white;
+  color: #1f2937;
   flex: 1;
 }
 
@@ -459,7 +515,7 @@
 
 .form-group label {
   font-weight: 500;
-  color: #e5e7eb;
+  color: #374151;
   font-size: 0.9rem;
 }
 
@@ -467,12 +523,32 @@
 .form-group select,
 .form-group textarea {
   padding: 12px;
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: #ffffff;
+  border: 1px solid rgb(214, 215, 217);
   border-radius: 8px;
-  color: white;
+  color: #1f2937 !important;
   font-size: 14px;
   transition: all 0.3s ease;
+  font-weight: 500;
+  caret-color: #1f2937;
+}
+
+.form-group select {
+  cursor: pointer;
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%231f2937' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='m6 8 4 4 4-4'/%3e%3c/svg%3e");
+  background-position: right 12px center;
+  background-repeat: no-repeat;
+  background-size: 16px;
+  padding-right: 40px;
+}
+
+.form-group select option {
+  background: #ffffff !important;
+  color: #1f2937 !important;
+  padding: 8px 12px;
 }
 
 .form-group input:focus,
@@ -506,7 +582,7 @@
   justify-content: flex-end;
   margin-top: 20px;
   padding-top: 20px;
-  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  border-top: 1px solid rgb(214, 215, 217);
 }
 
 /* Responsive */
@@ -518,6 +594,17 @@
   .filters {
     flex-direction: column;
     align-items: stretch;
+    gap: 15px;
+  }
+  
+  .filters-left {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 15px;
+  }
+  
+  .filters-right {
+    justify-content: center;
   }
   
   .search-box {
@@ -540,6 +627,24 @@
     font-size: 1.5rem;
   }
   
+  .filters {
+    gap: 12px;
+  }
+  
+  .filters-left {
+    gap: 12px;
+  }
+  
+  .filters-right {
+    width: 100%;
+    justify-content: center;
+  }
+  
+  .btn-primary {
+    width: 100%;
+    justify-content: center;
+  }
+  
   .trainers-table-container {
     overflow-x: auto;
   }
@@ -558,25 +663,100 @@
   }
 }
 
-/* Custom Scrollbar */
-.modal-content::-webkit-scrollbar,
-.modal-body::-webkit-scrollbar {
+/* Custom Scrollbar cho toàn bộ trang */
+.admin-trainers::-webkit-scrollbar {
   width: 8px;
 }
 
-.modal-content::-webkit-scrollbar-track,
+.admin-trainers::-webkit-scrollbar-track {
+  background: #f1f5f9;
+  border-radius: 4px;
+}
+
+.admin-trainers::-webkit-scrollbar-thumb {
+  background: #22c55e;
+  border-radius: 4px;
+}
+
+.admin-trainers::-webkit-scrollbar-thumb:hover {
+  background: #16a34a;
+}
+
+/* Custom Scrollbar cho modal - chỉ trong modal-body */
+.modal-body::-webkit-scrollbar {
+  width: 6px;
+}
+
 .modal-body::-webkit-scrollbar-track {
-  background: rgba(255, 255, 255, 0.05);
-  border-radius: 4px;
+  background: #f1f5f9;
+  border-radius: 3px;
+  margin: 8px 0;
 }
 
-.modal-content::-webkit-scrollbar-thumb,
 .modal-body::-webkit-scrollbar-thumb {
-  background: rgba(34, 197, 94, 0.5);
-  border-radius: 4px;
+  background: #22c55e;
+  border-radius: 3px;
 }
 
-.modal-content::-webkit-scrollbar-thumb:hover,
 .modal-body::-webkit-scrollbar-thumb:hover {
-  background: rgba(34, 197, 94, 0.7);
+  background: #16a34a;
+}
+
+/* Ẩn scrollbar cho modal-content */
+.admin-trainers .modal-content::-webkit-scrollbar {
+  display: none;
+}
+
+/* Custom Scrollbar cho body toàn trang - Override global styles */
+html::-webkit-scrollbar,
+body::-webkit-scrollbar,
+*::-webkit-scrollbar {
+  width: 8px !important;
+}
+
+html::-webkit-scrollbar-track,
+body::-webkit-scrollbar-track,
+*::-webkit-scrollbar-track {
+  background: #f1f5f9 !important;
+  border-radius: 4px !important;
+}
+
+html::-webkit-scrollbar-thumb,
+body::-webkit-scrollbar-thumb,
+*::-webkit-scrollbar-thumb {
+  background: #22c55e !important;
+  border-radius: 4px !important;
+}
+
+html::-webkit-scrollbar-thumb:hover,
+body::-webkit-scrollbar-thumb:hover,
+*::-webkit-scrollbar-thumb:hover {
+  background: #16a34a !important;
+}
+
+/* Override cho main container */
+.admin-layout::-webkit-scrollbar,
+.admin-content::-webkit-scrollbar,
+.main-content::-webkit-scrollbar {
+  width: 8px !important;
+}
+
+.admin-layout::-webkit-scrollbar-track,
+.admin-content::-webkit-scrollbar-track,
+.main-content::-webkit-scrollbar-track {
+  background: #f1f5f9 !important;
+  border-radius: 4px !important;
+}
+
+.admin-layout::-webkit-scrollbar-thumb,
+.admin-content::-webkit-scrollbar-thumb,
+.main-content::-webkit-scrollbar-thumb {
+  background: #22c55e !important;
+  border-radius: 4px !important;
+}
+
+.admin-layout::-webkit-scrollbar-thumb:hover,
+.admin-content::-webkit-scrollbar-thumb:hover,
+.main-content::-webkit-scrollbar-thumb:hover {
+  background: #16a34a !important;
 }

@@ -29,62 +29,62 @@ export default function AdminLayout() {
         <nav className="admin__nav">
           
           {/* OVERVIEW */}
-          <NavSectionTitle title="OVERVIEW" />
+          <NavSectionTitle title="TỔNG QUAN" />
           <NavLink end to="/admin" className="admin__link">
             <FontAwesomeIcon icon={faGaugeHigh} className="admin__link-icon" />
-            Dashboard
+            Thống kê
           </NavLink>
 
           {/* CORE MANAGEMENT */}
-          <NavSectionTitle title="CORE MANAGEMENT" />
+          <NavSectionTitle title="QUẢN LÍ" />
           <NavLink to="/admin/members" className="admin__link">
             <FontAwesomeIcon icon={faUsers} className="admin__link-icon" />
-            Members
+            Thành Viên
           </NavLink>
           <NavLink to="/admin/trainers" className="admin__link">
             <FontAwesomeIcon icon={faUserTie} className="admin__link-icon" />
-            Trainers (PT)
+            Huấn Luyện Viên
           </NavLink>
           <NavLink to="/admin/classes" className="admin__link">
             <FontAwesomeIcon icon={faCalendarDays} className="admin__link-icon" />
-            Schedule
+            Lịch Tập 
           </NavLink>
           <NavLink to="/admin/plans" className="admin__link">
             <FontAwesomeIcon icon={faIdCard} className="admin__link-icon" />
-            Membership Plans
+            Gói Thành Viên
           </NavLink>
 
           {/* FINANCIAL */}
-          <NavSectionTitle title="FINANCIAL" />
+          <NavSectionTitle title="TÀI CHÍNH" />
           <NavLink to="/admin/invoices" className="admin__link">
             <FontAwesomeIcon icon={faFileInvoiceDollar} className="admin__link-icon" />
-            Invoices & Payments
+            Hóa Đơn
           </NavLink>
-          <NavLink to="/admin/reports" className="admin__link">
+          {/* <NavLink to="/admin/reports" className="admin__link">
             <FontAwesomeIcon icon={faChartLine} className="admin__link-icon" />
-            Revenue Reports
-          </NavLink>
+            Reports
+          </NavLink> */}
           
           {/* POINT OF SALE */}
-          <NavSectionTitle title="POINT OF SALE" />
+          <NavSectionTitle title="CỬA HÀNG" />
            <NavLink to="/admin/products" className="admin__link">
             <FontAwesomeIcon icon={faBoxOpen} className="admin__link-icon" />
-            Products
+            Sản Phẩm
           </NavLink>
           <NavLink to="/admin/orders" className="admin__link">
             <FontAwesomeIcon icon={faReceipt} className="admin__link-icon" />
-            Orders
+            Đơn Hàng
           </NavLink>
 
           {/* SYSTEM */}
           <NavSectionTitle title="SYSTEM" />
-          <NavLink to="/admin/staff" className="admin__link">
+          {/* <NavLink to="/admin/staff" className="admin__link">
             <FontAwesomeIcon icon={faUsersCog} className="admin__link-icon" />
-            Staff & Permissions
-          </NavLink>
+            Chỉ số 
+          </NavLink> */}
           <NavLink to="/admin/settings" className="admin__link">
             <FontAwesomeIcon icon={faGears} className="admin__link-icon" />
-            Settings
+            Cài đặt
           </NavLink>
 
           {/* Logout */}
@@ -93,7 +93,7 @@ export default function AdminLayout() {
             onClick={() => { logout(); nav("/"); }}
           >
             <FontAwesomeIcon icon={faArrowRightFromBracket} className="admin__link-icon" />
-            Logout
+            Đăng xuất
           </button>
         </nav>
       </aside>

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faPlus, faPen, faTrash, faCheckCircle, faEye, faEyeSlash, faUsers } from '@fortawesome/free-solid-svg-icons';
+import { faPlus, faPen, faTrash, faCheckCircle, faEye, faEyeSlash, faUsers, faSearch } from '@fortawesome/free-solid-svg-icons';
 import './css/AdminPlans.css';
 
 const AdminPlans = () => {
@@ -10,6 +10,7 @@ const AdminPlans = () => {
     const [showMembersModal, setShowMembersModal] = useState(false);
     const [currentPackage, setCurrentPackage] = useState(null);
     const [packageMembers, setPackageMembers] = useState([]);
+    const [searchTerm, setSearchTerm] = useState('');
     const [formData, setFormData] = useState({
         name: '',
         description: '',
@@ -187,12 +188,34 @@ const AdminPlans = () => {
 
     if (loading) return <div>Loading...</div>;
 
+    // Filter packages based on search term
+    const filteredPackages = packages.filter(pkg => 
+        pkg.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        (pkg.description && pkg.description.toLowerCase().includes(searchTerm.toLowerCase())) ||
+        (Array.isArray(pkg.features) && pkg.features.some(feature => 
+            feature.toLowerCase().includes(searchTerm.toLowerCase())
+        ))
+    );
+
     return (
         <div className="admin-page-container">
             <div className="admin-page-header">
                 <h2 className="admin-page-title">Quản Lý Gói Tập</h2>
+            </div>
+
+            {/* Search and Action Bar */}
+            <div className="apl-search-action-bar">
+                <div className="apl-search-input">
+                    <FontAwesomeIcon icon={faSearch} className="apl-search-icon" />
+                    <input
+                        type="text"
+                        placeholder="Tìm kiếm gói tập theo tên, mô tả..."
+                        value={searchTerm}
+                        onChange={(e) => setSearchTerm(e.target.value)}
+                    />
+                </div>
                 <button 
-                    className="btn-primary"
+                    className="apl-btn-primary"
                     onClick={() => setShowModal(true)}
                 >
                     <FontAwesomeIcon icon={faPlus} />
@@ -200,22 +223,22 @@ const AdminPlans = () => {
                 </button>
             </div>
 
-            <div className="plans-grid">
-                {packages.map(pkg => (
-                    <div key={pkg.id} className="plan-card">
-                        <div className="plan-header">
-                            <h3 className="plan-name">{pkg.name}</h3>
-                            <div className="plan-actions">
+            <div className="apl-plans-grid">
+                {filteredPackages.map(pkg => (
+                    <div key={pkg.id} className="apl-plan-card">
+                        <div className="apl-plan-header">
+                            <h3 className="apl-plan-name">{pkg.name}</h3>
+                            <div className="apl-plan-actions">
                                 <button 
-                                    className="action-btn btn-info"
+                                    className="apl-action-btn apl-btn-info"
                                     onClick={() => viewMembers(pkg)}
                                     title="Xem thành viên"
                                 >
                                     <FontAwesomeIcon icon={faUsers} />
-                                    <span className="member-count">{pkg.active_members || 0}</span>
+                                    <span className="apl-member-count">{pkg.active_members || 0}</span>
                                 </button>
                                 <button 
-                                    className="action-btn btn-secondary"
+                                    className="apl-action-btn btn-secondary"
                                     onClick={() => togglePublished(pkg.id)}
                                     title={pkg.is_published ? 'Ẩn gói' : 'Hiển thị gói'}
                                 >
@@ -235,11 +258,11 @@ const AdminPlans = () => {
                                 </button>
                             </div>
                         </div>
-                        <div className="plan-pricing">
-                            <span className="plan-price">{pkg.price.toLocaleString('vi-VN')}đ</span>
-                            <span className="plan-duration">/ {Math.floor(pkg.duration_days / 30)} tháng</span>
+                        <div className="apl-plan-pricing">
+                            <span className="apl-plan-price">{pkg.price.toLocaleString('vi-VN')}đ</span>
+                            <span className="apl-plan-duration">/ {Math.floor(pkg.duration_days / 30)} tháng</span>
                         </div>
-                        <ul className="plan-features">
+                        <ul className="apl-plan-features">
                             {(Array.isArray(pkg.features) ? pkg.features : []).map((feature, index) => (
                                 <li key={index}>
                                     <FontAwesomeIcon icon={faCheckCircle} /> 
@@ -247,8 +270,8 @@ const AdminPlans = () => {
                                 </li>
                             ))}
                         </ul>
-                        <div className="plan-footer">
-                            <span className={`status-pill ${pkg.is_published ? 'status-active' : 'status-inactive'}`}>
+                        <div className="apl-plan-footer">
+                            <span className={`apl-status-pill ${pkg.is_published ? 'apl-status-active' : 'apl-status-inactive'}`}>
                                 {pkg.is_published ? 'Đang hiển thị' : 'Bản nháp'}
                             </span>
                         </div>
@@ -258,17 +281,17 @@ const AdminPlans = () => {
 
             {/* Modal Tạo/Sửa Package */}
             {showModal && (
-                <div className="modal-overlay" onClick={() => setShowModal(false)}>
-                    <div className="modal-content" onClick={e => e.stopPropagation()}>
-                        <div className="modal-header">
+                <div className="apl-modal-overlay" onClick={() => setShowModal(false)}>
+                    <div className="apl-modal-content" onClick={e => e.stopPropagation()}>
+                        <div className="apl-modal-header">
                             <h3>{currentPackage ? 'Sửa Gói Tập' : 'Tạo Gói Tập Mới'}</h3>
                             <button 
-                                className="modal-close"
+                                className="apl-modal-close"
                                 onClick={() => setShowModal(false)}
                             >×</button>
                         </div>
                         <form onSubmit={handleSubmit}>
-                            <div className="form-group">
+                            <div className="apl-form-group">
                                 <label>Tên gói:</label>
                                 <input
                                     type="text"
@@ -277,7 +300,7 @@ const AdminPlans = () => {
                                     required
                                 />
                             </div>
-                            <div className="form-group">
+                            <div className="apl-form-group">
                                 <label>Mô tả:</label>
                                 <textarea
                                     value={formData.description}
@@ -285,8 +308,8 @@ const AdminPlans = () => {
                                     rows="3"
                                 />
                             </div>
-                            <div className="form-row">
-                                <div className="form-group">
+                            <div className="apl-form-row">
+                                <div className="apl-form-group">
                                     <label>Giá (VNĐ):</label>
                                     <input
                                         type="number"
@@ -295,7 +318,7 @@ const AdminPlans = () => {
                                         required
                                     />
                                 </div>
-                                <div className="form-group">
+                                <div className="apl-form-group">
                                     <label>Thời hạn (ngày):</label>
                                     <input
                                         type="number"
@@ -305,10 +328,10 @@ const AdminPlans = () => {
                                     />
                                 </div>
                             </div>
-                            <div className="form-group">
+                            <div className="apl-form-group">
                                 <label>Tính năng:</label>
                                 {formData.features.map((feature, index) => (
-                                    <div key={index} className="feature-input">
+                                    <div key={index} className="apl-feature-input">
                                         <input
                                             type="text"
                                             value={feature}
@@ -319,7 +342,7 @@ const AdminPlans = () => {
                                             <button
                                                 type="button"
                                                 onClick={() => removeFeatureField(index)}
-                                                className="btn-remove-feature"
+                                                className="apl-btn-remove-feature"
                                             >
                                                 ×
                                             </button>
@@ -329,13 +352,13 @@ const AdminPlans = () => {
                                 <button
                                     type="button"
                                     onClick={addFeatureField}
-                                    className="btn-add-feature"
+                                    className="apl-btn-add-feature"
                                 >
                                     + Thêm tính năng
                                 </button>
                             </div>
-                            <div className="form-group">
-                                <label className="checkbox-label">
+                            <div className="apl-form-group">
+                                <label className="apl-checkbox-label">
                                     <input
                                         type="checkbox"
                                         checked={formData.is_published}
@@ -344,11 +367,11 @@ const AdminPlans = () => {
                                     Hiển thị công khai
                                 </label>
                             </div>
-                            <div className="modal-footer">
-                                <button type="button" onClick={() => setShowModal(false)} className="btn-secondary">
+                            <div className="apl-modal-footer">
+                                <button type="button" onClick={() => setShowModal(false)} className="apl-btn-secondary">
                                     Hủy
                                 </button>
-                                <button type="submit" className="btn-primary">
+                                <button type="submit" className="apl-btn-primary">
                                     {currentPackage ? 'Cập nhật' : 'Tạo mới'}
                                 </button>
                             </div>
@@ -359,16 +382,16 @@ const AdminPlans = () => {
 
             {/* Modal Xem Members */}
             {showMembersModal && (
-                <div className="modal-overlay" onClick={() => setShowMembersModal(false)}>
-                    <div className="modal-content modal-large" onClick={e => e.stopPropagation()}>
-                        <div className="modal-header">
+                <div className="apl-modal-overlay" onClick={() => setShowMembersModal(false)}>
+                    <div className="apl-modal-content apl-modal-large" onClick={e => e.stopPropagation()}>
+                        <div className="apl-modal-header">
                             <h3>Thành viên gói {currentPackage?.name}</h3>
                             <button 
-                                className="modal-close"
+                                className="apl-modal-close"
                                 onClick={() => setShowMembersModal(false)}
                             >×</button>
                         </div>
-                        <div className="members-table">
+                        <div className="apl-members-table">
                             <table>
                                 <thead>
                                     <tr>
@@ -390,7 +413,7 @@ const AdminPlans = () => {
                                             <td>{new Date(member.start_date).toLocaleDateString('vi-VN')}</td>
                                             <td>{new Date(member.end_date).toLocaleDateString('vi-VN')}</td>
                                             <td>
-                                                <span className={`status-pill status-${member.status}`}>
+                                                <span className={`apl-status-pill apl-status-${member.status}`}>
                                                     {member.status === 'active' ? 'Đang hoạt động' : 
                                                      member.status === 'expired' ? 'Hết hạn' : 'Đã hủy'}
                                                 </span>

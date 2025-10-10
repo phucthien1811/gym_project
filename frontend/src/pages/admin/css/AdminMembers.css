@@ -17,7 +17,11 @@
     margin: 0;
     font-size: 28px;
     font-weight: 700;
-    color: var(--admin-text-primary);
+    color: #1f2937 !important;
+    background: none !important;
+    -webkit-background-clip: unset !important;
+    background-clip: unset !important;
+    text-align: left !important;
 }
 
 .admin-page-actions {
@@ -39,7 +43,7 @@
 }
 .search-bar input {
     background-color: var(--admin-sidebar-bg);
-    border: 1px solid var(--admin-border-color);
+    border: 1px solid rgb(214, 215, 217);
     border-radius: 8px;
     color: var(--admin-text-primary);
     padding: 10px 12px 10px 36px;
@@ -65,7 +69,7 @@
 }
 .filter-group select {
     background-color: var(--admin-sidebar-bg);
-    border: 1px solid var(--admin-border-color);
+    border: 1px solid rgb(214, 215, 217);
     border-radius: 8px;
     color: var(--admin-text-primary);
     padding: 10px 12px 10px 36px;
@@ -96,7 +100,7 @@
 .admin-table-container {
     background-color: var(--admin-card-bg);
     border-radius: 12px;
-    border: 1px solid var(--admin-border-color);
+    border: 1px solid rgb(214, 215, 217);
     overflow: hidden; /* Giúp bo góc cho bảng */
 }
 
@@ -108,18 +112,18 @@
 .admin-table th, .admin-table td {
     padding: 16px 20px;
     text-align: left;
-    border-bottom: 1px solid var(--admin-border-color);
+    border-bottom: 1px solid rgb(214, 215, 217);
 }
 .admin-table tbody tr:last-child td {
     border-bottom: none;
 }
 .admin-table thead {
-    background-color: #2a3547;
+    background-color: rgb(235, 238, 243);
 }
 .admin-table th {
     font-size: 13px;
     font-weight: 600;
-    color: var(--admin-text-secondary);
+    color: #374151;
     text-transform: uppercase;
 }
 
@@ -171,20 +175,41 @@
     gap: 8px;
 }
 .action-btn {
-    background: none;
-    border: 1px solid var(--admin-border-color);
-    color: var(--admin-text-secondary);
+    background: #ffffff !important;
+    border: 1px solid rgb(214, 215, 217) !important;
+    color: #6b7280 !important;
     width: 32px;
     height: 32px;
     border-radius: 8px;
     cursor: pointer;
     transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
 }
 .action-btn:hover {
-    background-color: #374151;
+    background-color: #f3f4f6 !important;
+    color: #374151 !important;
 }
-.btn-edit:hover { color: var(--admin-brand-color); }
-.btn-delete:hover { color: var(--admin-danger-color); }
+
+.action-btn.btn-edit {
+    color: #f59e0b !important;
+}
+.action-btn.btn-edit:hover {
+    background: #fef3c7 !important;
+    border-color: #f59e0b !important;
+    color: #f59e0b !important;
+}
+
+.action-btn.btn-delete {
+    color: #ef4444 !important;
+}
+.action-btn.btn-delete:hover {
+    background: #fee2e2 !important;
+    border-color: #ef4444 !important;
+    color: #ef4444 !important;
+}
 
 /* --- PHÂN TRANG --- */
 .pagination-container {
@@ -195,7 +220,7 @@
 }
 .pagination-btn {
     background-color: var(--admin-sidebar-bg);
-    border: 1px solid var(--admin-border-color);
+    border: 1px solid rgb(214, 215, 217);
     color: var(--admin-text-secondary);
     width: 36px;
     height: 36px;
