@@ -130,7 +130,7 @@
 
 .apl-plan-actions .btn-secondary,
 .apl-action-btn.btn-secondary {
-    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+    background: white;
     border: 2px solid rgb(234, 235, 236);
     color: #8b5cf6;
     
@@ -141,7 +141,7 @@
     background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);
     color: white;
     transform: translateY(-2px);
-}
+}   
 
 .apl-plan-actions .btn-edit {
     background-color: #ffc107;

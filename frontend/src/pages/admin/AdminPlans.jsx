@@ -200,7 +200,7 @@ const AdminPlans = () => {
     return (
         <div className="admin-page-container">
             <div className="admin-page-header">
-                <h2 className="admin-page-title">Quản Lý Gói Tập</h2>
+                <h2 className="admin-page-title">Quản Lý Gói Thành Viên</h2>
             </div>
 
             {/* Search and Action Bar */}

@@ -1,19 +1,197 @@
-.invoice-id {
+/* Admin Invoices Layout */
+.ai-admin-page-container {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+}
+
+.ai-admin-page-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 16px;
+}
+
+.ai-admin-page-title {
+    margin: 0;
+    font-size: 28px;
+    font-weight: 700;
+    color: #1f2937;
+}
+
+.ai-admin-page-actions {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+
+.ai-search-bar {
+    position: relative;
+}
+
+.ai-search-icon {
+    position: absolute;
+    left: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--admin-text-secondary);
+}
+
+.ai-search-bar input {
+    background-color: var(--admin-sidebar-bg);
+    border: 1px solid rgb(214, 215, 217);
+    border-radius: 8px;
+    color: var(--admin-text-primary);
+    padding: 10px 12px 10px 36px;
+    width: 280px;
+    transition: all 0.2s;
+}
+
+.ai-btn-primary {
+    background-color: var(--admin-brand-color);
+    color: #ffffff;
+    border: none;
+    border-radius: 8px;
+    padding: 10px 16px;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.ai-btn-primary:hover {
+    background-color: #2e7d32;
+}
+
+.ai-admin-table-container {
+    background-color: var(--admin-card-bg);
+    border-radius: 12px;
+    border: 1px solid rgb(214, 215, 217);
+    overflow: hidden;
+}
+
+.ai-admin-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.ai-admin-table th,
+.ai-admin-table td {
+    padding: 16px 20px;
+    text-align: left;
+    border-bottom: 1px solid rgb(214, 215, 217);
+}
+
+.ai-admin-table thead {
+    background-color: rgb(235, 238, 243);
+}
+
+.ai-admin-table th {
+    font-size: 13px;
+    font-weight: 600;
+    color: #374151;
+    text-transform: uppercase;
+}
+
+.ai-invoice-id {
     font-weight: 500;
     color: var(--admin-brand-color);
 }
-.amount {
+
+.ai-amount {
     font-weight: 500;
 }
-.status-paid {
+
+.ai-status-pill {
+    padding: 4px 10px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+}
+
+.ai-status-paid {
     background-color: rgba(16, 185, 129, 0.2);
     color: #34d399;
 }
-.status-unpaid {
+
+.ai-status-unpaid {
     background-color: rgba(245, 158, 11, 0.2);
     color: #fbbf24;
 }
-.status-overdue {
+
+.ai-status-overdue {
     background-color: rgba(239, 68, 68, 0.2);
     color: #f87171;
+}
+
+.ai-action-buttons {
+    display: flex;
+    gap: 6px;
+    justify-content: center;
+}
+
+.ai-action-btn {
+    background: #ffffff;
+    border: 1px solid rgb(214, 215, 217);
+    color: #6b7280;
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+}
+
+.ai-action-btn:hover {
+    background-color: #f3f4f6;
+    color: #374151;
+}
+
+.ai-btn-pdf {
+    color: #dc3545 !important;
+}
+
+.ai-btn-pdf:hover {
+    background-color: #fee2e2 !important;
+    border-color: #dc3545 !important;
+    color: #dc3545 !important;
+}
+
+.ai-btn-warning {
+    color: #f59e0b !important;
+}
+
+.ai-btn-warning:hover {
+    background-color: #fef3c7 !important;
+    border-color: #f59e0b !important;
+    color: #f59e0b !important;
+}
+
+.ai-btn-confirm {
+    color: #10b981 !important;
+}
+
+.ai-btn-confirm:hover {
+    background-color: #d1fae5 !important;
+    border-color: #10b981 !important;
+    color: #10b981 !important;
+}
+
+/* Disable confirm button for paid invoices */
+.ai-btn-confirm.ai-disabled {
+    color: #9ca3af !important;
+    cursor: not-allowed;
+}
+
+.ai-btn-confirm.ai-disabled:hover {
+    background-color: #f9fafb !important;
+    border-color: #d1d5db !important;
+    color: #9ca3af !important;
 }

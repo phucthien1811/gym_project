@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faSearch, faFilter, faEye, faCheck, faTimes } from '@fortawesome/free-solid-svg-icons';
 import { orderService } from '../../services/orderService';
-import '../../styles/AdminOrders.css';
+import './css/AdminOrders.css';
 
 export default function AdminOrders() {
     const [orders, setOrders] = useState([]);
@@ -200,19 +200,19 @@ export default function AdminOrders() {
 
     if (loading) {
         return (
-            <div className="admin-page-container">
-                <div className="loading">Đang tải đơn hàng...</div>
+            <div className="ao-admin-page-container">
+                <div className="ao-loading">Đang tải đơn hàng...</div>
             </div>
         );
     }
 
     return (
-        <div className="admin-page-container">
-            <div className="admin-page-header">
-                <h2 className="admin-page-title">Quản Lý Đơn Hàng</h2>
-                <div className="admin-page-actions">
-                    <div className="search-bar">
-                        <FontAwesomeIcon icon={faSearch} className="search-icon" />
+        <div className="ao-admin-page-container">
+            <div className="ao-admin-page-header">
+                <h2 className="ao-admin-page-title">Quản Lý Đơn Hàng</h2>
+                <div className="ao-admin-page-actions">
+                    <div className="ao-search-bar">
+                        <FontAwesomeIcon icon={faSearch} className="ao-search-icon" />
                         <input 
                             type="text" 
                             placeholder="Tìm kiếm đơn hàng..." 
@@ -220,8 +220,8 @@ export default function AdminOrders() {
                             onChange={(e) => setSearchTerm(e.target.value)}
                         />
                     </div>
-                    <div className="filter-group">
-                        <FontAwesomeIcon icon={faFilter} className="filter-icon" />
+                    <div className="ao-filter-group">
+                        <FontAwesomeIcon icon={faFilter} className="ao-filter-icon" />
                         <select 
                             value={statusFilter} 
                             onChange={(e) => setStatusFilter(e.target.value)}
@@ -238,8 +238,8 @@ export default function AdminOrders() {
                 </div>
             </div>
 
-            <div className="admin-table-container">
-                <table className="admin-table">
+            <div className="ao-admin-table-container">
+                <table className="ao-admin-table">
                     <thead>
                         <tr>
                             <th>Mã Đơn Hàng</th>
@@ -253,13 +253,13 @@ export default function AdminOrders() {
                     <tbody>
                         {orders.length > 0 ? orders.map((order) => (
                             <tr key={order.id}>
-                                <td><span className="order-id">{order.order_number}</span></td>
+                                <td><span className="ao-order-id">{order.order_number}</span></td>
                                 <td>{order.shipping_name || 'N/A'}</td>
                                 <td>{new Date(order.created_at).toLocaleDateString('vi-VN')}</td>
-                                <td className="total-amount">{formatCurrency(order.total_amount)}</td>
+                                <td className="ao-total-amount">{formatCurrency(order.total_amount)}</td>
                                 <td>
                                     <span 
-                                        className="status-pill" 
+                                        className="ao-status-pill" 
                                         style={{ 
                                             backgroundColor: getStatusColor(order.status),
                                             color: 'white',
@@ -272,9 +272,9 @@ export default function AdminOrders() {
                                     </span>
                                 </td>
                                 <td>
-                                    <div className="action-buttons">
+                                    <div className="ao-action-buttons">
                                         <button 
-                                            className="action-btn view-btn"
+                                            className="ao-action-btn ao-view-btn"
                                             onClick={() => viewOrderDetails(order)}
                                             title="Xem chi tiết đơn hàng"
                                         >
@@ -282,7 +282,7 @@ export default function AdminOrders() {
                                         </button>
                                         {order.status === 'pending' && (
                                             <button 
-                                                className="action-btn confirm-btn"
+                                                className="ao-action-btn ao-confirm-btn"
                                                 onClick={() => updateOrderStatus(order.id, 'confirmed')}
                                                 title="Xác nhận đơn hàng"
                                             >
@@ -291,7 +291,7 @@ export default function AdminOrders() {
                                         )}
                                         {order.status === 'confirmed' && (
                                             <button 
-                                                className="action-btn processing-btn"
+                                                className="ao-action-btn ao-processing-btn"
                                                 onClick={() => updateOrderStatus(order.id, 'processing')}
                                                 title="Chuyển sang xử lý"
                                             >
@@ -300,7 +300,7 @@ export default function AdminOrders() {
                                         )}
                                         {order.status === 'processing' && (
                                             <button 
-                                                className="action-btn ship-btn"
+                                                className="ao-action-btn ao-ship-btn"
                                                 onClick={() => updateOrderStatus(order.id, 'shipped')}
                                                 title="Giao hàng"
                                             >
@@ -309,7 +309,7 @@ export default function AdminOrders() {
                                         )}
                                         {(order.status === 'pending' || order.status === 'confirmed') && (
                                             <button 
-                                                className="action-btn cancel-btn"
+                                                className="ao-action-btn ao-cancel-btn"
                                                 onClick={() => updateOrderStatus(order.id, 'cancelled')}
                                                 title="Hủy đơn hàng"
                                             >
@@ -332,21 +332,21 @@ export default function AdminOrders() {
 
             {/* Order Details Modal */}
             {showOrderDetails && selectedOrder && (
-                <div className="modal-overlay" onClick={() => setShowOrderDetails(false)}>
-                    <div className="modal-content" onClick={(e) => e.stopPropagation()}>
-                        <div className="modal-header">
+                <div className="ao-modal-overlay" onClick={() => setShowOrderDetails(false)}>
+                    <div className="ao-modal-content" onClick={(e) => e.stopPropagation()}>
+                        <div className="ao-modal-header">
                             <h3>Chi Tiết Đơn Hàng {selectedOrder.order_number}</h3>
                             <button 
-                                className="close-btn"
+                                className="ao-close-btn"
                                 onClick={() => setShowOrderDetails(false)}
                             >
                                 ×
                             </button>
                         </div>
                         
-                        <div className="modal-body">
-                            <div className="order-info-grid">
-                                <div className="info-section">
+                        <div className="ao-modal-body">
+                            <div className="ao-order-info-grid">
+                                <div className="ao-info-section">
                                     <h4>Thông Tin Khách Hàng</h4>
                                     <p><strong>Tên:</strong> {selectedOrder.shipping_address?.full_name || 'Không có thông tin'}</p>
                                     <p><strong>Điện thoại:</strong> {selectedOrder.shipping_address?.phone || 'Không có thông tin'}</p>
@@ -358,11 +358,11 @@ export default function AdminOrders() {
                                     </p>
                                 </div>
                                 
-                                <div className="info-section">
+                                <div className="ao-info-section">
                                     <h4>Thông Tin Đơn Hàng</h4>
                                     <p><strong>Trạng thái:</strong> 
                                         <span 
-                                            className="status-pill" 
+                                            className="ao-status-pill" 
                                             style={{ 
                                                 backgroundColor: getStatusColor(selectedOrder.status),
                                                 color: 'white',
@@ -377,24 +377,24 @@ export default function AdminOrders() {
                                 </div>
                             </div>
                             
-                            <div className="order-items-section">
+                            <div className="ao-order-items-section">
                                 <h4>Sản Phẩm</h4>
-                                <div className="items-list">
+                                <div className="ao-items-list">
                                     {selectedOrder.items?.map(item => (
-                                        <div key={item.id} className="item-row">
-                                            <span className="item-name">{item.product_name}</span>
-                                            <span className="item-quantity">SL: {item.quantity}</span>
-                                            <span className="item-price">{formatCurrency(item.total_price)}</span>
+                                        <div key={item.id} className="ao-item-row">
+                                            <span className="ao-item-name">{item.product_name}</span>
+                                            <span className="ao-item-quantity">SL: {item.quantity}</span>
+                                            <span className="ao-item-price">{formatCurrency(item.total_price)}</span>
                                         </div>
                                     ))}
                                 </div>
                                 
-                                <div className="order-total-section">
-                                    <div className="total-row">
+                                <div className="ao-order-total-section">
+                                    <div className="ao-total-row">
                                         <span>Phí vận chuyển:</span>
                                         <span>{formatCurrency(selectedOrder.shipping_fee || 0)}</span>
                                     </div>
-                                    <div className="total-row final-total">
+                                    <div className="ao-total-row ao-final-total">
                                         <span><strong>Tổng cộng:</strong></span>
                                         <span><strong>{formatCurrency(selectedOrder.total_amount)}</strong></span>
                                     </div>
@@ -402,7 +402,7 @@ export default function AdminOrders() {
                             </div>
                             
                             {selectedOrder.notes && (
-                                <div className="notes-section">
+                                <div className="ao-notes-section">
                                     <h4>Ghi Chú</h4>
                                     <p>{selectedOrder.notes}</p>
                                 </div>

@@ -30,7 +30,7 @@
   justify-content: space-between;
   align-items: center;
   padding: 20px 25px;
-  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+  background:  #43a047;
   color: white;
   border-radius: 12px 12px 0 0;
 }
@@ -228,6 +228,7 @@
   }
   
   .simple-modal-header {
+    background: #43a047;
     padding: 15px 20px;
   }
   

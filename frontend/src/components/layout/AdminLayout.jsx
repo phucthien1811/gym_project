@@ -10,7 +10,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { 
     faGaugeHigh, faUsers, faArrowRightFromBracket, faHouse, faUserTie,
     faCalendarDays, faIdCard, faFileInvoiceDollar, faChartLine,
-    faBoxOpen, faReceipt, faUsersCog, faGears
+    faBoxOpen, faReceipt, faGears
 } from '@fortawesome/free-solid-svg-icons';
 
 // A simple component for section headings in the nav
@@ -60,10 +60,7 @@ export default function AdminLayout() {
             <FontAwesomeIcon icon={faFileInvoiceDollar} className="admin__link-icon" />
             Hóa Đơn
           </NavLink>
-          {/* <NavLink to="/admin/reports" className="admin__link">
-            <FontAwesomeIcon icon={faChartLine} className="admin__link-icon" />
-            Reports
-          </NavLink> */}
+          
           
           {/* POINT OF SALE */}
           <NavSectionTitle title="CỬA HÀNG" />
@@ -78,14 +75,14 @@ export default function AdminLayout() {
 
           {/* SYSTEM */}
           <NavSectionTitle title="SYSTEM" />
-          {/* <NavLink to="/admin/staff" className="admin__link">
-            <FontAwesomeIcon icon={faUsersCog} className="admin__link-icon" />
-            Chỉ số 
-          </NavLink> */}
+          <NavLink to="/admin/reports" className="admin__link">
+            <FontAwesomeIcon icon={faChartLine} className="admin__link-icon" />
+            DS Đen
+          </NavLink>
           <NavLink to="/admin/settings" className="admin__link">
             <FontAwesomeIcon icon={faGears} className="admin__link-icon" />
             Cài đặt
-          </NavLink>
+          </NavLink> 
 
           {/* Logout */}
           <button
