@@ -724,14 +724,14 @@ body::-webkit-scrollbar-track,
 html::-webkit-scrollbar-thumb,
 body::-webkit-scrollbar-thumb,
 *::-webkit-scrollbar-thumb {
-  background: #22c55e !important;
+  background: #f1f5f9 !important;
   border-radius: 4px !important;
 }
 
 html::-webkit-scrollbar-thumb:hover,
 body::-webkit-scrollbar-thumb:hover,
 *::-webkit-scrollbar-thumb:hover {
-  background: #16a34a !important;
+  background: #f1f5f9 !important;
 }
 
 /* Override cho main container */
