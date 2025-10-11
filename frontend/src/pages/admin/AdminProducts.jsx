@@ -8,13 +8,15 @@ import {
     faEye, 
     faEyeSlash,
     faInfo,
-    faTimes
+    faTimes,
+    faFileExcel
 } from '@fortawesome/free-solid-svg-icons';
 import './css/AdminProducts.css';
 
 const mockProducts = [
     { 
-        id: 1, 
+        id: 1,
+        code: "SP001",
         name: "Whey Protein Gold Standard", 
         category: "Thực phẩm bổ sung", 
         description: "Protein whey cao cấp từ Optimum Nutrition, hỗ trợ tăng cơ hiệu quả",
@@ -25,7 +27,8 @@ const mockProducts = [
         visibility: "Hiển thị"
     },
     { 
-        id: 2, 
+        id: 2,
+        code: "SP002",
         name: "BCAA Xtend", 
         category: "Thực phẩm bổ sung", 
         description: "Axit amin thiết yếu hỗ trợ phục hồi cơ bắp sau tập luyện",
@@ -36,7 +39,8 @@ const mockProducts = [
         visibility: "Hiển thị"
     },
     { 
-        id: 3, 
+        id: 3,
+        code: "SP003",
         name: "Găng tay tập gym", 
         category: "Phụ kiện", 
         description: "Găng tay chống trượt, bảo vệ bàn tay khi tập luyện với tạ",
@@ -47,7 +51,8 @@ const mockProducts = [
         visibility: "Hiển thị"
     },
     { 
-        id: 4, 
+        id: 4,
+        code: "SP004",
         name: "Creatine Monohydrate", 
         category: "Thực phẩm bổ sung", 
         description: "Tăng sức mạnh và độ bền trong tập luyện cường độ cao",
@@ -58,7 +63,8 @@ const mockProducts = [
         visibility: "Ẩn"
     },
     { 
-        id: 5, 
+        id: 5,
+        code: "SP005",
         name: "Áo tank top gym", 
         category: "Trang phục", 
         description: "Áo tank top thoáng khí, co giãn tốt cho việc tập luyện",
@@ -69,7 +75,8 @@ const mockProducts = [
         visibility: "Hiển thị"
     },
     { 
-        id: 6, 
+        id: 6,
+        code: "SP006",
         name: "Máy tập tay kéo", 
         category: "Thiết bị", 
         description: "Thiết bị tập luyện cơ tay và vai tại nhà",
@@ -83,6 +90,8 @@ const mockProducts = [
 
 export default function AdminProducts() {
     const [searchTerm, setSearchTerm] = useState('');
+    const [currentPage, setCurrentPage] = useState(1);
+    const [itemsPerPage] = useState(6);
     const [showAddModal, setShowAddModal] = useState(false);
     const [showEditModal, setShowEditModal] = useState(false);
     const [showViewModal, setShowViewModal] = useState(false);
@@ -138,6 +147,28 @@ export default function AdminProducts() {
         product.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
         product.category.toLowerCase().includes(searchTerm.toLowerCase())
     );
+
+    // Pagination logic
+    const totalPages = Math.ceil(filteredProducts.length / itemsPerPage);
+    const indexOfLastItem = currentPage * itemsPerPage;
+    const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+    const currentProducts = filteredProducts.slice(indexOfFirstItem, indexOfLastItem);
+
+    // Reset to page 1 when search term changes
+    const handleSearchChange = (e) => {
+        setSearchTerm(e.target.value);
+        setCurrentPage(1);
+    };
+
+    const handlePageChange = (pageNumber) => {
+        setCurrentPage(pageNumber);
+    };
+
+    const handleExportExcel = () => {
+        // Export logic here
+        console.log('Exporting to Excel...');
+        alert('Xuất Excel thành công!');
+    };
 
     const handleInputChange = (e, isEdit = false) => {
         const { name, value } = e.target;
@@ -206,7 +237,7 @@ export default function AdminProducts() {
                             type="text" 
                             placeholder="Tìm sản phẩm..." 
                             value={searchTerm}
-                            onChange={(e) => setSearchTerm(e.target.value)}
+                            onChange={handleSearchChange}
                         />
                     </div>
                     <button className="ap-btn-primary" onClick={() => setShowAddModal(true)}>
@@ -220,7 +251,7 @@ export default function AdminProducts() {
                 <table className="ap-products-table">
                     <thead>
                         <tr>
-                            <th>Ảnh</th>
+                            <th>Mã SP</th>
                             <th>Tên Sản Phẩm</th>
                             <th>Danh Mục</th>
                             <th>Mô Tả</th>
@@ -232,14 +263,10 @@ export default function AdminProducts() {
                         </tr>
                     </thead>
                     <tbody>
-                        {filteredProducts.map(product => (
+                        {currentProducts.map(product => (
                             <tr key={product.id}>
-                                <td className="ap-product-image-cell">
-                                    <img 
-                                        src={product.image_url} 
-                                        alt={product.name}
-                                        className="ap-product-image-preview"
-                                    />
+                                <td className="ap-product-code-cell">
+                                    <span className="ap-product-code">{product.code}</span>
                                 </td>
                                 <td className="ap-product-name-cell" title={product.name}>
                                     {product.name}
@@ -290,6 +317,42 @@ export default function AdminProducts() {
                         ))}
                     </tbody>
                 </table>
+            </div>
+
+            {/* Pagination Controls */}
+            <div className="ap-pagination-container">
+                <button className="ap-btn-excel" onClick={handleExportExcel}>
+                    <FontAwesomeIcon icon={faFileExcel} />
+                    Xuất Excel
+                </button>
+
+                <div className="ap-pagination-controls">
+                    <button 
+                        className="ap-pagination-btn"
+                        onClick={() => handlePageChange(currentPage - 1)}
+                        disabled={currentPage === 1}
+                    >
+                        «
+                    </button>
+                    
+                    {[...Array(totalPages)].map((_, index) => (
+                        <button
+                            key={index + 1}
+                            className={`ap-pagination-btn ${currentPage === index + 1 ? 'active' : ''}`}
+                            onClick={() => handlePageChange(index + 1)}
+                        >
+                            {index + 1}
+                        </button>
+                    ))}
+                    
+                    <button 
+                        className="ap-pagination-btn"
+                        onClick={() => handlePageChange(currentPage + 1)}
+                        disabled={currentPage === totalPages}
+                    >
+                        »
+                    </button>
+                </div>
             </div>
 
             {/* Modal Thêm Sản Phẩm */}

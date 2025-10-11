@@ -11,7 +11,8 @@ import {
     faExclamationTriangle,
     faToggleOn,
     faToggleOff,
-    faTimes
+    faTimes,
+    faFileExcel
 } from '@fortawesome/free-solid-svg-icons';
 import './css/AdminMembers.css'; // Import file CSS mới
 
@@ -24,11 +25,11 @@ const mockPackages = [
 ];
 
 const mockMembers = [
-    { id: "M001", name: "Alex Carter", email: "alex.c@example.com", plan: "Pro", startDate: "2025-08-10", endDate: "2025-09-10", status: "Có", avatar: "https://placehold.co/40x40/60a5fa/FFFFFF?text=A" },
-    { id: "M002", name: "Mia Nguyen", email: "mia.n@example.com", plan: "Basic", startDate: "2025-08-01", endDate: "2025-08-31", status: "Không", avatar: "https://placehold.co/40x40/f87171/FFFFFF?text=M" },
-    { id: "M003", name: "Kenji Park", email: "kenji.p@example.com", plan: "Premium", startDate: "2025-08-20", endDate: "2026-08-20", status: "Có", avatar: "https://placehold.co/40x40/34d399/FFFFFF?text=K" },
-    { id: "M004", name: "Sophia Rossi", email: "sophia.r@example.com", plan: "Pro", startDate: "2025-09-01", endDate: "2025-10-01", status: "Có", avatar: "https://placehold.co/40x40/fbbf24/FFFFFF?text=S" },
-    { id: "M005", name: "Liam Chen", email: "liam.c@example.com", plan: "Basic", startDate: "2025-07-15", endDate: "2025-08-15", status: "Không", avatar: "https://placehold.co/40x40/a78bfa/FFFFFF?text=L" },
+    { id: "M001", name: "Nguyễn Văn Hùng", email: "hungnv@example.com", plan: "Pro", startDate: "2025-08-10", endDate: "2025-09-10", status: "Có", avatar: "https://placehold.co/40x40/60a5fa/FFFFFF?text=H" },
+    { id: "M002", name: "Trần Thị Mai", email: "maitt@example.com", plan: "Basic", startDate: "2025-08-01", endDate: "2025-08-31", status: "Không", avatar: "https://placehold.co/40x40/f87171/FFFFFF?text=M" },
+    { id: "M003", name: "Lê Minh Tuấn", email: "tuanlm@example.com", plan: "Premium", startDate: "2025-08-20", endDate: "2026-08-20", status: "Có", avatar: "https://placehold.co/40x40/34d399/FFFFFF?text=T" },
+    { id: "M004", name: "Phạm Thu Hương", email: "huongpt@example.com", plan: "Pro", startDate: "2025-09-01", endDate: "2025-10-01", status: "Có", avatar: "https://placehold.co/40x40/fbbf24/FFFFFF?text=H" },
+    { id: "M005", name: "Hoàng Đức Anh", email: "anhhd@example.com", plan: "Basic", startDate: "2025-07-15", endDate: "2025-08-15", status: "Không", avatar: "https://placehold.co/40x40/a78bfa/FFFFFF?text=A" },
 ];
 
 export default function AdminMembers() {
@@ -160,6 +161,12 @@ export default function AdminMembers() {
         console.log(`Toggle status for member: ${member.name}, current status: ${member.status}`);
     };
 
+    const handleExportExcel = () => {
+        // Logic để xuất file Excel
+        console.log('Exporting to Excel...');
+        alert('Xuất file Excel thành công!');
+    };
+
     return (
         <div className="am-admin-page-container">
             {/* Header của trang */}
@@ -258,11 +265,17 @@ export default function AdminMembers() {
 
             {/* Phân trang */}
             <div className="am-pagination-container">
-                <button className="am-pagination-btn" disabled><FontAwesomeIcon icon={faChevronLeft} /></button>
-                <span className="am-page-number am-active">1</span>
-                <span className="am-page-number">2</span>
-                <span className="am-page-number">3</span>
-                <button className="am-pagination-btn"><FontAwesomeIcon icon={faChevronRight} /></button>
+                <button className="am-btn-export-excel" onClick={handleExportExcel}>
+                    <FontAwesomeIcon icon={faFileExcel} />
+                    <span>Xuất Excel</span>
+                </button>
+                <div className="am-pagination-controls">
+                    <button className="am-pagination-btn" disabled><FontAwesomeIcon icon={faChevronLeft} /></button>
+                    <span className="am-page-number am-active">1</span>
+                    <span className="am-page-number">2</span>
+                    <span className="am-page-number">3</span>
+                    <button className="am-pagination-btn"><FontAwesomeIcon icon={faChevronRight} /></button>
+                </div>
             </div>
 
             {/* Modal Thêm Hội Viên */}

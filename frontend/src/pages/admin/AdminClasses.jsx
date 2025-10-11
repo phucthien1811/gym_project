@@ -11,7 +11,8 @@ import {
   faFilter,
   faEye,
   faDumbbell,
-  faMapMarkerAlt
+  faMapMarkerAlt,
+  faFileExcel
 } from '@fortawesome/free-solid-svg-icons';
 import './css/AdminClasses.css';
 import SimpleClassForm from './components/SimpleClassForm';
@@ -241,6 +242,36 @@ const AdminClasses = () => {
     return new Date(dateString).toLocaleDateString('vi-VN');
   };
 
+  const handleExportExcel = async () => {
+    try {
+      const token = localStorage.getItem('token');
+      const queryParams = new URLSearchParams({
+        ...Object.fromEntries(Object.entries(filters).filter(([_, value]) => value))
+      });
+
+      const response = await fetch(`/api/v1/schedules/export?${queryParams}`, {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+
+      if (!response.ok) throw new Error('Failed to export data');
+
+      const blob = await response.blob();
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `classes_${new Date().toISOString().split('T')[0]}.xlsx`;
+      document.body.appendChild(a);
+      a.click();
+      window.URL.revokeObjectURL(url);
+      document.body.removeChild(a);
+    } catch (err) {
+      alert('Không thể xuất file Excel');
+      console.error(err);
+    }
+  };
+
   if (loading && classes.length === 0) {
     return (
       <div className="ad-class-admin-page-container">
@@ -336,6 +367,11 @@ const AdminClasses = () => {
         </div>
         
         <div className="ad-class-filters-actions">
+          <button className="ad-class-btn-success" onClick={handleExportExcel}>
+            <FontAwesomeIcon icon={faFileExcel} />
+            Xuất Excel
+          </button>
+          
           <button className="ad-class-btn-secondary" onClick={clearFilters}>
             <FontAwesomeIcon icon={faFilter} />
             Xóa bộ lọc

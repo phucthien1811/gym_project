@@ -241,9 +241,33 @@
 /* --- PHÂN TRANG --- */
 .am-pagination-container {
     display: flex;
-    justify-content: flex-end;
+    justify-content: space-between;
+    align-items: center;
+    gap: 16px;
+}
+
+.am-pagination-controls {
+    display: flex;
     align-items: center;
     gap: 8px;
+}
+
+.am-btn-export-excel {
+    background-color: #22c55e;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    padding: 10px 16px;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.am-btn-export-excel:hover {
+    background-color: #059669;
 }
 .am-pagination-btn {
     background-color: var(--admin-sidebar-bg);

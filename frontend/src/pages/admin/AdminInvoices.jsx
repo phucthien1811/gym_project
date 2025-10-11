@@ -7,14 +7,15 @@ import {
     faExclamationTriangle, 
     faCheck,
     faTimes,
-    faEye 
+    faEye,
+    faFileExcel
 } from '@fortawesome/free-solid-svg-icons';
 import './css/AdminInvoices.css'; // File CSS mới
 
 const mockInvoices = [
     { 
         id: "INV-00123", 
-        memberName: "Alex Carter", 
+        memberName: "Nguyễn Văn Hùng", 
         amount: 500000, 
         issueDate: "2025-09-25", 
         status: "Paid",
@@ -28,7 +29,7 @@ const mockInvoices = [
     },
     { 
         id: "INV-00124", 
-        memberName: "Mia Nguyen", 
+        memberName: "Trần Thị Mai", 
         amount: 85000, 
         issueDate: "2025-09-22", 
         status: "Unpaid",
@@ -42,7 +43,7 @@ const mockInvoices = [
     },
     { 
         id: "INV-00125", 
-        memberName: "Kenji Park", 
+        memberName: "Lê Minh Tuấn", 
         amount: 1200000, 
         issueDate: "2025-09-20", 
         status: "Unpaid",
@@ -56,7 +57,7 @@ const mockInvoices = [
     },
     { 
         id: "INV-00126", 
-        memberName: "Sophia Rossi", 
+        memberName: "Phạm Thu Hương", 
         amount: 150000, 
         issueDate: "2025-09-15", 
         status: "Paid",
@@ -68,15 +69,44 @@ const mockInvoices = [
         changeAmount: 50000,
         description: "Tập thử 1 buổi và thuê tủ đồ"
     },
+    { 
+        id: "INV-00127", 
+        memberName: "Hoàng Đức Anh", 
+        amount: 2000000, 
+        issueDate: "2025-09-12", 
+        status: "Paid",
+        itemName: "Gói tập Premium",
+        quantity: 1,
+        unitPrice: 2000000,
+        paymentMethod: "banking",
+        amountPaid: 2000000,
+        changeAmount: 0,
+        description: "Đăng ký gói tập cao cấp 6 tháng với HLV riêng và tư vấn dinh dưỡng"
+    },
+    { 
+        id: "INV-00128", 
+        memberName: "Võ Thị Lan", 
+        amount: 320000, 
+        issueDate: "2025-09-10", 
+        status: "Unpaid",
+        itemName: "Găng tay tập + Khăn tập + Nước tăng lực",
+        quantity: 1,
+        unitPrice: 320000,
+        paymentMethod: "cash",
+        amountPaid: 0,
+        changeAmount: 0,
+        description: "Mua combo phụ kiện tập luyện và đồ uống"
+    },
 ];
 
 // Mock data cho danh sách hội viên
 const mockMembers = [
-    { id: "M001", name: "Alex Carter", email: "alex.c@example.com" },
-    { id: "M002", name: "Mia Nguyen", email: "mia.n@example.com" },
-    { id: "M003", name: "Kenji Park", email: "kenji.p@example.com" },
-    { id: "M004", name: "Sophia Rossi", email: "sophia.r@example.com" },
-    { id: "M005", name: "Liam Chen", email: "liam.c@example.com" },
+    { id: "M001", name: "Nguyễn Văn Hùng", email: "hungnv@example.com" },
+    { id: "M002", name: "Trần Thị Mai", email: "maitt@example.com" },
+    { id: "M003", name: "Lê Minh Tuấn", email: "tuanlm@example.com" },
+    { id: "M004", name: "Phạm Thu Hương", email: "huongpt@example.com" },
+    { id: "M005", name: "Hoàng Đức Anh", email: "anhhd@example.com" },
+    { id: "M006", name: "Võ Thị Lan", email: "lanvt@example.com" },
 ];
 
 // Mock data cho các gói tập
@@ -101,6 +131,9 @@ export default function AdminInvoices() {
     const [showCreateModal, setShowCreateModal] = useState(false);
     const [showViewModal, setShowViewModal] = useState(false);
     const [viewingInvoice, setViewingInvoice] = useState(null);
+    const [currentPage, setCurrentPage] = useState(1);
+    const [itemsPerPage] = useState(6);
+    const [searchTerm, setSearchTerm] = useState('');
     const [newInvoice, setNewInvoice] = useState({
         selectedMember: null,
         itemName: '',
@@ -113,6 +146,34 @@ export default function AdminInvoices() {
         issueDate: new Date().toISOString().split('T')[0],
         description: ''
     });
+
+    // Filter invoices based on search term
+    const filteredInvoices = mockInvoices.filter(invoice =>
+        invoice.id.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        invoice.memberName.toLowerCase().includes(searchTerm.toLowerCase())
+    );
+
+    // Pagination logic
+    const totalPages = Math.ceil(filteredInvoices.length / itemsPerPage);
+    const indexOfLastItem = currentPage * itemsPerPage;
+    const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+    const currentInvoices = filteredInvoices.slice(indexOfFirstItem, indexOfLastItem);
+
+    // Reset to page 1 when search term changes
+    const handleSearchChange = (e) => {
+        setSearchTerm(e.target.value);
+        setCurrentPage(1);
+    };
+
+    const handlePageChange = (pageNumber) => {
+        setCurrentPage(pageNumber);
+    };
+
+    const handleExportExcel = () => {
+        console.log('Exporting invoices to Excel...');
+        alert('Xuất danh sách hóa đơn ra Excel thành công!');
+    };
+
     const getStatusClass = (status) => {
         switch (status) {
             case 'Paid': return 'ai-status-paid';
@@ -225,7 +286,12 @@ export default function AdminInvoices() {
                 <div className="ai-admin-page-actions">
                     <div className="ai-search-bar">
                         <FontAwesomeIcon icon={faSearch} className="ai-search-icon" />
-                        <input type="text" placeholder="Tìm kiếm hóa đơn..." />
+                        <input 
+                            type="text" 
+                            placeholder="Tìm kiếm hóa đơn..." 
+                            value={searchTerm}
+                            onChange={handleSearchChange}
+                        />
                     </div>
                     <button className="ai-btn-primary" onClick={() => setShowCreateModal(true)}>
                         <FontAwesomeIcon icon={faPlus} />
@@ -247,7 +313,7 @@ export default function AdminInvoices() {
                         </tr>
                     </thead>
                     <tbody>
-                        {mockInvoices.map((invoice) => (
+                        {currentInvoices.map((invoice) => (
                             <tr key={invoice.id}>
                                 <td><span className="ai-invoice-id">{invoice.id}</span></td>
                                 <td>{invoice.memberName}</td>
@@ -295,6 +361,42 @@ export default function AdminInvoices() {
                         ))}
                     </tbody>
                 </table>
+            </div>
+
+            {/* Pagination Controls */}
+            <div className="ai-pagination-container">
+                <button className="ai-btn-excel" onClick={handleExportExcel}>
+                    <FontAwesomeIcon icon={faFileExcel} />
+                    Xuất Excel
+                </button>
+
+                <div className="ai-pagination-controls">
+                    <button 
+                        className="ai-pagination-btn"
+                        onClick={() => handlePageChange(currentPage - 1)}
+                        disabled={currentPage === 1}
+                    >
+                        «
+                    </button>
+                    
+                    {[...Array(totalPages)].map((_, index) => (
+                        <button
+                            key={index + 1}
+                            className={`ai-pagination-btn ${currentPage === index + 1 ? 'active' : ''}`}
+                            onClick={() => handlePageChange(index + 1)}
+                        >
+                            {index + 1}
+                        </button>
+                    ))}
+                    
+                    <button 
+                        className="ai-pagination-btn"
+                        onClick={() => handlePageChange(currentPage + 1)}
+                        disabled={currentPage === totalPages}
+                    >
+                        »
+                    </button>
+                </div>
             </div>
 
             {/* Modal Tạo Hóa Đơn */}

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faSearch, faFilter, faEye, faCheck, faTimes } from '@fortawesome/free-solid-svg-icons';
+import { faSearch, faFilter, faEye, faCheck, faTimes, faFileExcel } from '@fortawesome/free-solid-svg-icons';
 import { orderService } from '../../services/orderService';
 import './css/AdminOrders.css';
 
@@ -47,6 +47,41 @@ export default function AdminOrders() {
             'cancelled': '#dc3545'
         };
         return colorMap[status] || '#6c757d';
+    };
+
+    // Export to Excel
+    const handleExportExcel = () => {
+        // Tạo dữ liệu cho Excel
+        const dataToExport = orders.map(order => ({
+            'Mã Đơn Hàng': order.order_number,
+            'Khách Hàng': order.shipping_name || 'N/A',
+            'Ngày Đặt': new Date(order.created_at).toLocaleDateString('vi-VN'),
+            'Tổng Tiền': order.total_amount,
+            'Trạng Thái': getStatusText(order.status)
+        }));
+
+        // Chuyển đổi sang CSV
+        const headers = Object.keys(dataToExport[0] || {});
+        const csvContent = [
+            headers.join(','),
+            ...dataToExport.map(row => 
+                headers.map(header => {
+                    const value = row[header];
+                    return typeof value === 'string' && value.includes(',') ? `"${value}"` : value;
+                }).join(',')
+            )
+        ].join('\n');
+
+        // Tạo Blob và download
+        const blob = new Blob(['\uFEFF' + csvContent], { type: 'text/csv;charset=utf-8;' });
+        const link = document.createElement('a');
+        const url = URL.createObjectURL(blob);
+        link.setAttribute('href', url);
+        link.setAttribute('download', `don-hang-${new Date().toISOString().split('T')[0]}.csv`);
+        link.style.visibility = 'hidden';
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
     };
 
     // Fetch admin orders
@@ -211,6 +246,14 @@ export default function AdminOrders() {
             <div className="ao-admin-page-header">
                 <h2 className="ao-admin-page-title">Quản Lý Đơn Hàng</h2>
                 <div className="ao-admin-page-actions">
+                    <button 
+                        className="ao-btn-excel"
+                        onClick={handleExportExcel}
+                        title="Xuất file Excel"
+                    >
+                        <FontAwesomeIcon icon={faFileExcel} />
+                        <span>Xuất Excel</span>
+                    </button>
                     <div className="ao-search-bar">
                         <FontAwesomeIcon icon={faSearch} className="ao-search-icon" />
                         <input 
