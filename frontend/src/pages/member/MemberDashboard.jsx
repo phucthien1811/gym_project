@@ -1,15 +1,16 @@
 import React, { useState, useEffect } from 'react';
-import './css/MemberDashboard.css'; // Đường dẫn đến file CSS mới
+import './css/MemberDashboard.css'; 
 import { QRCodeSVG } from 'qrcode.react';
 import { useAuth } from '../../context/AuthContext';
 import memberProfileService from '../../services/memberProfileService.js';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faCrown, faClock, faCalendarCheck, faDumbbell, faPersonRunning } from '@fortawesome/free-solid-svg-icons';
+import { faCrown, faCalendarCheck, faDumbbell, faPersonRunning, faTimes, faQrcode } from '@fortawesome/free-solid-svg-icons';
 
 const Dashboard = () => {
     const { user } = useAuth();
     const [userProfile, setUserProfile] = useState(null);
     const [loading, setLoading] = useState(true);
+    const [showQRModal, setShowQRModal] = useState(false);
 
     // Fetch user profile data
     useEffect(() => {
@@ -77,9 +78,6 @@ const Dashboard = () => {
     };
 
     const membership = getMembershipInfo();
-    const membershipProgress = membership.totalDays > 0 
-        ? ((membership.totalDays - membership.daysRemaining) / membership.totalDays) * 100 
-        : 0;
 
     const todaysClasses = [
         { time: '18:00', name: 'Lớp Yoga Flow', type: 'yoga', trainer: 'HLV Anna' },
@@ -96,55 +94,61 @@ const Dashboard = () => {
     };
 
     return (
-        <div className="dashboard-container fade-in">
+        <div className="md-container fade-in">
             {loading ? (
-                <div className="loading-dashboard">
+                <div className="md-loading">
                     <p>Đang tải thông tin...</p>
                 </div>
             ) : (
                 <>
                     {/* --- KHU VỰC CHÀO MỪNG --- */}
-            <div className="dash-header">
+            <div className="md-header">
                 <img 
                     src={getAvatarUrl(userProfile?.avatar_url)} 
                     alt="Avatar" 
-                    className="header-avatar-dash"
+                    className="md-avatar"
                     onError={(e) => {
                         e.target.src = 'https://placehold.co/100x100/333333/FFFFFF?text=User';
                     }}
                 />
-                <div className="header-text">
-                    <h1>Chào, {userProfile?.name || user?.name || 'bạn'}!</h1>
+                <div className="md-header-text">
+                    <h1>Chào mừng, {userProfile?.name || user?.name || 'bạn'}!</h1>
                     <p>Sẵn sàng cho một buổi tập tuyệt vời nào!</p>
                 </div>
             </div>
 
             {/* --- LƯỚI THÔNG TIN CHÍNH --- */}
-            <div className="dash-grid">
+            <div className="md-grid">
                 {/* THẺ GÓI TẬP */}
-                <div className="dash-card membership-card">
-                    <h3><FontAwesomeIcon icon={faCrown} /> Gói tập của bạn</h3>
+                <div className="md-card">
+                    <h3 className="md-card-header">
+                        <FontAwesomeIcon icon={faCrown} /> Gói tập của bạn
+                    </h3>
                     {membership.isActive ? (
-                        <>
-                            <div className="package-details">
-                                <span className="package-name-main">{membership.packageName}</span>
-                                <div className="days-remaining">
-                                    <FontAwesomeIcon icon={faClock} />
-                                    <span>Còn <strong>{membership.daysRemaining}</strong> ngày</span>
-                                </div>
+                        <div className="md-package-info">
+                            <div className="md-package-row">
+                                <span className="md-package-label">Tên gói</span>
+                                <span className="md-package-name">{membership.packageName}</span>
                             </div>
-                            <div className="progress-bar-container">
-                                <div className="progress-bar" style={{ width: `${membershipProgress}%` }}></div>
+                            <div className="md-package-row">
+                                <span className="md-package-label">Thời gian còn lại</span>
+                                <span className="md-days-remaining">
+                                    {membership.daysRemaining} ngày
+                                </span>
                             </div>
-                            <div className="date-range">
-                                <span>{membership.startDate}</span>
-                                <span>{membership.endDate}</span>
+                            <div className="md-package-row">
+                                <span className="md-package-label">Ngày bắt đầu</span>
+                                <span className="md-package-value">{membership.startDate}</span>
                             </div>
-                        </>
+                            <div className="md-package-row">
+                                <span className="md-package-label">Ngày kết thúc</span>
+                                <span className="md-package-value">{membership.endDate}</span>
+                            </div>
+                        </div>
                     ) : (
-                        <div className="no-membership">
+                        <div className="md-no-membership">
                             <p>Bạn chưa đăng ký gói tập nào</p>
-                            <button className="btn-primary" onClick={() => window.location.href = '/member/packages'}>
+                            <button className="md-btn-primary" onClick={() => window.location.href = '/member/packages'}>
                                 Đăng ký ngay
                             </button>
                         </div>
@@ -152,47 +156,92 @@ const Dashboard = () => {
                 </div>
 
                 {/* THẺ LỊCH TẬP HÔM NAY */}
-                <div className="dash-card schedule-card">
-                    <h3><FontAwesomeIcon icon={faCalendarCheck} /> Lịch tập hôm nay</h3>
-                    <div className="schedule-list">
+                <div className="md-card">
+                    <h3 className="md-card-header">
+                        <FontAwesomeIcon icon={faCalendarCheck} /> Lịch tập hôm nay
+                    </h3>
+                    <div className="md-schedule-list">
                         {todaysClasses.length > 0 ? (
                             todaysClasses.map((item, index) => (
-                                <div key={index} className="session-item-mini">
-                                    <div className={`session-icon type-${item.type}`}>
+                                <div key={index} className="md-session-item">
+                                    <div className={`md-session-icon md-type-${item.type}`}>
                                         <FontAwesomeIcon icon={getClassIcon(item.type)} />
                                     </div>
-                                    <div className="session-info">
-                                        <span className="session-name-mini">{item.name}</span>
-                                        <span className="trainer-name-mini">{item.trainer}</span>
+                                    <div className="md-session-info">
+                                        <span className="md-session-name">{item.name}</span>
+                                        <span className="md-trainer-name">{item.trainer}</span>
                                     </div>
-                                    <span className="session-time-mini">{item.time}</span>
+                                    <span className="md-session-time">{item.time}</span>
                                 </div>
                             ))
                         ) : (
-                            <div className="no-schedule">
+                            <div className="md-no-schedule">
                                 <p>Hôm nay bạn không có lịch tập nào.</p>
-                                <button className="btn-secondary">Đặt lịch ngay</button>
+                                <button className="md-btn-secondary">Đặt lịch ngay</button>
                             </div>
                         )}
                     </div>
                 </div>
 
-                {/* THẺ MÃ QR */}
-                <div className="dash-card qr-card">
-                    <h3>Mã Check-in</h3>
-                    <div className="qr-code-wrapper">
-                        <QRCodeSVG
-                            value={user?.id || "member-123456"}
-                            size={160} // Tăng kích thước để rõ hơn
-                            level="H"
-                            bgColor="#ffffff"
-                            fgColor="#000000"
-                            includeMargin={false}
-                        />
+                {/* THẺ MEMBERSHIP CARD & QR */}
+                <div className="md-membership-card-wrapper">
+                    {/* Credit Card Style */}
+                    <div className="md-credit-card">
+                        <div className="md-card-gym-name">ROYAL FITNESS</div>
+                        <div className="md-card-chip"></div>
+                        <div className="md-card-number">
+                            {user?.id ? String(user.id).padStart(16, '0').match(/.{1,4}/g).join(' ') : '**** **** **** ****'}
+                        </div>
+                        <div className="md-card-bottom">
+                            <div className="md-card-holder">
+                                <div className="md-card-label">Thành viên</div>
+                                <div className="md-card-name">
+                                    {(userProfile?.name || user?.name || 'Member').toUpperCase()}
+                                </div>
+                            </div>
+                            <div className="md-card-logo">VIP</div>
+                        </div>
                     </div>
-                    <p>Sử dụng mã này tại quầy lễ tân</p>
+
+                    {/* Check-in Section */}
+                    <div className="md-checkin-section" onClick={() => setShowQRModal(true)}>
+                        <div className="md-checkin-label">Mã Check-in</div>
+                        <button className="md-checkin-btn">
+                            <FontAwesomeIcon icon={faCalendarCheck} />
+                            Hiển thị QR Code
+                        </button>
+                    </div>
                 </div>
             </div>
+
+            {/* QR Code Modal */}
+            {showQRModal && (
+                <div className="md-qr-modal" onClick={() => setShowQRModal(false)}>
+                    <div className="md-qr-modal-content" onClick={(e) => e.stopPropagation()}>
+                        <button className="md-close-x-btn" onClick={() => setShowQRModal(false)}>
+                            <FontAwesomeIcon icon={faTimes} />
+                        </button>
+                        
+                        <div className="md-qr-modal-header">
+                            <FontAwesomeIcon icon={faQrcode} className="md-qr-icon" />
+                            <h3>Mã Check-in</h3>
+                        </div>
+                        
+                        <p className="md-qr-description">Quét mã QR này tại quầy lễ tân để check-in vào phòng gym</p>
+                        
+                        <div className="md-qr-wrapper">
+                            <QRCodeSVG
+                                value={user?.id || "member-123456"}
+                                size={220}
+                                level="H"
+                                bgColor="#ffffff"
+                                fgColor="#000000"
+                                includeMargin={true}
+                            />
+                        </div>
+                    </div>
+                </div>
+            )}
                 </>
             )}
         </div>

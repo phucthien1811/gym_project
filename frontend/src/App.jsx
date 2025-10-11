@@ -33,7 +33,7 @@ import MemberDashboard from "./pages/member/MemberDashboard.jsx";
 import MemberProfile from "./pages/member/Profile.jsx";
 import MemberSchedule from "./pages/member/MemberSchedule.jsx";
 import BookClass from "./pages/member/BookClass.jsx";
-import TrainingProgress from "./pages/member/TrainingProgress.jsx";
+// import TrainingProgress from "./pages/member/TrainingProgress.jsx";
 import MemberPackages from "./pages/member/MemberPackages.jsx";
 import MyOrders from "./pages/member/MyOrders.jsx";
 import OrderDetail from "./pages/member/OrderDetail.jsx";
@@ -137,7 +137,7 @@ export default function App() {
             <Route path="profile" element={<MemberProfile />} />
             <Route path="schedule" element={<MemberSchedule />} />
             <Route path="book-class" element={<BookClass />} />
-            <Route path="progress" element={<TrainingProgress />} />
+            {/* <Route path="progress" element={<TrainingProgress />} /> */}
             <Route path="packages" element={<MemberPackages />} />
             <Route path="orders" element={<MyOrders />} />
             <Route path="orders/:orderId" element={<OrderDetail />} />

@@ -1,4 +1,6 @@
 import React, { useState, useEffect } from 'react';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faSearch, faCheck, faTimes } from '@fortawesome/free-solid-svg-icons';
 import './css/MemberBookClass.css';
 
 const BookClass = () => {
@@ -90,50 +92,6 @@ const BookClass = () => {
         }
     };
 
-    // Format thời gian
-    const formatDateTime = (classDate, startTime, endTime) => {
-        try {
-            // Sử dụng class_date thực tế từ database
-            let dateObj;
-            
-            if (classDate) {
-                // Parse class_date (YYYY-MM-DD format)
-                dateObj = new Date(classDate);
-            } else {
-                // Fallback nếu không có class_date
-                dateObj = new Date();
-            }
-            
-            // Format ngày
-            const formattedDate = dateObj.toLocaleDateString('vi-VN', {
-                weekday: 'long',
-                year: 'numeric', 
-                month: 'long', 
-                day: 'numeric'
-            });
-            
-            // Format thời gian
-            let formattedTime = 'Chưa xác định';
-            if (startTime) {
-                formattedTime = startTime.substring(0, 5);
-                if (endTime) {
-                    formattedTime += ` - ${endTime.substring(0, 5)}`;
-                }
-            }
-            
-            return {
-                date: formattedDate,
-                time: formattedTime
-            };
-        } catch (error) {
-            console.error('Error formatting date:', error, classDate, startTime);
-            return {
-                date: 'Chưa xác định',
-                time: 'Chưa xác định'
-            };
-        }
-    };
-
     // Filter classes
     const filteredClasses = classes.filter(classItem => {
         const matchesSearch = classItem.class_name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -152,8 +110,8 @@ const BookClass = () => {
 
     if (loading) {
         return (
-            <div className="book-class-container">
-                <div className="loading-message">
+            <div className="bc-container">
+                <div className="bc-loading">
                     <i className="fas fa-spinner fa-spin"></i>
                     <p>Đang tải danh sách lớp học...</p>
                 </div>
@@ -162,64 +120,59 @@ const BookClass = () => {
     }
 
     return (
-        <div className="book-class-container">
-            <div className="book-class-header">
-                <h1>
-                    <i className="fas fa-calendar-plus"></i>
-                    Đặt Lớp Học
-                </h1>
-                <p>Chọn và đăng ký các lớp học phù hợp với bạn</p>
+        <div className="bc-container">
+            {/* Header */}
+            <div className="bc-header">
+                <h1>Đăng ký lớp học</h1>
             </div>
 
-            {/* Filter và Search */}
-            <div className="book-class-controls">
-                <div className="search-bar">
-                    <i className="fas fa-search"></i>
-                    <input
-                        type="text"
-                        placeholder="Tìm kiếm lớp học hoặc huấn luyện viên..."
-                        value={searchTerm}
-                        onChange={(e) => setSearchTerm(e.target.value)}
-                    />
-                </div>
-                
-                <div className="filter-buttons">
+            {/* Controls: Filter buttons and Search */}
+            <div className="bc-controls">
+                <div className="bc-filter-buttons">
                     <button 
-                        className={`filter-btn ${filter === 'all' ? 'active' : ''}`}
+                        className={`bc-filter-btn ${filter === 'all' ? 'bc-active' : ''}`}
                         onClick={() => setFilter('all')}
                     >
-                        <i className="fas fa-list"></i>
                         Tất cả
                     </button>
                     <button 
-                        className={`filter-btn ${filter === 'available' ? 'active' : ''}`}
+                        className={`bc-filter-btn ${filter === 'available' ? 'bc-active' : ''}`}
                         onClick={() => setFilter('available')}
                     >
-                        <i className="fas fa-check-circle"></i>
                         Còn chỗ
                     </button>
                     <button 
-                        className={`filter-btn ${filter === 'full' ? 'active' : ''}`}
+                        className={`bc-filter-btn ${filter === 'full' ? 'bc-active' : ''}`}
                         onClick={() => setFilter('full')}
                     >
-                        <i className="fas fa-times-circle"></i>
                         Đã đầy
                     </button>
                 </div>
+                
+                <div className="bc-search">
+                    <FontAwesomeIcon icon={faSearch} className="bc-search-icon" />
+                    <input
+                        type="text"
+                        placeholder="Tìm kiếm lớp học..."
+                        value={searchTerm}
+                        onChange={(e) => setSearchTerm(e.target.value)}
+                        className="bc-search-input"
+                    />
+                </div>
             </div>
 
-            {/* Danh sách lớp học */}
+            {/* Table */}
             {error ? (
-                <div className="error-message">
+                <div className="bc-error">
                     <i className="fas fa-exclamation-triangle"></i>
                     <p>{error}</p>
-                    <button onClick={loadAvailableClasses} className="retry-btn">
+                    <button onClick={loadAvailableClasses} className="bc-retry-btn">
                         <i className="fas fa-redo"></i>
                         Thử lại
                     </button>
                 </div>
             ) : filteredClasses.length === 0 ? (
-                <div className="empty-message">
+                <div className="bc-empty">
                     <i className="fas fa-calendar-times"></i>
                     <h3>Không có lớp học nào</h3>
                     <p>
@@ -228,101 +181,76 @@ const BookClass = () => {
                     </p>
                 </div>
             ) : (
-                <div className="classes-grid">
-                    {filteredClasses.map(classItem => {
-                        const { date, time } = formatDateTime(classItem.class_date, classItem.start_time, classItem.end_time);
-                        const isAvailable = classItem.current_participants < classItem.max_participants;
-                        const isEnrolled = classItem.is_enrolled || false;
-                        
-                        console.log(`Class ${classItem.class_name} - isEnrolled:`, isEnrolled, 'Raw value:', classItem.is_enrolled);
-                        
-                        return (
-                            <div key={classItem.id} className={`class-card ${!isAvailable ? 'full' : ''} ${isEnrolled ? 'enrolled' : ''}`}>
-                                <div className="class-header">
-                                    <h3 className="class-name">
-                                        <i className="fas fa-dumbbell"></i>
-                                        {classItem.class_name}
-                                    </h3>
-                                    <span className={`status-badge ${isEnrolled ? 'enrolled' : isAvailable ? 'available' : 'full'}`}>
-                                        {isEnrolled ? 'Đã đăng ký' : isAvailable ? 'Còn chỗ' : 'Đã đầy'}
-                                    </span>
-                                </div>
-
-                                <div className="class-info">
-                                    <div className="info-row">
-                                        <i className="fas fa-user-tie"></i>
-                                        <span>HLV: {classItem.trainer_name || 'Chưa có'}</span>
-                                    </div>
-                                    
-                                    <div className="info-row">
-                                        <i className="fas fa-calendar-alt"></i>
-                                        <span>{date}</span>
-                                    </div>
-                                    
-                                    <div className="info-row">
-                                        <i className="fas fa-clock"></i>
-                                        <span>{time}</span>
-                                    </div>
-                                    
-                                    <div className="info-row">
-                                        <i className="fas fa-users"></i>
-                                        <span>
-                                            {classItem.current_participants || 0}/{classItem.max_participants} người
-                                        </span>
-                                    </div>
-                                    
-                                    {classItem.price && classItem.price > 0 ? (
-                                        <div className="info-row">
-                                            <i className="fas fa-tag"></i>
-                                            <span className="price">
-                                                {parseInt(classItem.price).toLocaleString('vi-VN')} VNĐ
+                <div className="bc-table-wrapper">
+                    <table className="bc-table">
+                        <thead>
+                            <tr>
+                                <th>Tên lớp</th>
+                                <th>Huấn luyện viên</th>
+                                <th>Ngày</th>
+                                <th>Giờ bắt đầu</th>
+                                <th>Giờ kết thúc</th>
+                                <th>Số lượng</th>
+                                <th>Hành động</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {filteredClasses.map(classItem => {
+                                const isAvailable = classItem.current_participants < classItem.max_participants;
+                                const isEnrolled = classItem.is_enrolled || false;
+                                
+                                // Format date (DD/MM/YYYY)
+                                let formattedDate = 'N/A';
+                                if (classItem.class_date) {
+                                    const dateObj = new Date(classItem.class_date);
+                                    formattedDate = dateObj.toLocaleDateString('vi-VN');
+                                }
+                                
+                                // Format time (HH:MM)
+                                const startTime = classItem.start_time ? classItem.start_time.substring(0, 5) : 'N/A';
+                                const endTime = classItem.end_time ? classItem.end_time.substring(0, 5) : 'N/A';
+                                
+                                // Format participants count
+                                const currentCount = classItem.current_participants || 0;
+                                const maxCount = classItem.max_participants || 0;
+                                
+                                return (
+                                    <tr key={classItem.id} className={isEnrolled ? 'bc-enrolled-row' : ''}>
+                                        <td className="bc-class-name">{classItem.class_name}</td>
+                                        <td>{classItem.trainer_name || 'Chưa có'}</td>
+                                        <td>{formattedDate}</td>
+                                        <td>{startTime}</td>
+                                        <td>{endTime}</td>
+                                        <td className="bc-participants">
+                                            <span className={`bc-count ${!isAvailable ? 'bc-full' : ''}`}>
+                                                {currentCount}/{maxCount}
                                             </span>
-                                        </div>
-                                    ) : (
-                                        <div className="info-row">
-                                            <i className="fas fa-gift"></i>
-                                            <span className="price free">
-                                                Miễn phí
-                                            </span>
-                                        </div>
-                                    )}
-                                </div>
-
-                                {classItem.description && (
-                                    <div className="class-description">
-                                        <p>{classItem.description}</p>
-                                    </div>
-                                )}
-
-                                <div className="class-actions">
-                                    {isEnrolled ? (
-                                        <button 
-                                            className="unenroll-btn"
-                                            onClick={() => {
-                                                console.log('Clicking unenroll for class:', classItem.id);
-                                                unenrollFromClass(classItem.id);
-                                            }}
-                                        >
-                                            <i className="fas fa-minus"></i>
-                                            Hủy đăng ký
-                                        </button>
-                                    ) : (
-                                        <button 
-                                            className={`enroll-btn ${!isAvailable ? 'disabled' : ''}`}
-                                            onClick={() => {
-                                                console.log('Clicking enroll for class:', classItem.id);
-                                                enrollInClass(classItem.id);
-                                            }}
-                                            disabled={!isAvailable}
-                                        >
-                                            <i className={`fas ${isAvailable ? 'fa-plus' : 'fa-times'}`}></i>
-                                            {isAvailable ? 'Đăng ký' : 'Đã đầy'}
-                                        </button>
-                                    )}
-                                </div>
-                            </div>
-                        );
-                    })}
+                                        </td>
+                                        <td>
+                                            {isEnrolled ? (
+                                                <button 
+                                                    className="bc-btn bc-unenroll-btn"
+                                                    onClick={() => unenrollFromClass(classItem.id)}
+                                                >
+                                                    <FontAwesomeIcon icon={faTimes} />
+                                                    Hủy đăng ký
+                                                </button>
+                                            ) : (
+                                                <button 
+                                                    className={`bc-btn bc-enroll-btn ${!isAvailable ? 'bc-disabled' : ''}`}
+                                                    onClick={() => enrollInClass(classItem.id)}
+                                                    disabled={!isAvailable}
+                                                >
+                                                    <FontAwesomeIcon icon={faCheck} />
+                                                    {isAvailable ? 'Đăng ký' : 'Đã đầy'}
+                                                </button>
+                                            )}
+                                        </td>
+                                    </tr>
+                                );
+                            })}
+                        </tbody>
+                    </table>
                 </div>
             )}
         </div>

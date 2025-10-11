@@ -109,7 +109,7 @@ export const useOrderDetails = (orderId) => {
     setError(null);
     
     try {
-      const response = await orderService.getOrderDetails(orderId);
+      const response = await orderService.getMyOrderDetails(orderId);
       setOrder(response.data);
     } catch (err) {
       setError(err.message);

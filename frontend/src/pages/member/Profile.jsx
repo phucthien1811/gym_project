@@ -8,7 +8,7 @@ const Profile = () => {
     const [profile, setProfile] = useState(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
-    const [editing, setEditing] = useState(false);
+    const [isEditing, setIsEditing] = useState(false);
     const [formData, setFormData] = useState({
         full_name: '',
         phone: '',
@@ -19,13 +19,27 @@ const Profile = () => {
         weight: '',
         fitness_goal: ''
     });
-    const [errors, setErrors] = useState({});
     const [avatarFile, setAvatarFile] = useState(null);
     const [avatarPreview, setAvatarPreview] = useState(null);
 
     useEffect(() => {
         fetchProfile();
     }, []);
+
+    useEffect(() => {
+        if (profile) {
+            setFormData({
+                full_name: profile.name || profile.full_name || '',
+                phone: profile.phone || '',
+                birth_date: profile.birth_date || '',
+                gender: profile.gender || '',
+                address: profile.address || '',
+                height: profile.height || '',
+                weight: profile.weight || '',
+                fitness_goal: profile.fitness_goal || ''
+            });
+        }
+    }, [profile]);
 
     // Helper function to format avatar URL
     const getAvatarUrl = (avatarPath) => {
@@ -50,17 +64,6 @@ const Profile = () => {
             
             if (response.success) {
                 setProfile(response.data);
-                setFormData({
-                    full_name: response.data.name || response.data.full_name || '',
-                    phone: response.data.phone || '',
-                    birth_date: response.data.birth_date || '',
-                    gender: response.data.gender || '',
-                    address: response.data.address || '',
-                    height: response.data.height || '',
-                    weight: response.data.weight || '',
-                    fitness_goal: response.data.fitness_goal || ''
-                });
-                setAvatarPreview(response.data.avatar_url);
             }
         } catch (error) {
             console.error('❌ Error fetching profile:', error);
@@ -70,19 +73,19 @@ const Profile = () => {
         }
     };
 
+    const getBMICategory = (bmi) => {
+        if (bmi < 18.5) return { text: 'Thiếu cân', color: '#17a2b8' };
+        if (bmi < 25) return { text: 'Bình thường', color: '#28a745' };
+        if (bmi < 30) return { text: 'Thừa cân', color: '#ffc107' };
+        return { text: 'Béo phì', color: '#dc3545' };
+    };
+
     const handleInputChange = (e) => {
         const { name, value } = e.target;
         setFormData(prev => ({
             ...prev,
             [name]: value
         }));
-        // Clear error when user starts typing
-        if (errors[name]) {
-            setErrors(prev => ({
-                ...prev,
-                [name]: ''
-            }));
-        }
     };
 
     const handleAvatarChange = (e) => {
@@ -97,102 +100,34 @@ const Profile = () => {
         }
     };
 
-    const calculateBMI = () => {
-        const height = parseFloat(formData.height);
-        const weight = parseFloat(formData.weight);
-        if (height > 0 && weight > 0) {
-            const heightInMeters = height / 100;
-            return (weight / (heightInMeters * heightInMeters)).toFixed(1);
-        }
-        return null;
-    };
-
-    const getBMICategory = (bmi) => {
-        if (bmi < 18.5) return { text: 'Thiếu cân', color: '#17a2b8' };
-        if (bmi < 25) return { text: 'Bình thường', color: '#28a745' };
-        if (bmi < 30) return { text: 'Thừa cân', color: '#ffc107' };
-        return { text: 'Béo phì', color: '#dc3545' };
-    };
-
-    const validateForm = () => {
-        const newErrors = {};
-        
-        if (!formData.full_name.trim()) {
-            newErrors.full_name = 'Vui lòng nhập họ tên';
-        }
-        
-        if (!formData.phone.trim()) {
-            newErrors.phone = 'Vui lòng nhập số điện thoại';
-        } else if (!/^[0-9]{10,11}$/.test(formData.phone.replace(/\s/g, ''))) {
-            newErrors.phone = 'Số điện thoại không hợp lệ';
-        }
-
-        if (formData.height && (formData.height < 100 || formData.height > 250)) {
-            newErrors.height = 'Chiều cao phải từ 100-250cm';
-        }
-
-        if (formData.weight && (formData.weight < 30 || formData.weight > 200)) {
-            newErrors.weight = 'Cân nặng phải từ 30-200kg';
-        }
-
-        setErrors(newErrors);
-        return Object.keys(newErrors).length === 0;
-    };
-
     const handleSubmit = async (e) => {
         e.preventDefault();
         
-        if (!validateForm()) return;
-
         try {
             setLoading(true);
-            
-            console.log('🚀 Submitting profile data:', formData);
             
             const profileData = new FormData();
             Object.keys(formData).forEach(key => {
                 if (formData[key]) {
                     profileData.append(key, formData[key]);
-                    console.log(`📝 Adding to FormData: ${key} = ${formData[key]}`);
                 }
             });
             
             if (avatarFile) {
                 profileData.append('avatar', avatarFile);
-                console.log('📷 Adding avatar file:', avatarFile.name);
             }
 
-            console.log('📡 Sending PUT request...');
             const response = await memberProfileService.updateProfile(profileData);
-            console.log('✅ Update response:', response);
             
             if (response.success) {
-                console.log('✅ Update successful, refreshing profile...');
-                // Refresh profile data from server
                 await fetchProfile();
-                setEditing(false);
+                setIsEditing(false);
                 setAvatarFile(null);
                 setAvatarPreview(null);
-                // Force UI refresh by updating profile state with new data
-                if (response.data) {
-                    setProfile(response.data);
-                    setFormData({
-                        full_name: response.data.name || response.data.full_name || '',
-                        phone: response.data.phone || '',
-                        birth_date: response.data.birth_date || '',
-                        gender: response.data.gender || '',
-                        address: response.data.address || '',
-                        height: response.data.height || '',
-                        weight: response.data.weight || '',
-                        fitness_goal: response.data.fitness_goal || ''
-                    });
-                    setAvatarPreview(response.data.avatar_url);
-                }
                 alert('Cập nhật hồ sơ thành công!');
             }
         } catch (error) {
             console.error('❌ Error updating profile:', error);
-            console.error('❌ Error details:', error.response?.data);
             alert('Có lỗi xảy ra khi cập nhật hồ sơ: ' + (error.response?.data?.message || error.message));
         } finally {
             setLoading(false);
@@ -200,28 +135,38 @@ const Profile = () => {
     };
 
     const handleCancel = () => {
-        setEditing(false);
+        setIsEditing(false);
         setAvatarFile(null);
-        setAvatarPreview(profile?.avatar_url);
-        fetchProfile(); // Reset form data
-        setErrors({});
+        setAvatarPreview(null);
+        if (profile) {
+            setFormData({
+                full_name: profile.name || profile.full_name || '',
+                phone: profile.phone || '',
+                birth_date: profile.birth_date || '',
+                gender: profile.gender || '',
+                address: profile.address || '',
+                height: profile.height || '',
+                weight: profile.weight || '',
+                fitness_goal: profile.fitness_goal || ''
+            });
+        }
     };
 
     if (loading && !profile) {
         return (
-            <div className="member-profile-container">
-                <div className="loading">Đang tải hồ sơ...</div>
+            <div className="mp-container">
+                <div className="mp-loading">Đang tải hồ sơ...</div>
             </div>
         );
     }
 
     if (error) {
         return (
-            <div className="member-profile-container">
-                <div className="error-message">
+            <div className="mp-container">
+                <div className="mp-error-message">
                     <h3>Lỗi tải hồ sơ</h3>
                     <p>{error}</p>
-                    <button onClick={fetchProfile} className="retry-btn">
+                    <button onClick={fetchProfile} className="mp-retry-btn">
                         Thử lại
                     </button>
                 </div>
@@ -229,168 +174,217 @@ const Profile = () => {
         );
     }
 
-    const bmi = calculateBMI();
+    const bmi = profile?.height && profile?.weight 
+        ? (profile.weight / ((profile.height / 100) ** 2)).toFixed(1)
+        : null;
     const bmiCategory = bmi ? getBMICategory(parseFloat(bmi)) : null;
 
+    // Calculate days remaining for membership
+    const calculateDaysRemaining = () => {
+        if (!profile?.membership_end_date) return null;
+        const endDate = new Date(profile.membership_end_date);
+        const today = new Date();
+        const diffTime = endDate - today;
+        const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+        return diffDays > 0 ? diffDays : 0;
+    };
+
+    const daysRemaining = calculateDaysRemaining();
+
     return (
-        <div className="member-profile-container">
-            <div className="profile-header">
+        <div className="mp-container">
+            <div className="mp-header">
                 <h2>Hồ Sơ Thành Viên</h2>
-                {!editing && (
-                    <button 
-                        className="edit-btn"
-                        onClick={() => setEditing(true)}
-                    >
-                        Chỉnh sửa hồ sơ
-                    </button>
-                )}
+                <button 
+                    className="mp-edit-btn"
+                    onClick={() => setIsEditing(!isEditing)}
+                >
+                    {isEditing ? 'Hủy chỉnh sửa' : 'Cập nhật thông tin'}
+                </button>
             </div>
 
-            <div className="profile-content">
-                {editing ? (
-                    <form onSubmit={handleSubmit} className="profile-form">
-                        <div className="form-grid">
-                            {/* Avatar Section */}
-                            <div className="avatar-section">
-                                <div className="avatar-container">
-                                    <img 
-                                        src={getAvatarUrl(avatarPreview)} 
-                                        alt="Avatar" 
-                                        className="avatar-preview"
-                                    />
+            <div className="mp-content">
+                {/* Column 1: Avatar and Personal Info */}
+                <div className="mp-col-1">
+                    <div className="mp-avatar-card">
+                        <img 
+                            src={avatarPreview || getAvatarUrl(profile?.avatar_url)} 
+                            alt="Avatar" 
+                            className="mp-avatar"
+                        />
+                        {isEditing && (
+                            <>
+                                <input
+                                    type="file"
+                                    id="avatar-upload"
+                                    accept="image/*"
+                                    onChange={handleAvatarChange}
+                                    style={{ display: 'none' }}
+                                />
+                                <label htmlFor="avatar-upload" className="mp-avatar-upload-btn">
+                                    Thay đổi ảnh
+                                </label>
+                            </>
+                        )}
+                        <div className="mp-avatar-name">
+                            {profile?.name || profile?.full_name || 'Chưa cập nhật'}
+                        </div>
+                    </div>
+
+                    <div className="mp-personal-card">
+                        <div className="mp-card-header">
+                            Thông tin cá nhân
+                        </div>
+                        <div className="mp-card-content">
+                            <div className="mp-info-row">
+                                <span className="mp-info-label">Họ và tên</span>
+                                {isEditing ? (
                                     <input
-                                        type="file"
-                                        id="avatar"
-                                        accept="image/*"
-                                        onChange={handleAvatarChange}
-                                        style={{ display: 'none' }}
+                                        type="text"
+                                        name="full_name"
+                                        value={formData.full_name}
+                                        onChange={handleInputChange}
+                                        className="mp-input"
                                     />
-                                    <label htmlFor="avatar" className="avatar-upload-btn">
-                                        Thay đổi ảnh
-                                    </label>
-                                </div>
+                                ) : (
+                                    <span className="mp-info-value">
+                                        {profile?.name || profile?.full_name || 'Chưa cập nhật'}
+                                    </span>
+                                )}
                             </div>
-
-                            {/* Personal Info */}
-                            <div className="form-section">
-                                <h3>Thông tin cá nhân</h3>
-                                
-                                <div className="form-row">
-                                    <div className="form-group">
-                                        <label>Họ và tên *</label>
-                                        <input
-                                            type="text"
-                                            name="full_name"
-                                            value={formData.full_name}
-                                            onChange={handleInputChange}
-                                            className={errors.full_name ? 'error' : ''}
-                                        />
-                                        {errors.full_name && <span className="error-text">{errors.full_name}</span>}
-                                    </div>
-                                    
-                                    <div className="form-group">
-                                        <label>Số điện thoại *</label>
-                                        <input
-                                            type="tel"
-                                            name="phone"
-                                            value={formData.phone}
-                                            onChange={handleInputChange}
-                                            className={errors.phone ? 'error' : ''}
-                                        />
-                                        {errors.phone && <span className="error-text">{errors.phone}</span>}
-                                    </div>
-                                </div>
-
-                                <div className="form-row">
-                                    <div className="form-group">
-                                        <label>Ngày sinh</label>
-                                        <input
-                                            type="date"
-                                            name="birth_date"
-                                            value={formData.birth_date}
-                                            onChange={handleInputChange}
-                                        />
-                                    </div>
-                                    
-                                    <div className="form-group">
-                                        <label>Giới tính</label>
-                                        <select
-                                            name="gender"
-                                            value={formData.gender}
-                                            onChange={handleInputChange}
-                                        >
-                                            <option value="">Chọn giới tính</option>
-                                            <option value="male">Nam</option>
-                                            <option value="female">Nữ</option>
-                                            <option value="other">Khác</option>
-                                        </select>
-                                    </div>
-                                </div>
-
-                                <div className="form-group">
-                                    <label>Địa chỉ</label>
+                            <div className="mp-info-row">
+                                <span className="mp-info-label">Email</span>
+                                <span className="mp-info-value">{user?.email}</span>
+                            </div>
+                            <div className="mp-info-row">
+                                <span className="mp-info-label">Ngày sinh</span>
+                                {isEditing ? (
+                                    <input
+                                        type="date"
+                                        name="birth_date"
+                                        value={formData.birth_date}
+                                        onChange={handleInputChange}
+                                        className="mp-input"
+                                    />
+                                ) : (
+                                    <span className="mp-info-value">
+                                        {profile?.birth_date 
+                                            ? new Date(profile.birth_date).toLocaleDateString('vi-VN')
+                                            : 'Chưa cập nhật'
+                                        }
+                                    </span>
+                                )}
+                            </div>
+                            <div className="mp-info-row">
+                                <span className="mp-info-label">Giới tính</span>
+                                {isEditing ? (
+                                    <select
+                                        name="gender"
+                                        value={formData.gender}
+                                        onChange={handleInputChange}
+                                        className="mp-input"
+                                    >
+                                        <option value="">Chọn giới tính</option>
+                                        <option value="male">Nam</option>
+                                        <option value="female">Nữ</option>
+                                        <option value="other">Khác</option>
+                                    </select>
+                                ) : (
+                                    <span className="mp-info-value">
+                                        {profile?.gender === 'male' ? 'Nam' : 
+                                         profile?.gender === 'female' ? 'Nữ' : 
+                                         profile?.gender === 'other' ? 'Khác' : 'Chưa cập nhật'}
+                                    </span>
+                                )}
+                            </div>
+                            <div className="mp-info-row">
+                                <span className="mp-info-label">Địa chỉ</span>
+                                {isEditing ? (
                                     <textarea
                                         name="address"
                                         value={formData.address}
                                         onChange={handleInputChange}
-                                        rows="3"
+                                        className="mp-input"
+                                        rows="2"
                                     />
-                                </div>
-                            </div>
-
-                            {/* Body Stats */}
-                            <div className="form-section">
-                                <h3>Chỉ số cơ thể</h3>
-                                
-                                <div className="form-row">
-                                    <div className="form-group">
-                                        <label>Chiều cao (cm)</label>
-                                        <input
-                                            type="number"
-                                            name="height"
-                                            value={formData.height}
-                                            onChange={handleInputChange}
-                                            min="100"
-                                            max="250"
-                                            className={errors.height ? 'error' : ''}
-                                        />
-                                        {errors.height && <span className="error-text">{errors.height}</span>}
-                                    </div>
-                                    
-                                    <div className="form-group">
-                                        <label>Cân nặng (kg)</label>
-                                        <input
-                                            type="number"
-                                            name="weight"
-                                            value={formData.weight}
-                                            onChange={handleInputChange}
-                                            min="30"
-                                            max="200"
-                                            step="0.1"
-                                            className={errors.weight ? 'error' : ''}
-                                        />
-                                        {errors.weight && <span className="error-text">{errors.weight}</span>}
-                                    </div>
-                                </div>
-
-                                {bmi && (
-                                    <div className="bmi-display">
-                                        <span>BMI: {bmi}</span>
-                                        <span 
-                                            className="bmi-category"
-                                            style={{ color: bmiCategory.color }}
-                                        >
-                                            ({bmiCategory.text})
-                                        </span>
-                                    </div>
+                                ) : (
+                                    <span className="mp-info-value">
+                                        {profile?.address || 'Chưa cập nhật'}
+                                    </span>
                                 )}
+                            </div>
+                        </div>
+                    </div>
+                </div>
 
-                                <div className="form-group">
-                                    <label>Mục tiêu tập luyện</label>
+                {/* Column 2: Body Stats */}
+                <div className="mp-col-2">
+                    <div className="mp-stats-card">
+                        <div className="mp-card-header">
+                            Chỉ số hội viên
+                        </div>
+                        <div className="mp-stats-grid">
+                            <div className="mp-stat-item">
+                                <span className="mp-stat-label">Chiều cao</span>
+                                {isEditing ? (
+                                    <input
+                                        type="number"
+                                        name="height"
+                                        value={formData.height}
+                                        onChange={handleInputChange}
+                                        className="mp-input-stat"
+                                        placeholder="cm"
+                                        min="100"
+                                        max="250"
+                                    />
+                                ) : (
+                                    <span className="mp-stat-value">
+                                        {profile?.height ? `${profile.height} cm` : 'N/A'}
+                                    </span>
+                                )}
+                            </div>
+                            <div className="mp-stat-item">
+                                <span className="mp-stat-label">Cân nặng</span>
+                                {isEditing ? (
+                                    <input
+                                        type="number"
+                                        name="weight"
+                                        value={formData.weight}
+                                        onChange={handleInputChange}
+                                        className="mp-input-stat"
+                                        placeholder="kg"
+                                        min="30"
+                                        max="200"
+                                        step="0.1"
+                                    />
+                                ) : (
+                                    <span className="mp-stat-value">
+                                        {profile?.weight ? `${profile.weight} kg` : 'N/A'}
+                                    </span>
+                                )}
+                            </div>
+                            {bmi && (
+                                <div className="mp-stat-item">
+                                    <span className="mp-stat-label">BMI</span>
+                                    <span className="mp-stat-value">
+                                        {bmi}
+                                    </span>
+                                </div>
+                            )}
+                            <div className="mp-stat-item">
+                                <span className="mp-stat-label">Phân loại</span>
+                                <span className="mp-stat-value" style={{ color: bmiCategory?.color || 'rgb(33, 37, 41)', fontSize: '1rem' }}>
+                                    {bmiCategory?.text || 'N/A'}
+                                </span>
+                            </div>
+                            <div className="mp-stat-item full-width">
+                                <span className="mp-stat-label">Mục tiêu tập luyện</span>
+                                {isEditing ? (
                                     <select
                                         name="fitness_goal"
                                         value={formData.fitness_goal}
                                         onChange={handleInputChange}
+                                        className="mp-input"
                                     >
                                         <option value="">Chọn mục tiêu</option>
                                         <option value="weight_loss">Giảm cân</option>
@@ -399,132 +393,72 @@ const Profile = () => {
                                         <option value="strength">Tăng sức mạnh</option>
                                         <option value="general_fitness">Tăng cường sức khỏe</option>
                                     </select>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div className="form-actions">
-                            <button type="submit" className="save-btn" disabled={loading}>
-                                {loading ? 'Đang lưu...' : 'Lưu thay đổi'}
-                            </button>
-                            <button type="button" className="cancel-btn" onClick={handleCancel}>
-                                Hủy
-                            </button>
-                        </div>
-                    </form>
-                ) : (
-                    <div className="profile-view">
-                        {/* Avatar */}
-                        <div className="avatar-section">
-                            <img 
-                                src={getAvatarUrl(profile?.avatar_url)} 
-                                alt="Avatar" 
-                                className="avatar-display"
-                            />
-                        </div>
-
-                        {/* Personal Info */}
-                        <div className="info-section">
-                            <h3>Thông tin cá nhân</h3>
-                            <div className="info-grid">
-                                <div className="info-item">
-                                    <span className="label">Họ và tên:</span>
-                                    <span className="value">{profile?.name || profile?.full_name || 'Chưa cập nhật'}</span>
-                                </div>
-                                <div className="info-item">
-                                    <span className="label">Email:</span>
-                                    <span className="value">{user?.email}</span>
-                                </div>
-                                <div className="info-item">
-                                    <span className="label">Số điện thoại:</span>
-                                    <span className="value">{profile?.phone || 'Chưa cập nhật'}</span>
-                                </div>
-                                <div className="info-item">
-                                    <span className="label">Ngày sinh:</span>
-                                    <span className="value">
-                                        {profile?.birth_date 
-                                            ? new Date(profile.birth_date).toLocaleDateString('vi-VN')
-                                            : 'Chưa cập nhật'
-                                        }
-                                    </span>
-                                </div>
-                                <div className="info-item">
-                                    <span className="label">Giới tính:</span>
-                                    <span className="value">
-                                        {profile?.gender === 'male' ? 'Nam' : 
-                                         profile?.gender === 'female' ? 'Nữ' : 
-                                         profile?.gender === 'other' ? 'Khác' : 'Chưa cập nhật'}
-                                    </span>
-                                </div>
-                                <div className="info-item full-width">
-                                    <span className="label">Địa chỉ:</span>
-                                    <span className="value">{profile?.address || 'Chưa cập nhật'}</span>
-                                </div>
-                            </div>
-                        </div>
-
-                        {/* Body Stats */}
-                        <div className="info-section">
-                            <h3>Chỉ số cơ thể</h3>
-                            <div className="stats-grid">
-                                <div className="stat-item">
-                                    <span className="stat-label">Chiều cao</span>
-                                    <span className="stat-value">
-                                        {profile?.height ? `${profile.height} cm` : 'Chưa cập nhật'}
-                                    </span>
-                                </div>
-                                <div className="stat-item">
-                                    <span className="stat-label">Cân nặng</span>
-                                    <span className="stat-value">
-                                        {profile?.weight ? `${profile.weight} kg` : 'Chưa cập nhật'}
-                                    </span>
-                                </div>
-                                {profile?.height && profile?.weight && (
-                                    <div className="stat-item">
-                                        <span className="stat-label">BMI</span>
-                                        <span className="stat-value">
-                                            {((profile.weight / ((profile.height / 100) ** 2)).toFixed(1))}
-                                        </span>
-                                    </div>
-                                )}
-                                <div className="stat-item full-width">
-                                    <span className="stat-label">Mục tiêu tập luyện</span>
-                                    <span className="stat-value">
+                                ) : (
+                                    <span className="mp-stat-value" style={{ fontSize: '1rem' }}>
                                         {profile?.fitness_goal === 'weight_loss' ? 'Giảm cân' :
                                          profile?.fitness_goal === 'muscle_gain' ? 'Tăng cơ' :
                                          profile?.fitness_goal === 'endurance' ? 'Tăng sức bền' :
                                          profile?.fitness_goal === 'strength' ? 'Tăng sức mạnh' :
                                          profile?.fitness_goal === 'general_fitness' ? 'Tăng cường sức khỏe' :
-                                         'Chưa cập nhật'}
+                                         'Chưa đặt mục tiêu'}
                                     </span>
-                                </div>
-                            </div>
-                        </div>
-
-                        {/* Membership Info */}
-                        <div className="info-section">
-                            <h3>Thông tin hội viên</h3>
-                            <div className="membership-info">
-                                <div className="membership-status">
-                                    <span className="status-label">Gói hội viên:</span>
-                                    <span className="status-value">
-                                        {profile?.membership_plan || 'Chưa đăng ký'}
-                                    </span>
-                                </div>
-                                {profile?.membership_start_date && profile?.membership_end_date && (
-                                    <div className="membership-dates">
-                                        <span>
-                                            {new Date(profile.membership_start_date).toLocaleDateString('vi-VN')} 
-                                            {' - '}
-                                            {new Date(profile.membership_end_date).toLocaleDateString('vi-VN')}
-                                        </span>
-                                    </div>
                                 )}
                             </div>
                         </div>
                     </div>
-                )}
+                </div>
+
+                {/* Column 3: Membership Info */}
+                <div className="mp-col-3">
+                    <div className="mp-membership-card">
+                        <div className="mp-card-header">
+                            Thông tin gói hội viên
+                        </div>
+                        <div className="mp-membership-content">
+                            <div className="mp-package-name">
+                                {profile?.membership_plan || 'Chưa đăng ký'}
+                            </div>
+                            
+                            {daysRemaining !== null && (
+                                <div className="mp-time-remaining">
+                                    <span className="mp-time-label">Thời gian còn lại</span>
+                                    <span className="mp-time-value">
+                                        {daysRemaining} ngày
+                                    </span>
+                                </div>
+                            )}
+
+                            {profile?.membership_start_date && profile?.membership_end_date && (
+                                <div className="mp-membership-dates">
+                                    <div>Ngày bắt đầu: {new Date(profile.membership_start_date).toLocaleDateString('vi-VN')}</div>
+                                    <div>Ngày kết thúc: {new Date(profile.membership_end_date).toLocaleDateString('vi-VN')}</div>
+                                </div>
+                            )}
+                        </div>
+                    </div>
+                </div>
             </div>
+
+            {/* Save/Cancel buttons when editing */}
+            {isEditing && (
+                <div className="mp-form-actions">
+                    <button 
+                        type="button" 
+                        className="mp-save-btn"
+                        onClick={handleSubmit}
+                        disabled={loading}
+                    >
+                        {loading ? 'Đang lưu...' : 'Lưu thay đổi'}
+                    </button>
+                    <button 
+                        type="button" 
+                        className="mp-cancel-btn"
+                        onClick={handleCancel}
+                    >
+                        Hủy
+                    </button>
+                </div>
+            )}
         </div>
     );
 };

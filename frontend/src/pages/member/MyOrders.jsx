@@ -1,7 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faBox, faCheckCircle, faClock, faTruck, faTimesCircle } from '@fortawesome/free-solid-svg-icons';
 import { useOrders } from '../../hooks/useOrders';
-import '../../styles/MyOrders.css';
+import './css/MyOrders.css';
 
 const MyOrders = () => {
   const { 
@@ -12,8 +14,7 @@ const MyOrders = () => {
     fetchOrders, 
     cancelOrder,
     formatCurrency,
-    getStatusText,
-    getStatusColor 
+    getStatusText
   } = useOrders();
 
   const [statusFilter, setStatusFilter] = useState('');
@@ -54,119 +55,143 @@ const MyOrders = () => {
 
   if (loading && orders.length === 0) {
     return (
-      <div className="my-orders-page">
-        <div className="orders-container">
-          <div className="loading">Đang tải đơn hàng...</div>
+      <div className="mo-container">
+        <div className="mo-loading">
+          <i className="fas fa-spinner fa-spin"></i>
+          <p>Đang tải đơn hàng...</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="my-orders-page">
-      <div className="orders-container">
-        <div className="page-header">
-          <h1>Đơn hàng của tôi</h1>
-          <div className="order-filters">
-            <select 
-              value={statusFilter} 
-              onChange={(e) => {
-                setStatusFilter(e.target.value);
-                setCurrentPage(1);
-              }}
-            >
-              <option value="">Tất cả trạng thái</option>
-              <option value="pending">Chờ xác nhận</option>
-              <option value="confirmed">Đã xác nhận</option>
-              <option value="processing">Đang xử lý</option>
-              <option value="shipped">Đang giao hàng</option>
-              <option value="delivered">Đã giao hàng</option>
-            <option value="cancelled">Đã hủy</option>
-          </select>
-        </div>
+    <div className="mo-container">
+      {/* Header */}
+      <div className="mo-header">
+        <h1>Đơn hàng của tôi</h1>
+      </div>
+
+      {/* Filter */}
+      <div className="mo-filter-bar">
+        <select 
+          className="mo-status-select"
+          value={statusFilter} 
+          onChange={(e) => {
+            setStatusFilter(e.target.value);
+            setCurrentPage(1);
+          }}
+        >
+          <option value="">Tất cả trạng thái</option>
+          <option value="pending">Chờ xác nhận</option>
+          <option value="confirmed">Đã xác nhận</option>
+          <option value="processing">Đang xử lý</option>
+          <option value="shipped">Đang giao hàng</option>
+          <option value="delivered">Đã giao hàng</option>
+          <option value="cancelled">Đã hủy</option>
+        </select>
       </div>
 
       {error && (
-        <div className="error-message">
-          {error}
+        <div className="mo-error">
+          <FontAwesomeIcon icon={faTimesCircle} />
+          <p>{error}</p>
         </div>
       )}
 
       {orders.length === 0 && !loading ? (
-        <div className="empty-orders">
+        <div className="mo-empty">
+          <FontAwesomeIcon icon={faBox} className="mo-empty-icon" />
           <h3>Chưa có đơn hàng nào</h3>
           <p>Bạn chưa có đơn hàng nào. Hãy bắt đầu mua sắm ngay!</p>
-          <Link to="/shop" className="btn btn-primary">
+          <Link to="/shop" className="mo-btn mo-btn-primary">
             Mua sắm ngay
           </Link>
         </div>
       ) : (
         <>
-          <div className="orders-list">
+          <div className="mo-orders-list">
             {orders.map(order => (
-              <div key={order.id} className="order-card">
-                <div className="order-header">
-                  <div className="order-info">
-                    <h3>Đơn hàng #{order.order_number}</h3>
-                    <span className="order-date">
-                      {new Date(order.created_at).toLocaleDateString('vi-VN')}
+              <div key={order.id} className="mo-order-card">
+                {/* Card Header */}
+                <div className="mo-card-header">
+                  <div className="mo-order-info">
+                    <h3 className="mo-order-number">Đơn hàng #{order.order_number}</h3>
+                    <span className="mo-order-date">
+                      <FontAwesomeIcon icon={faClock} />
+                      {new Date(order.created_at).toLocaleDateString('vi-VN', {
+                        day: '2-digit',
+                        month: '2-digit',
+                        year: 'numeric',
+                        hour: '2-digit',
+                        minute: '2-digit'
+                      })}
                     </span>
                   </div>
-                  <div className="order-status">
-                    <span 
-                      className="status-badge"
-                      style={{ backgroundColor: getStatusColor(order.status) }}
-                    >
-                      {getStatusText(order.status)}
-                    </span>
-                  </div>
+                  <span 
+                    className={`mo-status-badge mo-status-${order.status}`}
+                  >
+                    {order.status === 'pending' && <FontAwesomeIcon icon={faClock} />}
+                    {order.status === 'confirmed' && <FontAwesomeIcon icon={faCheckCircle} />}
+                    {order.status === 'processing' && <FontAwesomeIcon icon={faClock} />}
+                    {order.status === 'shipped' && <FontAwesomeIcon icon={faTruck} />}
+                    {order.status === 'delivered' && <FontAwesomeIcon icon={faCheckCircle} />}
+                    {order.status === 'cancelled' && <FontAwesomeIcon icon={faTimesCircle} />}
+                    {getStatusText(order.status)}
+                  </span>
                 </div>
 
-                <div className="order-items">
+                {/* Order Items */}
+                <div className="mo-items-container">
                   {order.items && order.items.slice(0, 3).map(item => (
-                    <div key={item.id} className="order-item">
+                    <div key={item.id} className="mo-item">
                       <img 
                         src={item.product_image} 
                         alt={item.product_name}
+                        className="mo-item-image"
                         onError={(e) => {
                           e.target.src = '/images/placeholder.jpg';
                         }}
                       />
-                      <div className="item-details">
-                        <h4>{item.product_name}</h4>
-                        <p>Số lượng: {item.quantity}</p>
+                      <div className="mo-item-details">
+                        <h4 className="mo-item-name">{item.product_name}</h4>
+                        <p className="mo-item-quantity">Số lượng: {item.quantity}</p>
                       </div>
-                      <div className="item-price">
+                      <div className="mo-item-price">
                         {formatCurrency(item.total_price)}
                       </div>
                     </div>
                   ))}
                   
                   {order.items && order.items.length > 3 && (
-                    <div className="more-items">
+                    <div className="mo-more-items">
                       +{order.items.length - 3} sản phẩm khác
                     </div>
                   )}
                 </div>
 
-                <div className="order-summary">
-                  <div className="payment-info">
-                    <span>Thanh toán: {order.payment_method === 'COD' ? 'COD' : order.payment_method}</span>
-                    <span className={`payment-status ${order.payment_status}`}>
+                {/* Order Summary */}
+                <div className="mo-summary">
+                  <div className="mo-payment-info">
+                    <span className="mo-payment-method">
+                      Thanh toán: <strong>{order.payment_method === 'COD' ? 'COD' : order.payment_method}</strong>
+                    </span>
+                    <span className={`mo-payment-status mo-payment-${order.payment_status}`}>
                       {order.payment_status === 'pending' ? 'Chờ thanh toán' : 
                        order.payment_status === 'paid' ? 'Đã thanh toán' : 
                        order.payment_status}
                     </span>
                   </div>
-                  <div className="total-amount">
-                    <strong>Tổng: {formatCurrency(order.total_amount)}</strong>
+                  <div className="mo-total">
+                    <span>Tổng cộng:</span>
+                    <strong className="mo-total-amount">{formatCurrency(order.total_amount)}</strong>
                   </div>
                 </div>
 
-                <div className="order-actions">
+                {/* Actions */}
+                <div className="mo-actions">
                   <Link 
                     to={`/member/orders/${order.id}`}
-                    className="btn btn-secondary"
+                    className="mo-btn mo-btn-secondary"
                   >
                     Xem chi tiết
                   </Link>
@@ -174,7 +199,7 @@ const MyOrders = () => {
                   {canCancelOrder(order) && (
                     <button
                       onClick={() => handleCancelOrder(order.id)}
-                      className="btn btn-danger"
+                      className="mo-btn mo-btn-danger"
                       disabled={loading}
                     >
                       Hủy đơn hàng
@@ -182,7 +207,7 @@ const MyOrders = () => {
                   )}
 
                   {order.status === 'delivered' && (
-                    <button className="btn btn-primary">
+                    <button className="mo-btn mo-btn-primary">
                       Đánh giá
                     </button>
                   )}
@@ -193,21 +218,21 @@ const MyOrders = () => {
 
           {/* Pagination */}
           {pagination.totalPages > 1 && (
-            <div className="pagination">
+            <div className="mo-pagination">
               <button
                 onClick={() => handlePageChange(currentPage - 1)}
                 disabled={currentPage === 1}
-                className="btn btn-secondary"
+                className="mo-page-btn"
               >
-                Trước
+                ‹ Trước
               </button>
               
-              <div className="page-numbers">
+              <div className="mo-page-numbers">
                 {Array.from({ length: pagination.totalPages }, (_, i) => i + 1).map(page => (
                   <button
                     key={page}
                     onClick={() => handlePageChange(page)}
-                    className={`btn ${currentPage === page ? 'btn-primary' : 'btn-secondary'}`}
+                    className={`mo-page-btn ${currentPage === page ? 'mo-active' : ''}`}
                   >
                     {page}
                   </button>
@@ -217,19 +242,18 @@ const MyOrders = () => {
               <button
                 onClick={() => handlePageChange(currentPage + 1)}
                 disabled={currentPage === pagination.totalPages}
-                className="btn btn-secondary"
+                className="mo-page-btn"
               >
-                Sau
+                Sau ›
               </button>
             </div>
           )}
 
-          <div className="pagination-info">
+          <div className="mo-pagination-info">
             Hiển thị {orders.length} trong tổng số {pagination.total} đơn hàng
           </div>
         </>
       )}
-      </div>
     </div>
   );
 };

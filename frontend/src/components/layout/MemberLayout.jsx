@@ -6,7 +6,7 @@ import './css/MemberLayout.css';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { 
     faTachometerAlt, faUserCircle, faCalendarAlt, faClipboardCheck, 
-    faChartLine, faBoxOpen, faReceipt, faSignOutAlt, faBell,
+     faBoxOpen, faReceipt, faSignOutAlt, faBell,
     faIdCard, faHouse 
 } from '@fortawesome/free-solid-svg-icons';
 
@@ -49,7 +49,7 @@ const MemberLayout = () => {
         {
             title: "Trang cá nhân",
             items: [
-                { name: "Bảng điều khiển", path: "/member/dashboard", icon: faTachometerAlt },
+                { name: "Trang Chủ", path: "/member/dashboard", icon: faTachometerAlt },
                 { name: "Hồ sơ", path: "/member/profile", icon: faUserCircle }
             ]
         },
@@ -58,7 +58,7 @@ const MemberLayout = () => {
             items: [
                 { name: "Lịch tập", path: "/member/schedule", icon: faCalendarAlt },
                 { name: "Đặt lớp", path: "/member/book-class", icon: faClipboardCheck },
-                { name: "Tiến trình", path: "/member/progress", icon: faChartLine }
+                // { name: "Tiến trình", path: "/member/progress", icon: faChartLine }
             ]
         },
         {
@@ -76,12 +76,6 @@ const MemberLayout = () => {
             <header className="member-header">
                 <div className="header-brand">
                     <span>Royal Fitness</span>
-                </div>
-                <div className="header-center">
-                    <Link to="/" className="back-to-web-btn">
-                        <FontAwesomeIcon icon={faHouse} className="back-to-web-icon" />
-                        Back to Web
-                    </Link>
                 </div>
                 <div className="header-actions">
                     <button className="notification-bell">
@@ -103,6 +97,10 @@ const MemberLayout = () => {
                                     <strong>{user?.name || 'Nguyễn Văn A'}</strong>
                                     <small>{user?.email || 'member@email.com'}</small>
                                 </div>
+                                <Link to="/" className="dropdown-item">
+                                    <FontAwesomeIcon icon={faHouse} />
+                                    <span>Quay về Website</span>
+                                </Link>
                                 <button onClick={handleLogout} className="dropdown-item">
                                     <FontAwesomeIcon icon={faSignOutAlt} />
                                     <span>Đăng xuất</span>

@@ -177,49 +177,44 @@ const MemberSchedule = () => {
     };
 
     return (
-        <div className="schedule-page-container fade-in">
-            <div className="schedule-header">
-                <h1 className="page-title">Lịch tập của tôi</h1>
-                <div className="week-navigation">
-                    <button className="nav-btn" onClick={() => navigateWeek(-1)}>
+        <div className="ms-container fade-in">
+            <div className="ms-header">
+                <h1 className="ms-title">Lịch tập của tôi</h1>
+                <div className="ms-week-navigation">
+                    <button className="ms-nav-btn" onClick={() => navigateWeek(-1)}>
                         <FontAwesomeIcon icon={faChevronLeft} />
                     </button>
                     <span>
                         {formatDateString(weekDates[0]).split('-').reverse().join('/')} - {formatDateString(weekDates[6]).split('-').reverse().join('/')}
                     </span>
-                    <button className="nav-btn" onClick={() => navigateWeek(1)}>
+                    <button className="ms-nav-btn" onClick={() => navigateWeek(1)}>
                         <FontAwesomeIcon icon={faChevronRight} />
                     </button>
                 </div>
             </div>
 
-            <div className="schedule-grid-container">
+            <div className="ms-grid-container">
                 {/* Dòng tiêu đề các ngày trong tuần */}
-                <div className="grid-header"></div> {/* Ô trống góc trên bên trái */}
+                <div className="ms-grid-header"></div> {/* Ô trống góc trên bên trái */}
                 {daysOfWeek.map((day, index) => (
-                    <div key={index} className="day-header">
+                    <div key={index} className="ms-day-header">
                         {day.name}
-                        <span className="date-label">{day.date}/{day.month.toString().padStart(2, '0')}</span>
+                        <span className="ms-date-label">{day.date}/{day.month.toString().padStart(2, '0')}</span>
                     </div>
                 ))}
 
                 {/* Cột tầng bên trái */}
-                <div className="time-column">
-                    {floors.map(floor => <div key={floor} className="time-slot-label">{floor}</div>)}
+                <div className="ms-time-column">
+                    {floors.map(floor => <div key={floor} className="ms-time-slot-label">{floor}</div>)}
                 </div>
 
                 {/* Lưới lịch tập chính */}
-                <div className="schedule-main-grid">
-                    {/* Vẽ 4 hàng cho 4 tầng */}
-                    {Array.from({ length: 4 }).map((_, i) => (
-                        <div key={i} className="grid-line"></div>
-                    ))}
-
+                <div className="ms-main-grid">
                     {/* Hiển thị các lớp học đã đặt */}
                     {loading ? (
-                        <div className="loading-message">Đang tải lịch của bạn...</div>
+                        <div className="ms-loading">Đang tải lịch của bạn...</div>
                     ) : scheduledClasses.length === 0 ? (
-                        <div className="empty-message">Bạn chưa đăng ký lớp học nào</div>
+                        <div className="ms-empty">Bạn chưa đăng ký lớp học nào</div>
                     ) : (
                         scheduledClasses.map(item => {
                             const gridPosition = calculateGridPosition(item);
@@ -227,16 +222,16 @@ const MemberSchedule = () => {
                             return (
                                 <div 
                                     key={item.id} 
-                                    className={`scheduled-item event-${item.color}`} 
+                                    className={`ms-scheduled-item ms-event-${item.color}`} 
                                     style={{
                                         gridColumn: gridPosition.gridColumn,
                                         gridRow: gridPosition.gridRow
                                     }}
                                 >
-                                    <p className="event-name">{item.name}</p>
-                                    <p className="event-details">{item.startTime} - {item.endTime}</p>
-                                    <p className="event-details">HLV: {item.trainer}</p>
-                                    <p className="event-details">Phòng: {item.studio}</p>
+                                    <p className="ms-event-name">{item.name}</p>
+                                    <p className="ms-event-details">{item.startTime} - {item.endTime}</p>
+                                    <p className="ms-event-details">HLV: {item.trainer}</p>
+                                    <p className="ms-event-details">Phòng: {item.studio}</p>
                                 </div>
                             );
                         })
