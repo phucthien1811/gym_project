@@ -12,24 +12,33 @@ const __dirname = path.dirname(__filename);
 
 const app = express();
 
-app.use(helmet({
-  crossOriginResourcePolicy: { policy: "cross-origin" },
-}));
+// CORS configuration - MUST be before other middleware
 app.use(cors({ 
-  origin: config.corsOrigin, 
+  origin: ['http://localhost:3000', 'http://localhost:4000'],
   credentials: true,
-  optionsSuccessStatus: 200 // some legacy browsers (IE11, various SmartTVs) choke on 204
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With'],
+  optionsSuccessStatus: 200
 }));
+
+// Helmet with relaxed settings for development
+app.use(helmet({
+  crossOriginResourcePolicy: false, // Tắt hoàn toàn để không block ảnh từ domain khác
+  crossOriginEmbedderPolicy: false,
+  contentSecurityPolicy: false, // Disable CSP in development
+}));
+
 app.use(express.json());
 app.use(morgan('dev'));
 
-// Serve static files (uploaded images) - Add CORS headers for static files
-app.use('/uploads', (req, res, next) => {
-  res.header('Access-Control-Allow-Origin', 'http://localhost:3000');
-  res.header('Access-Control-Allow-Methods', 'GET');
-  res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept');
-  next();
-}, express.static(path.join(__dirname, 'uploads')));
+// Serve static files (uploaded images) - Don't set CORS here, already handled by cors middleware above
+app.use('/uploads', express.static(path.join(__dirname, 'uploads'), {
+  maxAge: '1d',
+  setHeaders: (res, filePath) => {
+    // Only set cache control, CORS is already handled by the cors middleware
+    res.set('Cache-Control', 'public, max-age=86400');
+  }
+}));
 
 app.use('/api/v1', api);
 

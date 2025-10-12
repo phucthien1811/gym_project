@@ -9,6 +9,7 @@ const MemberPackages = () => {
   const [loading, setLoading] = useState(true);
   const [showRegisterModal, setShowRegisterModal] = useState(false);
   const [selectedPackage, setSelectedPackage] = useState(null);
+  const [showHistoryModal, setShowHistoryModal] = useState(false);
 
   useEffect(() => {
     fetchPublicPackages();
@@ -100,73 +101,107 @@ const MemberPackages = () => {
   if (loading) return <div>Loading...</div>;
 
   return (
-    <div className="packages-page-container">
-      <h2 className="admin-page-title">Gói tập của tôi</h2>
+    <div className="mpk-packages-page-container">
+      <h2 className="mpk-admin-page-title">Gói tập của tôi</h2>
 
       {/* Current Package Section */}
       {currentPackage ? (
-        <div className="bg-gradient-to-r from-blue-500 to-blue-600 rounded-lg shadow p-6 text-white mb-6">
-          <div className="flex justify-between items-start">
-            <div>
-              <h3 className="text-xl font-semibold mb-2">{currentPackage.package_name}</h3>
-              <p className="opacity-90">{currentPackage.description}</p>
-              <div className="mt-4">
-                <div className="text-sm opacity-90">Thời hạn còn lại</div>
-                <div className="text-3xl font-bold">{getDaysLeft(currentPackage.end_date)} ngày</div>
+        <div className="mpk-current-package-wrapper">
+          {/* Left Column - Package Card */}
+          <div className="mpk-package-info-card">
+            <div className="mpk-package-card-header">
+              <h3 className="mpk-package-title">{currentPackage.package_name}</h3>
+              <span className="mpk-package-badge">Đang hoạt động</span>
+            </div>
+            
+            <div className="mpk-package-card-body">
+              <div className="mpk-package-benefits">
+                <h4 className="mpk-benefits-title">Quyền lợi gói tập</h4>
+                <ul className="mpk-benefits-list">
+                  {(Array.isArray(currentPackage.features) ? currentPackage.features : []).map((benefit, index) => (
+                    <li key={index} className="mpk-benefit-item">
+                      <svg className="mpk-check-icon" fill="currentColor" viewBox="0 0 20 20">
+                        <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                      </svg>
+                      {benefit}
+                    </li>
+                  ))}
+                </ul>
               </div>
             </div>
-            <button className="bg-white text-blue-600 px-4 py-2 rounded-lg font-medium hover:bg-blue-50 transition-colors">
-              Gia Hạn
-            </button>
           </div>
-          <div className="mt-6 pt-6 border-t border-blue-400">
-            <h4 className="font-medium mb-3">Quyền lợi gói tập:</h4>
-            <ul className="space-y-2 text-sm">
-              {(Array.isArray(currentPackage.features) ? currentPackage.features : []).map((benefit, index) => (
-                <li key={index} className="flex items-center">
-                  <svg className="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20">
-                    <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                  </svg>
-                  {benefit}
-                </li>
-              ))}
-            </ul>
+
+          {/* Right Column - Time & Actions */}
+          <div className="mpk-package-actions-card">
+            <div className="mpk-time-remaining">
+              <div className="mpk-time-label">Thời hạn còn lại</div>
+              <div className="mpk-time-value">{getDaysLeft(currentPackage.end_date)}</div>
+              <div className="mpk-time-unit">ngày</div>
+              <div className="mpk-time-dates">
+                <div className="mpk-date-info">
+                  <span className="mpk-date-label">Bắt đầu:</span>
+                  <span className="mpk-date-value">{new Date(currentPackage.start_date).toLocaleDateString('vi-VN')}</span>
+                </div>
+                <div className="mpk-date-info">
+                  <span className="mpk-date-label">Kết thúc:</span>
+                  <span className="mpk-date-value">{new Date(currentPackage.end_date).toLocaleDateString('vi-VN')}</span>
+                </div>
+              </div>
+            </div>
+            
+            <div className="mpk-action-buttons">
+              <button className="mpk-btn-renew">
+                <svg className="mpk-btn-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                </svg>
+                Gia hạn
+              </button>
+              <button 
+                className="mpk-btn-history"
+                onClick={() => setShowHistoryModal(true)}
+              >
+                <svg className="mpk-btn-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                Xem lịch sử gói tập
+              </button>
+            </div>
           </div>
         </div>
       ) : (
-        <div className="packages-page-container">
-          <p className="page-subtitle">Chọn gói tập phù hợp với nhu cầu của bạn</p>
+        <div className="mpk-packages-page-container">
+          <p className="mpk-page-subtitle">Chọn gói tập phù hợp với nhu cầu của bạn</p>
           
-          <div className="packages-grid">
+          <div className="mpk-packages-grid">
             {packages.map((pkg, index) => (
               <div 
                 key={pkg.id} 
-                className={`package-card ${index === 1 ? 'recommended' : ''}`}
+                className={`mpk-package-card ${index === 1 ? 'mpk-recommended' : ''}`}
               >
-                {index === 1 && <div className="recommended-badge">Phổ biến nhất</div>}
+                {index === 1 && <div className="mpk-recommended-badge">Phổ biến nhất</div>}
                 
-                <div className="package-header">
-                  <h3 className="package-name">{pkg.name}</h3>
-                  {pkg.description && <p className="package-description">{pkg.description}</p>}
+                <div className="mpk-package-header">
+                  <h3 className="mpk-package-name">{pkg.name}</h3>
+                  {pkg.description && <p className="mpk-package-description">{pkg.description}</p>}
                 </div>
 
-                <div className="package-price">
+                <div className="mpk-package-price">
                   {pkg.price.toLocaleString('vi-VN')}đ
-                  <span className="package-duration">/ {Math.floor(pkg.duration_days / 30)} tháng</span>
+                  <span className="mpk-package-duration">/ {Math.floor(pkg.duration_days / 30)} tháng</span>
                 </div>
 
-                <ul className="package-features">
+                <ul className="mpk-package-features">
                   {(Array.isArray(pkg.features) ? pkg.features : []).map((feature, index) => (
                     <li key={index}>
-                      <span className="feature-icon">✓</span>
+                      <span className="mpk-feature-icon">✓</span>
                       {feature}
                     </li>
                   ))}
                 </ul>
 
-                <div className="package-footer">
+                <div className="mpk-package-footer">
                   <button 
-                    className="btn-primary"
+                    className="mpk-btn-primary"
                     onClick={() => openRegisterModal(pkg)}
                   >
                     Đăng Ký Ngay
@@ -178,86 +213,92 @@ const MemberPackages = () => {
         </div>
       )}
 
-      {/* Package History */}
-      <div className="bg-white rounded-lg shadow overflow-hidden">
-        <div className="p-6">
-          <h3 className="text-lg font-medium text-gray-900">Lịch sử gói tập</h3>
+      {/* History Modal */}
+      {showHistoryModal && (
+        <div className="mpk-modal-overlay" onClick={() => setShowHistoryModal(false)}>
+          <div className="mpk-modal-content mpk-history-modal" onClick={e => e.stopPropagation()}>
+            <div className="mpk-modal-header">
+              <h3>Lịch sử gói tập</h3>
+              <button 
+                className="mpk-modal-close"
+                onClick={() => setShowHistoryModal(false)}
+              >×</button>
+            </div>
+            
+            <div className="mpk-modal-body">
+              <div className="mpk-history-table-wrapper">
+                <table className="mpk-history-table">
+                  <thead>
+                    <tr>
+                      <th>Gói tập</th>
+                      <th>Ngày bắt đầu</th>
+                      <th>Ngày kết thúc</th>
+                      <th>Trạng thái</th>
+                      <th>Số tiền</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {packageHistory.map((pkg, index) => (
+                      <tr key={index}>
+                        <td>
+                          <div className="mpk-package-name-cell">{pkg.package_name}</div>
+                        </td>
+                        <td>{new Date(pkg.start_date).toLocaleDateString('vi-VN')}</td>
+                        <td>{new Date(pkg.end_date).toLocaleDateString('vi-VN')}</td>
+                        <td>
+                          <span className={`mpk-status-badge ${
+                            pkg.status === 'active' 
+                              ? 'mpk-status-active'
+                              : pkg.status === 'expired'
+                              ? 'mpk-status-expired'
+                              : 'mpk-status-cancelled'
+                          }`}>
+                            {pkg.status === 'active' ? 'Đang sử dụng' : 
+                             pkg.status === 'expired' ? 'Đã hết hạn' : 'Đã hủy'}
+                          </span>
+                        </td>
+                        <td>
+                          <div className="mpk-amount-cell">{pkg.paid_amount.toLocaleString('vi-VN')}đ</div>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+                
+                {packageHistory.length === 0 && (
+                  <div className="mpk-empty-history">
+                    <svg className="mpk-empty-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                    </svg>
+                    <p>Chưa có lịch sử gói tập</p>
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
         </div>
-        <div className="border-t border-gray-200">
-          <table className="min-w-full divide-y divide-gray-200">
-            <thead className="bg-gray-50">
-              <tr>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Gói tập
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Ngày bắt đầu
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Ngày kết thúc
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Trạng thái
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Số tiền
-                </th>
-              </tr>
-            </thead>
-            <tbody className="bg-white divide-y divide-gray-200">
-              {packageHistory.map((pkg, index) => (
-                <tr key={index}>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="text-sm text-gray-900">{pkg.package_name}</div>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="text-sm text-gray-900">{new Date(pkg.start_date).toLocaleDateString('vi-VN')}</div>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="text-sm text-gray-900">{new Date(pkg.end_date).toLocaleDateString('vi-VN')}</div>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
-                      pkg.status === 'active' 
-                        ? 'bg-green-100 text-green-800'
-                        : pkg.status === 'expired'
-                        ? 'bg-yellow-100 text-yellow-800'
-                        : 'bg-red-100 text-red-800'
-                    }`}>
-                      {pkg.status === 'active' ? 'Đang sử dụng' : 
-                       pkg.status === 'expired' ? 'Đã hết hạn' : 'Đã hủy'}
-                    </span>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="text-sm text-gray-900">{pkg.paid_amount.toLocaleString('vi-VN')}đ</div>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      </div>
+      )}
 
       {/* Register Modal */}
       {showRegisterModal && selectedPackage && (
-        <div className="modal-overlay" onClick={() => setShowRegisterModal(false)}>
-          <div className="modal-content" onClick={e => e.stopPropagation()}>
-            <div className="modal-header">
+        <div className="mpk-modal-overlay" onClick={() => setShowRegisterModal(false)}>
+          <div className="mpk-modal-content" onClick={e => e.stopPropagation()}>
+            <div className="mpk-modal-header">
               <h3>Xác nhận đăng ký gói tập</h3>
               <button 
-                className="modal-close"
+                className="mpk-modal-close"
                 onClick={() => setShowRegisterModal(false)}
               >×</button>
             </div>
             
-            <div className="register-package-details">
+            <div className="mpk-register-package-details">
               <h4>{selectedPackage.name}</h4>
-              <p className="package-price-large">
+              <p className="mpk-package-price-large">
                 {selectedPackage.price.toLocaleString('vi-VN')}đ
               </p>
               <p>Thời hạn: {Math.floor(selectedPackage.duration_days / 30)} tháng</p>
               
-              <div className="package-features-summary">
+              <div className="mpk-package-features-summary">
                 <h5>Quyền lợi bao gồm:</h5>
                 <ul>
                   {(Array.isArray(selectedPackage.features) ? selectedPackage.features : []).map((feature, index) => (
@@ -267,18 +308,18 @@ const MemberPackages = () => {
               </div>
             </div>
 
-            <div className="modal-footer">
+            <div className="mpk-modal-footer">
               <button 
                 type="button" 
                 onClick={() => setShowRegisterModal(false)} 
-                className="btn-secondary"
+                className="mpk-btn-secondary"
               >
                 Hủy
               </button>
               <button 
                 type="button"
                 onClick={() => handleRegister(selectedPackage)}
-                className="btn-primary"
+                className="mpk-btn-primary"
               >
                 Xác nhận đăng ký
               </button>
