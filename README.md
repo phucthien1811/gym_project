@@ -77,7 +77,7 @@ This repository contains a simple gym management application with a Node.js/Expr
 │       ├── hooks/         # custom hooks
 │       └── utils/         # frontend utilities
 
-Detailed `frontend/src/` files (hiện có):
+Detailed `frontend/src/` files:
 
 frontend/src/
 ├── App.jsx
