@@ -10,7 +10,7 @@ This repository contains a simple gym management application with a Node.js/Expr
 - Authentication: JWT (backend services)
 - Frontend: React 
 
-## Project Structure
+## Project Structure```
 .
 ├── api/                   # Backend (Node.js + Express)
 │   ├── app.js
@@ -136,6 +136,7 @@ frontend/src/
 	├── constants.js
 	├── formatPrice.js
 	└── productHelpers.js
+
 
 ## Prerequisites
 
