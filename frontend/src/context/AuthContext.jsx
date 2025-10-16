@@ -1,46 +1,57 @@
 import React, { createContext, useContext, useEffect, useMemo, useState } from "react";
+import { auth } from '../services/api';
 
 const AuthContext = createContext(null);
-
-const LS_KEY = "rf_auth_v1";
-
-// Demo accounts (sau này thay bằng API)
-const DEMO_USERS = [
-  { id: "1", name: "Admin", email: "admin@royal.fit", role: "admin", password: "123456" },
-  { id: "2", name: "Member", email: "member@royal.fit", role: "member", password: "123456" },
-];
+const LS_KEY = 'rf_auth_v1'; // Thêm constant cho localStorage
 
 export function AuthProvider({ children }) {
-  const [user, setUser] = useState(null);
+  const [user, setUser] = useState(auth.getUser());
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
 
-  // khôi phục phiên từ localStorage
   useEffect(() => {
     try {
       const raw = localStorage.getItem(LS_KEY);
-      if (raw) setUser(JSON.parse(raw));
+      if (raw) {
+        const parsed = JSON.parse(raw);
+        setUser(parsed.user);
+      }
     } catch {}
   }, []);
 
   const login = async ({ email, password }) => {
-    // demo: kiểm tra mảng cứng
-    const found = DEMO_USERS.find(u => u.email === email && u.password === password);
-    if (!found) throw new Error("Email hoặc mật khẩu không đúng.");
-    const { password: _pw, ...publicUser } = found;
-    setUser(publicUser);
-    localStorage.setItem(LS_KEY, JSON.stringify(publicUser));
-    return publicUser;
+    try {
+      setLoading(true);
+      setError(null);
+      const data = await auth.login(email, password);
+      setUser(data.user);
+      // Lưu toàn bộ data auth vào localStorage
+      localStorage.setItem(LS_KEY, JSON.stringify({
+        user: data.user,
+        token: data.token,
+        accessToken: data.token // để tương thích với api interceptor
+      }));
+      return data;
+    } catch (err) {
+      setError(err.response?.data?.message || 'Đăng nhập thất bại');
+      throw err;
+    } finally {
+      setLoading(false);
+    }
   };
 
   const logout = () => {
-    setUser(null);
     localStorage.removeItem(LS_KEY);
+    setUser(null);
   };
 
   const value = useMemo(() => ({
     user,
     isAuthenticated: !!user,
     login,
-    logout
+    logout,
+    loading,
+    error
   }), [user]);
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

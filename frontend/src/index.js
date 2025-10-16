@@ -2,9 +2,7 @@ import React from "react";
 import { createRoot } from "react-dom/client";
 import App from "./App";           // <-- chỉ rõ .jsx
 
-// CSS của bạn (nếu để trong src/styles)
-import "./styles/globals.css";
-import "./styles/components.css";
+
 
 const root = createRoot(document.getElementById("root"));
 root.render(

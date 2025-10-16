@@ -1,0 +1,169 @@
+/* frontend/src/styles/Register.css */
+/* --- Biến màu và font chữ (Tương tự Login.css để nhất quán) --- */
+:root {
+  --primary-blue: #3b82f6;
+  --primary-blue-hover: #2563eb;
+  --background-start: #111827;
+  --background-end: #1f2937;
+  --card-background: rgba(31, 41, 55, 0.5);
+  --card-border: rgba(255, 255, 255, 0.1);
+  --text-primary: #f9fafb;
+  --text-secondary: #d1d5db;
+  --text-link: #60a5fa;
+  --text-error: #f87171;
+  --error-bg: rgba(239, 68, 68, 0.1);
+  --error-border: rgba(239, 68, 68, 0.3);
+  --input-bg: rgba(255, 255, 255, 0.05);
+  --font-family: 'Inter', sans-serif;
+}
+
+/* --- Toàn bộ trang --- */
+.register-page-container {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+  background-color: var(--background-start);
+  background-image: linear-gradient(135deg, var(--background-start) 0%, var(--background-end) 100%);
+  font-family: var(--font-family);
+  overflow: hidden;
+}
+
+/* --- Khung đăng ký "Glass" --- */
+.register-card {
+  width: 100%;
+  max-width: 420px;
+  background: var(--card-background);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-radius: 1.5rem;
+  padding: 2.5rem;
+  border: 1px solid var(--card-border);
+  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+  animation: fadeIn 0.5s ease-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* --- Tiêu đề --- */
+.register-header {
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+.register-title {
+  font-size: 2rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-bottom: 0.5rem;
+}
+
+.register-subtitle {
+  color: var(--text-secondary);
+}
+
+/* --- Form --- */
+.register-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem; /* Giảm khoảng cách một chút so với login */
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+}
+
+.form-group label {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--text-secondary);
+  margin-bottom: 0.5rem;
+}
+
+.form-input {
+  background: var(--input-bg);
+  border: 1px solid var(--card-border);
+  border-radius: 0.5rem;
+  padding: 0.75rem 1rem;
+  color: var(--text-primary);
+  font-size: 1rem;
+  transition: all 0.2s ease-in-out;
+}
+
+.form-input::placeholder {
+  color: #6b7280;
+}
+
+.form-input:focus {
+  outline: none;
+  border-color: var(--primary-blue);
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.3);
+}
+
+/* --- Nút Submit --- */
+.submit-btn {
+  padding: 0.75rem;
+  border-radius: 0.5rem;
+  background-color: var(--primary-blue);
+  color: white;
+  font-weight: 600;
+  border: none;
+  cursor: pointer;
+  transition: background-color 0.2s, transform 0.1s;
+  margin-top: 0.5rem;
+}
+
+.submit-btn:hover {
+  background-color: var(--primary-blue-hover);
+}
+
+.submit-btn:active {
+  transform: scale(0.98);
+}
+
+.submit-btn:disabled {
+  background-color: #374151;
+  cursor: not-allowed;
+}
+
+/* --- Link đăng nhập --- */
+.login-link {
+  text-align: center;
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+  margin-top: 1.5rem;
+}
+
+.login-link a {
+  color: var(--text-link);
+  font-weight: 500;
+  text-decoration: none;
+  transition: color 0.2s;
+}
+
+.login-link a:hover {
+  color: var(--primary-blue);
+}
+
+/* --- Thông báo lỗi --- */
+.register-error {
+  background: var(--error-bg);
+  border: 1px solid var(--error-border);
+  color: var(--text-error);
+  padding: 1rem;
+  border-radius: 0.5rem;
+  margin-bottom: 1.5rem;
+  text-align: center;
+  font-size: 0.875rem;
+}

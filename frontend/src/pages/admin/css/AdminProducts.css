@@ -1,0 +1,648 @@
+/* Admin Products Layout */
+.ap-admin-page-container {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+}
+
+.ap-admin-page-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 16px;
+}
+
+.ap-admin-page-title {
+    margin: 0;
+    font-size: 28px;
+    font-weight: 700;
+    color: #1f2937;
+}
+
+.ap-admin-page-actions {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+
+.ap-search-bar {
+    position: relative;
+}
+
+.ap-search-icon {
+    position: absolute;
+    left: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--admin-text-secondary);
+}
+
+.ap-search-bar input {
+    background-color: var(--admin-sidebar-bg);
+    border: 1px solid rgb(214, 215, 217);
+    border-radius: 8px;
+    color: var(--admin-text-primary);
+    padding: 10px 12px 10px 36px;
+    width: 280px;
+    transition: all 0.2s;
+}
+
+.ap-search-bar input:focus {
+    outline: none;
+    border-color: var(--admin-brand-color);
+    background-color: var(--admin-bg);
+}
+
+.ap-btn-primary {
+    background-color: var(--admin-brand-color);
+    color: #ffffff;
+    border: none;
+    border-radius: 8px;
+    padding: 10px 16px;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.ap-btn-primary:hover {
+    background-color: #2e7d32;
+}
+
+/* Products Table */
+.ap-products-table-container {
+    background-color: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+}
+
+.ap-products-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 14px;
+}
+
+.ap-products-table th {
+    background-color: #f8f9fa;
+    color: #495057;
+    font-weight: 600;
+    padding: 16px 12px;
+    text-align: left;
+    border-bottom: 2px solid #dee2e6;
+    white-space: nowrap;
+}
+
+.ap-products-table td {
+    padding: 12px;
+    border-bottom: 1px solid #dee2e6;
+    vertical-align: middle;
+}
+
+.ap-products-table tbody tr:hover {
+    background-color: #f8f9fa;
+}
+
+/* Product code in table */
+.ap-product-code-cell {
+    width: 100px;
+    text-align: center;
+}
+
+.ap-product-code {
+    display: inline-block;
+    padding: 4px 12px;
+    background-color: #e9ecef;
+    color: #495057;
+    border-radius: 6px;
+    font-weight: 600;
+    font-size: 13px;
+    font-family: 'Courier New', monospace;
+}
+
+/* Product name */
+.ap-product-name-cell {
+    font-weight: 500;
+    color: #495057;
+    max-width: 200px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+/* Category styling */
+.ap-category-badge {
+    padding: 4px 8px;
+    border-radius: 12px;
+    font-size: 12px;
+    font-weight: 500;
+    white-space: nowrap;
+}
+
+.ap-category-supplement {
+    background-color: #e3f2fd;
+    color: #1976d2;
+}
+
+.ap-category-equipment {
+    background-color: #f3e5f5;
+    color: #7b1fa2;
+}
+
+.ap-category-clothing {
+    background-color: #e8f5e8;
+    color: #388e3c;
+}
+
+.ap-category-accessories {
+    background-color: #fff3e0;
+    color: #f57c00;
+}
+
+/* Description */
+.ap-product-description {
+    max-width: 250px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    color: #6c757d;
+}
+
+/* Price formatting */
+.ap-product-price-cell {
+    font-weight: 600;
+    color: #28a745;
+    white-space: nowrap;
+}
+
+/* Stock styling */
+.ap-stock-cell {
+    text-align: center;
+}
+
+.ap-stock-badge {
+    padding: 4px 8px;
+    border-radius: 12px;
+    font-size: 12px;
+    font-weight: 500;
+    min-width: 60px;
+    text-align: center;
+    display: inline-block;
+}
+
+.ap-stock-in {
+    background-color: #d4edda;
+    color: #155724;
+}
+
+.ap-stock-low {
+    background-color: #fff3cd;
+    color: #856404;
+}
+
+.ap-stock-out {
+    background-color: #f8d7da;
+    color: #721c24;
+}
+
+/* Status badges */
+.ap-status-badge {
+    padding: 4px 8px;
+    border-radius: 12px;
+    font-size: 12px;
+    font-weight: 500;
+    white-space: nowrap;
+}
+
+.ap-status-available {
+    background-color: #d4edda;
+    color: #155724;
+}
+
+.ap-status-out-of-stock {
+    background-color: #f8d7da;
+    color: #721c24;
+}
+
+.ap-status-hidden {
+    background-color: #e2e3e5;
+    color: #6c757d;
+}
+
+.ap-status-visible {
+    background-color: #cce7ff;
+    color: #0056b3;
+}
+
+/* Action buttons */
+.ap-actions-cell {
+    white-space: nowrap;
+    width: 160px;
+    min-width: 160px;
+}
+
+.ap-action-buttons {
+    display: flex;
+    gap: 4px;
+    align-items: center;
+    justify-content: flex-start;
+}
+
+.ap-action-btn {
+    padding: 6px 8px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 32px;
+    min-height: 32px;
+    transition: all 0.2s ease;
+    flex-shrink: 0;
+}
+
+.ap-btn-edit {
+    background-color: #ffc107;
+    color: #212529;
+}
+
+.ap-btn-edit:hover {
+    background-color: #e0a800;
+    transform: translateY(-1px);
+}
+
+.ap-btn-delete {
+    background-color: #dc3545;
+    color: white;
+}
+
+.ap-btn-delete:hover {
+    background-color: #c82333;
+    transform: translateY(-1px);
+}
+
+.ap-btn-toggle {
+    background-color: #6c757d;
+    color: white;
+}
+
+.ap-btn-toggle:hover {
+    background-color: #545b62;
+    transform: translateY(-1px);
+}
+
+.ap-btn-view {
+    background-color: #17a2b8;
+    color: white;
+}
+
+.ap-btn-view:hover {
+    background-color: #138496;
+    transform: translateY(-1px);
+}
+
+/* Modal Styles */
+.ap-modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+}
+
+.ap-modal-content {
+    background-color: white;
+    border-radius: 12px;
+    padding: 24px;
+    width: 90%;
+    max-width: 700px;
+    max-height: 90vh;
+    overflow-y: auto;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+}
+
+.ap-modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 24px;
+    padding-bottom: 16px;
+    border-bottom: 2px solid #f1f5f9;
+}
+
+.ap-modal-header h3 {
+    margin: 0;
+    font-size: 20px;
+    font-weight: 600;
+    color: #1f2937;
+}
+
+.ap-modal-close-btn {
+    background: none;
+    border: none;
+    font-size: 18px;
+    cursor: pointer;
+    color: #6b7280;
+    padding: 8px;
+    border-radius: 4px;
+    transition: all 0.2s;
+}
+
+.ap-modal-close-btn:hover {
+    background-color: #f3f4f6;
+    color: #374151;
+}
+
+.ap-form-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    margin-bottom: 20px;
+}
+
+.ap-form-group {
+    margin-bottom: 20px;
+}
+
+.ap-form-group label {
+    display: block;
+    margin-bottom: 6px;
+    font-weight: 500;
+    color: #374151;
+    font-size: 14px;
+}
+
+.ap-form-group input,
+.ap-form-group select,
+.ap-form-group textarea {
+    width: 100%;
+    padding: 12px 16px;
+    border: 2px solid #e5e7eb;
+    border-radius: 8px;
+    font-size: 14px;
+    color: #1f2937;
+    background-color: white;
+    transition: all 0.2s;
+}
+
+.ap-form-group input:focus,
+.ap-form-group select:focus,
+.ap-form-group textarea:focus {
+    outline: none;
+    border-color: var(--admin-brand-color);
+    box-shadow: 0 0 0 3px rgba(67, 160, 71, 0.1);
+}
+
+.ap-form-group textarea {
+    resize: vertical;
+    min-height: 80px;
+}
+
+.ap-modal-footer {
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+    margin-top: 32px;
+    padding-top: 20px;
+    border-top: 2px solid #f1f5f9;
+}
+
+.ap-btn-secondary {
+    background-color: #6b7280;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    padding: 12px 20px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.ap-btn-secondary:hover {
+    background-color: #4b5563;
+}
+
+/* View Product Modal Styles */
+.ap-product-view {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+}
+
+.ap-product-image-section {
+    text-align: center;
+    padding: 20px;
+    background-color: #f9fafb;
+    border-radius: 8px;
+}
+
+.ap-product-full-image {
+    max-width: 300px;
+    width: 100%;
+    height: auto;
+    border-radius: 8px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.ap-product-details-section h4,
+.ap-product-description-section h4 {
+    margin: 0 0 16px 0;
+    font-size: 16px;
+    font-weight: 600;
+    color: #1f2937;
+    border-bottom: 2px solid #f1f5f9;
+    padding-bottom: 8px;
+}
+
+.ap-detail-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px;
+    background-color: #f9fafb;
+    border-radius: 6px;
+    margin-bottom: 8px;
+}
+
+.ap-detail-label {
+    color: #6b7280;
+    font-weight: 500;
+    font-size: 14px;
+}
+
+.ap-detail-value {
+    color: #1f2937;
+    font-weight: 600;
+    font-size: 14px;
+}
+
+.ap-detail-price {
+    color: #28a745;
+    font-weight: 700;
+    font-size: 16px;
+}
+
+.ap-product-description-section p {
+    margin: 0;
+    padding: 12px;
+    background-color: #f9fafb;
+    border-radius: 6px;
+    color: #4b5563;
+    line-height: 1.6;
+}
+
+/* Pagination Styles */
+.ap-pagination-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 24px;
+    padding: 16px 0;
+}
+
+.ap-btn-excel {
+    background-color: #28a745;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    padding: 10px 16px;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.ap-btn-excel:hover {
+    background-color: #218838;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(40, 167, 69, 0.3);
+}
+
+.ap-pagination-controls {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+}
+
+.ap-pagination-btn {
+    background-color: white;
+    border: 1px solid #dee2e6;
+    color: #495057;
+    padding: 8px 12px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: 500;
+    min-width: 40px;
+    transition: all 0.2s;
+}
+
+.ap-pagination-btn:hover:not(:disabled) {
+    background-color: var(--admin-brand-color);
+    color: white;
+    border-color: var(--admin-brand-color);
+}
+
+.ap-pagination-btn.active {
+    background-color: var(--admin-brand-color);
+    color: white;
+    border-color: var(--admin-brand-color);
+}
+
+.ap-pagination-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+/* Responsive design */
+@media (max-width: 1200px) {
+    .ap-products-table-container {
+        overflow-x: auto;
+    }
+    
+    .ap-products-table {
+        min-width: 1100px;
+    }
+    
+    .ap-actions-cell {
+        width: 150px;
+        min-width: 150px;
+    }
+    
+    .ap-action-buttons {
+        gap: 3px;
+    }
+    
+    .ap-action-btn {
+        min-width: 30px;
+        min-height: 30px;
+        padding: 5px 6px;
+    }
+}
+
+@media (max-width: 768px) {
+    .ap-products-table th,
+    .ap-products-table td {
+        padding: 8px 6px;
+    }
+    
+    .ap-products-table {
+        min-width: 1000px;
+    }
+    
+    .ap-actions-cell {
+        width: 140px;
+        min-width: 140px;
+    }
+    
+    .ap-action-buttons {
+        gap: 2px;
+        flex-wrap: nowrap;
+    }
+    
+    .ap-action-btn {
+        min-width: 28px;
+        min-height: 28px;
+        padding: 4px 5px;
+        font-size: 11px;
+    }
+
+    .ap-pagination-container {
+        flex-direction: column;
+        gap: 16px;
+    }
+
+    .ap-btn-excel {
+        width: 100%;
+        justify-content: center;
+    }
+    
+    /* Stack buttons in two rows on very small screens */
+    @media (max-width: 480px) {
+        .ap-action-buttons {
+            flex-wrap: wrap;
+            max-width: 70px;
+        }
+        
+        .ap-action-btn {
+            min-width: 32px;
+            min-height: 28px;
+        }
+
+        .ap-pagination-controls {
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+    }
+}

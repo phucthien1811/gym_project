@@ -1,0 +1,553 @@
+/* Member Layout */
+.member-layout {
+  min-height: 100vh;
+  background-color: #000000;
+  color: #ffffff;
+}
+
+.header {
+  height: 60px;
+  background-color: #000000;
+  border-bottom: 1px solid #333;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 20px;
+  position: fixed;
+  width: 100%;
+  top: 0;
+  z-index: 100;
+}
+
+.header-brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.header-brand img {
+  height: 40px;
+}
+
+.header-brand span {
+  color: #4CAF50;
+  font-weight: 600;
+  font-size: 24px;
+}
+
+.member-sidebar {
+  width: 250px;
+  background-color: #000000;
+  border-right: 1px solid #333;
+  position: fixed;
+  top: 60px;
+  left: 0;
+  height: calc(100vh - 60px);
+  padding: 20px 0;
+}
+
+.nav-section {
+  margin-bottom: 24px;
+}
+
+.nav-section-title {
+  color: #ffffff;
+  font-size: 16px;
+  padding: 0 20px;
+  margin-bottom: 8px;
+}
+
+.nav-item-link {
+  display: block;
+  padding: 8px 20px;
+  color: #999999;
+  text-decoration: none;
+  transition: all 0.2s;
+}
+
+.nav-item-link:hover,
+.nav-item-link.active {
+  color: #ffffff;
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+.member-content {
+  margin-left: 250px;
+  margin-top: 60px;
+  padding: 20px;
+  min-height: calc(100vh - 60px);
+}
+
+/* Header styles */
+.header {
+  background-color: #141414;
+  border-bottom: 1px solid rgba(255,255,255,0.1);
+  height: 60px;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 1001;
+  display: flex;
+  align-items: center;
+  padding: 0 20px;
+}
+
+.header-brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.header-brand img {
+  height: 32px;
+}
+
+.header-brand span {
+  font-size: 20px;
+  font-weight: 600;
+  color: #4CAF50;
+}
+
+/* Member Dashboard */
+.welcome-card {
+  background: linear-gradient(135deg, #1e1e1e 0%, #2d2d2d 100%);
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 12px;
+  padding: 2rem;
+  margin-bottom: 2rem;
+}
+
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+.stat-card {
+  background: #141414;
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 12px;
+  padding: 1.5rem;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+}
+
+/* Member Schedule */
+.schedule-container {
+  background: white;
+  border-radius: 1rem;
+  padding: 1.5rem;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+}
+
+.schedule-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+}
+
+.schedule-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 0.5rem;
+}
+
+.schedule-day {
+  text-align: center;
+  padding: 1rem;
+  border-radius: 0.5rem;
+  background: #f8f9fa;
+}
+
+/* Book Class */
+.class-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 1.5rem;
+}
+
+.class-card {
+  background: #141414;
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 12px;
+  overflow: hidden;
+  transition: transform 0.2s ease;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+}
+
+.class-card:hover {
+  transform: translateY(-5px);
+}
+
+.class-image {
+  width: 100%;
+  height: 200px;
+  object-fit: cover;
+}
+
+.class-content {
+  padding: 1.5rem;
+}
+
+.class-title {
+  font-size: 1.25rem;
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+}
+
+.class-info {
+  color: #6c757d;
+  margin-bottom: 1rem;
+}
+
+.book-btn {
+  background: #4CAF50;
+  color: white;
+  border: none;
+  padding: 0.75rem 1.5rem;
+  border-radius: 8px;
+  font-weight: 500;
+  transition: all 0.3s ease;
+}
+
+.book-btn:hover {
+  background: #43a047;
+  transform: translateY(-2px);
+}
+
+.book-btn:disabled {
+  background-color: #ccc;
+  cursor: not-allowed;
+}
+
+/* Training Progress */
+.progress-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 1.5rem;
+}
+
+.progress-card {
+  background: #141414;
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 12px;
+  padding: 1.5rem;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+}
+
+.progress-title {
+  font-size: 1.25rem;
+  font-weight: 600;
+  margin-bottom: 1rem;
+}
+
+.progress-bar-container {
+  width: 100%;
+  height: 0.5rem;
+  background: #e9ecef;
+  border-radius: 1rem;
+  overflow: hidden;
+  margin: 0.5rem 0;
+}
+
+.progress-bar {
+  height: 100%;
+  background: #0d6efd;
+  border-radius: 1rem;
+  transition: width 0.3s ease;
+}
+
+.workout-calendar {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 0.25rem;
+}
+
+.calendar-day {
+  aspect-ratio: 1;
+  border-radius: 0.25rem;
+  background: #f8f9fa;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.875rem;
+}
+
+.calendar-day.completed {
+  background: #a3cfbb;
+  color: #155724;
+}
+
+/* Animations */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.fade-in {
+  animation: fadeIn 0.3s ease forwards;
+}
+
+/* Form Elements */
+.form-input {
+  width: 100%;
+  padding: 0.75rem;
+  border: 1px solid #dee2e6;
+  border-radius: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+.form-label {
+  display: block;
+  margin-bottom: 0.5rem;
+  color: #495057;
+}
+
+/* Utilities */
+.text-primary {
+  color: #0d6efd;
+}
+
+.text-success {
+  color: #198754;
+}
+
+.text-danger {
+  color: #dc3545;
+}
+
+.font-bold {
+  font-weight: 600;
+}
+
+.mb-4 {
+  margin-bottom: 1rem;
+}
+
+.flex {
+  display: flex;
+}
+
+.items-center {
+  align-items: center;
+}
+
+.justify-between {
+  justify-content: space-between;
+}
+
+/* Orders Styles */
+.orders-grid {
+  display: grid;
+  gap: 1rem;
+  padding: 1rem;
+}
+
+.order-card {
+  background: #141414;
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 12px;
+  padding: 1rem;
+}
+
+.order-header {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 1rem;
+}
+
+.order-status {
+  padding: 0.25rem 0.75rem;
+  border-radius: 1rem;
+  font-size: 0.875rem;
+}
+
+/* Transaction Styles */
+.transactions-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  padding: 1rem;
+}
+
+.transaction-card {
+  background: #141414;
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 12px;
+  padding: 1rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.transaction-amount {
+  text-align: right;
+}
+
+.status-thành-công {
+  background: rgba(76, 175, 80, 0.1);
+  color: #4CAF50;
+}
+
+.status-đang-xử-lý {
+  background: rgba(255, 193, 7, 0.1);
+  color: #FFC107;
+}
+
+/* Dashboard Styles */
+.dashboard-container {
+  padding: 24px;
+  background: #000000;
+}
+
+.welcome-card {
+  background: linear-gradient(135deg, #4CAF50 0%, #45a049 100%);
+  color: white;
+  padding: 24px;
+  border-radius: 12px;
+  margin-bottom: 24px;
+}
+
+.welcome-card h1 {
+  font-size: 28px;
+  margin-bottom: 8px;
+}
+
+.dashboard-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 24px;
+}
+
+.info-card {
+  background: #141414;
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 12px;
+  padding: 20px;
+}
+
+.info-card h3 {
+  color: #ffffff;
+  margin-bottom: 16px;
+  font-size: 18px;
+}
+
+/* Membership Card */
+.membership-info {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+.highlight {
+  color: #4CAF50;
+  font-size: 24px;
+  font-weight: 600;
+}
+
+.days-left {
+  color: #FFC107;
+}
+
+/* Session Card */
+.next-session {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.session-time {
+  color: #4CAF50;
+  font-weight: 500;
+}
+
+/* QR Card */
+.qr-card {
+  max-width: 300px;  /* Giới hạn chiều rộng tối đa */
+}
+
+.qr-wrapper {
+  width: 120px;  /* Cố định chiều rộng wrapper */
+  margin: 0 auto;
+}
+
+.qr-container {
+  display: flex;
+  justify-content: center;
+  padding: 8px;
+  background: white !important; /* Force white background */
+  border-radius: 8px;
+  width: 100%;
+  height: 100%;
+}
+
+.qr-container canvas,
+.qr-container svg {
+  width: 100% !important;
+  height: auto !important;
+  background: white !important;
+}
+
+/* Chart Card */
+.chart-container {
+  height: 200px;
+}
+
+/* Notifications Card */
+.notifications-list {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.notification-item {
+  padding-bottom: 16px;
+  border-bottom: 1px solid rgba(255,255,255,0.1);
+}
+
+.notification-item h4 {
+  color: #4CAF50;
+  margin-bottom: 8px;
+}
+
+.note-date {
+  color: #666;
+  font-size: 12px;
+  display: block;
+  margin-top: 8px;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .member-sidebar {
+    width: 100%;
+    height: auto;
+    position: relative;
+  }
+
+  .member-content {
+    margin-left: 0;
+  }
+
+  .stats-grid,
+  .progress-grid,
+  .class-grid {
+    grid-template-columns: 1fr;
+  }
+}
+  .stats-grid,
+  .progress-grid,
+  .class-grid {
+    grid-template-columns: 1fr;
+  }
+
+

@@ -1,26 +1,44 @@
 import React from "react";
 import { BrowserRouter, Routes, Route, Navigate, useLocation } from "react-router-dom";
+import "./styles/globals.css";
 
 import { AuthProvider, useAuth } from "./context/AuthContext.jsx";
-
-import Header from "./componets/common/Header.jsx";
-import HomePage from "./pages/HomePage.jsx";
-import ServicesPage from "./pages/ServicesPage.jsx";
-import AboutPage from "./pages/AboutPage.jsx";
-import PricingPage from "./pages/PricingPage.jsx";
-import ReviewPage from "./pages/ReviewPage.jsx";
-
-import LoginPage from "./pages/LoginPage.jsx";
-
-import AdminLayout from "./pages/admin/AdminLayout.jsx";
+import { CartProvider } from "./context/CartContext.jsx";
+import NotificationPopup from "./components/NotificationPopup.jsx";
+import Header from "./components/common/Header.jsx";
+import HomePage from "./pages/public/HomePage.jsx";
+import ServicesPage from "./pages/public/ServicesPage.jsx";
+import AboutPage from "./pages/public/AboutPage.jsx";
+import PricingPage from "./pages/public/PricingPage.jsx";
+import ReviewPage from "./pages/public/ReviewPage.jsx";
+import ShopPage from "./pages/shop/ShopPage.jsx";
+import CartPage from "./pages/shop/CartPage.jsx";
+import CheckoutPage from "./pages/shop/CheckoutPage.jsx";
+import OrderSuccessPage from "./pages/shop/OrderSuccessPage.jsx";
+import LoginPage from "./pages/auth/LoginPage.jsx";
+import RegisterPage from "./pages/auth/RegisterPage.jsx";
+import AdminLayout from "./components/layout/AdminLayout.jsx";
+import MemberLayout from "./components/layout/MemberLayout.jsx";
 import AdminDashboard from "./pages/admin/Dashboard.jsx";
-import AdminMembers from "./pages/admin/Members.jsx";
-import Card1 from "./pages/admin/Card/Card1.jsx";
-import Card2 from "./pages/admin/Card/Card2.jsx";
-import Card3 from "./pages/admin/Card/Card3.jsx";
-import Card4 from "./pages/admin/Card/Card4.jsx";
-import Card5 from "./pages/admin/Card/Card5.jsx";
-import Card6 from "./pages/admin/Card/Card6.jsx";
+import AdminMembers from "./pages/admin/AdminMembers.jsx";
+import Trainers from "./pages/admin/Trainers.jsx";
+import AdminClasses from "./pages/admin/AdminClasses.jsx";
+import AdminPlans from "./pages/admin/AdminPlans.jsx";
+import AdminInvoices from "./pages/admin/AdminInvoices.jsx";
+import AdminReports from "./pages/admin/AdminReports.jsx";
+import AdminProducts from "./pages/admin/AdminProducts.jsx";
+import AdminOrders from "./pages/admin/AdminOrders.jsx";
+import AdminSettings from "./pages/admin/AdminSettings.jsx";
+import MemberDashboard from "./pages/member/MemberDashboard.jsx";
+import MemberProfile from "./pages/member/Profile.jsx";
+import MemberSchedule from "./pages/member/MemberSchedule.jsx";
+import BookClass from "./pages/member/BookClass.jsx";
+// import TrainingProgress from "./pages/member/TrainingProgress.jsx";
+import MemberPackages from "./pages/member/MemberPackages.jsx";
+import MyOrders from "./pages/member/MyOrders.jsx";
+import OrderDetail from "./pages/member/OrderDetail.jsx";
+import TransactionHistory from "./pages/member/TransactionHistory.jsx";
+
 function Landing() {
   return (
     <>
@@ -61,43 +79,30 @@ function AdminRoute({ children }) {
   return children;
 }
 
-// export default function App() {
-//   return (
-//     <AuthProvider>
-//       <BrowserRouter>
-//         <Routes>
-//           <Route path="/" element={<Landing />} />
-//           <Route path="/login" element={<LoginPage />} />
-//           <Route
-//             path="/admin"
-//             element={
-//               <AdminRoute>
-//                 <AdminLayout />
-//               </AdminRoute>
-//             }
-//           >
-//             <Route index element={<AdminDashboard />} />
-//             <Route path="members" element={<AdminMembers />} />
-//           </Route>
-//           <Route path="*" element={<Landing />} />
-//         </Routes>
-//         <Routes path="card1" element={<Card1/>}></Routes>
-//         <Routes path="card2" element={<Card2/>}></Routes>
-//         <Routes path="card3" element={<Card3/>}></Routes>
-//         <Routes path="card4" element={<Card4/>}></Routes>
-//         <Routes path="card5" element={<Card5/>}></Routes>
-//         <Routes path="card6" element={<Card6/>}></Routes>
-//       </BrowserRouter>
-//     </AuthProvider>
-//   );
-// }
+function MemberRoute({ children }) {
+  const { user } = useAuth();
+  const location = useLocation();
+  if (!user) return <Navigate to="/login" replace state={{ from: location }} />;
+  if (user.role !== "member") return <Navigate to="/" replace />;
+  return children;
+}
+
 export default function App() {
   return (
     <AuthProvider>
-      <BrowserRouter>
+      <CartProvider>
+        <BrowserRouter>
+        <NotificationPopup />
         <Routes>
           <Route path="/" element={<Landing />} />
           <Route path="/login" element={<LoginPage />} />
+          <Route path="/register" element={<RegisterPage />} />
+          <Route path="/shop" element={<ShopPage />} />
+          <Route path="/cart" element={<CartPage />} />
+          <Route path="/checkout" element={<CheckoutPage />} />
+          <Route path="/order-success" element={<OrderSuccessPage />} />
+          
+          {/* Admin Routes */}
           <Route
             path="/admin"
             element={
@@ -108,16 +113,41 @@ export default function App() {
           >
             <Route index element={<AdminDashboard />} />
             <Route path="members" element={<AdminMembers />} />
-            <Route path="card1" element={<Card1 />} />
-            <Route path="card2" element={<Card2 />} />
-            <Route path="card3" element={<Card3 />} />
-            <Route path="card4" element={<Card4 />} />
-            <Route path="card5" element={<Card5 />} />
-            <Route path="card6" element={<Card6 />} />
+            <Route path="trainers" element={<Trainers />} />
+            <Route path="classes" element={<AdminClasses />} />
+            <Route path="plans" element={<AdminPlans />} />
+            <Route path="invoices" element={<AdminInvoices />} />
+            <Route path="reports" element={<AdminReports />} />
+            <Route path="products" element={<AdminProducts />} />
+            <Route path="orders" element={<AdminOrders />} />
+            <Route path="settings" element={<AdminSettings />} />
           </Route>
+
+          {/* Member Routes */}
+          <Route
+            path="/member"
+            element={
+              <MemberRoute>
+                <MemberLayout />
+              </MemberRoute>
+            }
+          >
+            <Route index element={<Navigate to="/member/dashboard" replace />} />
+            <Route path="dashboard" element={<MemberDashboard />} />
+            <Route path="profile" element={<MemberProfile />} />
+            <Route path="schedule" element={<MemberSchedule />} />
+            <Route path="book-class" element={<BookClass />} />
+            {/* <Route path="progress" element={<TrainingProgress />} /> */}
+            <Route path="packages" element={<MemberPackages />} />
+            <Route path="orders" element={<MyOrders />} />
+            <Route path="orders/:orderId" element={<OrderDetail />} />
+            <Route path="transactions" element={<TransactionHistory />} />
+          </Route>
+
           <Route path="*" element={<Landing />} />
         </Routes>
-      </BrowserRouter>
+        </BrowserRouter>
+      </CartProvider>
     </AuthProvider>
   );
 }
