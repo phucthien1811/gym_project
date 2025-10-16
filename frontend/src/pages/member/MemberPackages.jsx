@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import './css/MemberPackages.css';
 import PackageService from '../../services/packageService';
 
 const MemberPackages = () => {
+  const navigate = useNavigate();
   const [packages, setPackages] = useState([]);
   const [currentPackage, setCurrentPackage] = useState(null);
   const [packageHistory, setPackageHistory] = useState([]);
@@ -86,8 +88,8 @@ const MemberPackages = () => {
   };
 
   const openRegisterModal = (pkg) => {
-    setSelectedPackage(pkg);
-    setShowRegisterModal(true);
+    // Navigate to checkout page instead of modal
+    navigate('/member/packages/checkout', { state: { package: pkg } });
   };
 
   const getDaysLeft = (endDate) => {
