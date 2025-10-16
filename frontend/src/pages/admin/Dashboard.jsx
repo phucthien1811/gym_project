@@ -1,11 +1,5 @@
-<<<<<<< HEAD
 import React from 'react';
 import { Bar, Line, Doughnut } from 'react-chartjs-2';
-=======
-import React from "react";
-// Import các icon từ Font Awesome
-import { NavLink } from "react-router-dom";
->>>>>>> origin/main
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { 
     faUsers, 
