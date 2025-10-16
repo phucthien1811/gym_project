@@ -11,6 +11,9 @@ import packageRoutes from "./package.js";
 import memberPackageRoutes from "./member-package.js";
 import trainerRoutes from "./trainer.js";
 import scheduleRoutes from "./schedule.js";
+import userRoutes from "./user.js";
+import voucherRoutes from "./voucher.js";
+import invoiceRoutes from "./invoice.js";
 
 const r = Router();
 
@@ -25,6 +28,9 @@ r.use("/packages", packageRoutes);
 r.use("/member-packages", memberPackageRoutes);
 r.use("/trainers", trainerRoutes);
 r.use("/schedules", scheduleRoutes);
+r.use("/users", userRoutes);
+r.use("/vouchers", voucherRoutes);
+r.use("/invoices", invoiceRoutes);
 
 
 
