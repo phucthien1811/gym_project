@@ -141,20 +141,10 @@ const CartPage = () => {
 
                   <div className="item-details">
                     <h4 className="item-name">{item.name}</h4>
-                    <p className="item-brand">{item.brand}</p>
-                    <p className="item-description">{item.description}</p>
-                    <div className="item-tags">
-                      {item.tags?.slice(0, 2).map(tag => (
-                        <span key={tag} className="tag">#{tag}</span>
-                      ))}
-                    </div>
                   </div>
 
                   <div className="item-price">
                     <span className="current-price">{formatPrice(item.price)}</span>
-                    {item.originalPrice && item.originalPrice > item.price && (
-                      <span className="original-price">{formatPrice(item.originalPrice)}</span>
-                    )}
                   </div>
 
                   <div className="item-quantity">

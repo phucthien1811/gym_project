@@ -1,21 +1,24 @@
 import React, { useState, useMemo } from 'react';
 import { Link } from 'react-router-dom';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faShoppingCart, faEye } from '@fortawesome/free-solid-svg-icons';
 import Header from '../../components/common/Header';
 import { useCart } from '../../context/CartContext';
-import { gymProducts, categories, sortOptions } from '../../data/gymProducts';
-import '../../styles/ShopPage.css';
+import { useToast } from '../../context/ToastContext';
+import { gymProducts, categories } from '../../data/gymProducts';
+import './css/ShopPage.css';
 
 const ShopPage = () => {
   const [selectedCategory, setSelectedCategory] = useState('all');
-  const [sortBy, setSortBy] = useState('default');
   const [searchQuery, setSearchQuery] = useState('');
   const [priceRange, setPriceRange] = useState([0, 5000000]);
   
   const { addItem } = useCart();
+  const { showSuccess } = useToast();
 
   const handleAddToCart = (product) => {
     addItem(product, 1);
-    // Show success message or animation here
+    showSuccess(`Đã thêm "${product.name}" vào giỏ hàng!`);
   };
 
   // Filter and sort products
@@ -40,26 +43,8 @@ const ShopPage = () => {
       return true;
     });
 
-    // Sort products
-    switch (sortBy) {
-      case 'price_low':
-        filtered.sort((a, b) => a.price - b.price);
-        break;
-      case 'price_high':
-        filtered.sort((a, b) => b.price - a.price);
-        break;
-      case 'rating':
-        filtered.sort((a, b) => b.rating - a.rating);
-        break;
-      case 'newest':
-        filtered.sort((a, b) => b.id - a.id);
-        break;
-      default:
-        break;
-    }
-
     return filtered;
-  }, [selectedCategory, sortBy, searchQuery, priceRange]);
+  }, [selectedCategory, searchQuery, priceRange]);
 
   const formatPrice = (price) => {
     return new Intl.NumberFormat('vi-VN', {
@@ -68,20 +53,24 @@ const ShopPage = () => {
     }).format(price);
   };
 
-  const calculateDiscount = (original, current) => {
-    return Math.round(((original - current) / original) * 100);
-  };
-
   return (
     <div className="shop-page">
       <Header />
+      
+      {/* Hero Banner */}
+      <div className="shop-hero">
+        <div className="hero-content">
+          <h1>Cửa Hàng Thể Thao</h1>
+          <p>Khám phá các sản phẩm gym chất lượng cao</p>
+        </div>
+      </div>
       
       <div className="shop-container">
         <div className="shop-main">
           {/* Sidebar Filters */}
           <aside className="shop-sidebar">
             <div className="filter-section">
-              <h3>🔍 Tìm kiếm</h3>
+              <h3>TÌM KIẾM</h3>
               <input
                 type="text"
                 placeholder="Tìm sản phẩm..."
@@ -92,7 +81,7 @@ const ShopPage = () => {
             </div>
 
             <div className="filter-section">
-              <h3>📂 Danh mục</h3>
+              <h3>DANH MỤC</h3>
               <div className="category-list">
                 {categories.map(category => (
                   <button
@@ -100,8 +89,7 @@ const ShopPage = () => {
                     className={`category-btn ${selectedCategory === category.id ? 'active' : ''}`}
                     onClick={() => setSelectedCategory(category.id)}
                   >
-                    <span className="category-icon">{category.icon}</span>
-                    {category.name}
+                    {category.name.toUpperCase()}
                   </button>
                 ))}
               </div>
@@ -112,70 +100,19 @@ const ShopPage = () => {
 
           {/* Main Content */}
           <main className="shop-content">
-            {/* Toolbar */}
-            <div className="shop-toolbar">
-              <div className="results-info">
-                <span>{filteredProducts.length} sản phẩm</span>
-              </div>
-              <div className="sort-controls">
-                <label>Sắp xếp:</label>
-                <select
-                  value={sortBy}
-                  onChange={(e) => setSortBy(e.target.value)}
-                  className="sort-select"
-                >
-                  {sortOptions.map(option => (
-                    <option key={option.value} value={option.value}>
-                      {option.label}
-                    </option>
-                  ))}
-                </select>
-              </div>
-            </div>
-
             {/* Products Grid */}
             <div className="products-grid">
               {filteredProducts.map(product => (
                 <div key={product.id} className="product-card">
                   <div className="product-image">
                     <img src={product.image} alt={product.name} />
-                    {!product.inStock && <div className="out-of-stock">Hết hàng</div>}
-                    {product.originalPrice > product.price && (
-                      <div className="discount-badge">
-                        -{calculateDiscount(product.originalPrice, product.price)}%
-                      </div>
-                    )}
                   </div>
                   
                   <div className="product-info">
-                    <div className="product-brand">{product.brand}</div>
                     <h4 className="product-name">{product.name}</h4>
-                    <p className="product-description">{product.description}</p>
-                    
-                    <div className="product-rating">
-                      <div className="stars">
-                        {[...Array(5)].map((_, i) => (
-                          <span key={i} className={i < Math.floor(product.rating) ? 'star filled' : 'star'}>
-                            ⭐
-                          </span>
-                        ))}
-                      </div>
-                      <span className="rating-text">
-                        {product.rating} ({product.reviews} đánh giá)
-                      </span>
-                    </div>
-
-                    <div className="product-tags">
-                      {product.tags.slice(0, 2).map(tag => (
-                        <span key={tag} className="tag">#{tag}</span>
-                      ))}
-                    </div>
 
                     <div className="product-price">
                       <span className="current-price">{formatPrice(product.price)}</span>
-                      {product.originalPrice > product.price && (
-                        <span className="original-price">{formatPrice(product.originalPrice)}</span>
-                      )}
                     </div>
 
                     <div className="product-actions">
@@ -183,11 +120,16 @@ const ShopPage = () => {
                         className={`add-to-cart-btn ${!product.inStock ? 'disabled' : ''}`}
                         disabled={!product.inStock}
                         onClick={() => handleAddToCart(product)}
+                        title={product.inStock ? 'Thêm vào giỏ hàng' : 'Hết hàng'}
                       >
-                        {product.inStock ? '🛒 Thêm vào giỏ' : '❌ Hết hàng'}
+                        <FontAwesomeIcon icon={faShoppingCart} />
                       </button>
-                      <Link to={`/shop/product/${product.id}`} className="view-details-btn">
-                        👁️ Chi tiết
+                      <Link 
+                        to={`/shop/product/${product.id}`} 
+                        className="view-details-btn"
+                        title="Xem chi tiết"
+                      >
+                        <FontAwesomeIcon icon={faEye} />
                       </Link>
                     </div>
                   </div>

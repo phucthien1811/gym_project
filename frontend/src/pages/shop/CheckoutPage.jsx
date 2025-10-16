@@ -2,14 +2,24 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useCart } from '../../context/CartContext';
 import { useAuth } from '../../context/AuthContext';
+import { useToast } from '../../context/ToastContext';
 import { useOrders } from '../../hooks/useOrders';
-import '../../styles/CheckoutPage.css';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faCheckCircle, faTimesCircle } from '@fortawesome/free-solid-svg-icons';
+import './css/CheckoutPage.css';
 
 const CheckoutPage = () => {
   const navigate = useNavigate();
   const { user } = useAuth();
   const { selectedItemsArray, selectedSubtotal, clearSelectedItems } = useCart();
   const { createOrder, loading } = useOrders(false);
+  const { showSuccess, showError } = useToast();
+
+  const [voucherCode, setVoucherCode] = useState('');
+  const [appliedVoucher, setAppliedVoucher] = useState(null);
+  const [voucherError, setVoucherError] = useState('');
+  const [voucherLoading, setVoucherLoading] = useState(false);
+  const [discount, setDiscount] = useState(0);
 
   const [formData, setFormData] = useState({
     shipping_name: user?.full_name || '',
@@ -45,7 +55,7 @@ const CheckoutPage = () => {
   };
 
   const calculateTotal = () => {
-    return selectedSubtotal + calculateShipping();
+    return selectedSubtotal + calculateShipping() - discount;
   };
 
   const formatCurrency = (amount) => {
@@ -76,24 +86,56 @@ const CheckoutPage = () => {
     return Object.keys(newErrors).length === 0;
   };
 
-  // Debug function
-  const debugAuth = () => {
-    console.log('=== AUTH DEBUG ===');
-    console.log('User from context:', user);
-    console.log('localStorage rf_auth_v1:', localStorage.getItem('rf_auth_v1'));
-    console.log('localStorage token:', localStorage.getItem('token'));
-    
-    try {
-      const raw = localStorage.getItem('rf_auth_v1');
-      if (raw) {
-        const parsed = JSON.parse(raw);
-        console.log('Parsed auth data:', parsed);
-        console.log('Access token exists:', !!parsed?.accessToken);
-        console.log('Token exists:', !!parsed?.token);
-      }
-    } catch (e) {
-      console.error('Error parsing auth data:', e);
+  const handleApplyVoucher = async () => {
+    if (!voucherCode.trim()) {
+      setVoucherError('Vui lòng nhập mã voucher');
+      return;
     }
+
+    setVoucherLoading(true);
+    setVoucherError('');
+
+    try {
+      const token = localStorage.getItem('token');
+      const orderValue = selectedSubtotal + calculateShipping();
+      
+      const response = await fetch('http://localhost:4000/api/v1/vouchers/apply', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({
+          code: voucherCode.toUpperCase(),
+          order_value: orderValue
+        })
+      });
+
+      const data = await response.json();
+
+      if (data.success) {
+        setAppliedVoucher(data.data);
+        setDiscount(data.data.discount_amount);
+        setVoucherError('');
+        showSuccess(`✅ Áp dụng voucher ${data.data.voucher_code} thành công!`);
+      } else {
+        setVoucherError(data.message);
+        setAppliedVoucher(null);
+        setDiscount(0);
+      }
+    } catch (error) {
+      setVoucherError('Có lỗi xảy ra khi áp dụng voucher');
+      console.error('Error applying voucher:', error);
+    } finally {
+      setVoucherLoading(false);
+    }
+  };
+
+  const handleRemoveVoucher = () => {
+    setAppliedVoucher(null);
+    setVoucherCode('');
+    setDiscount(0);
+    setVoucherError('');
   };
 
   const handleInputChange = (e) => {
@@ -135,63 +177,82 @@ const CheckoutPage = () => {
           full_name: formData.shipping_name,
           phone: formData.shipping_phone,
           address: formData.shipping_address,
-          ward: "Phường 1", // Default values
+          ward: "Phường 1",
           district: "Quận 1",
           province: "TP.HCM",
           postal_code: ""
         },
-        payment_method: formData.payment_method.toLowerCase(), // Convert to lowercase
+        payment_method: formData.payment_method, // Keep uppercase
         shipping_fee: calculateShipping(),
-        discount_amount: 0,
+        discount_amount: discount,
+        voucher_code: appliedVoucher?.voucher_code || null,
         notes: formData.notes || ""
       };
 
-      console.log('Order data to send:', orderData);
+      console.log('📦 Order data to send:', JSON.stringify(orderData, null, 2));
       
-      try {
-        const response = await createOrder(orderData);
-        console.log('✅ Create order response:', response);
-        
-        // Extract order info from response
-        const orderInfo = response?.data || response || {};
-        const orderId = orderInfo.id || Math.floor(Math.random() * 1000000);
-        const orderNumber = orderInfo.order_number || `ORD-${Date.now()}`;
-        
-        // Clear cart first
-        clearSelectedItems();
-        
-        // Small delay then navigate to success page
-        setTimeout(() => {
-          navigate('/order-success', { 
-            state: { 
-              orderId: orderId,
-              orderNumber: orderNumber,
-              totalAmount: orderInfo.total_amount || selectedSubtotal + calculateShipping(),
-              paymentMethod: orderInfo.payment_method || formData.payment_method
-            } 
-          });
-        }, 100);
-        
-      } catch (error) {
-        console.log('❌ Frontend error (but order might be created):', error);
-        
-        // Still navigate to success since order is created in DB
-        clearSelectedItems();
-        
-        setTimeout(() => {
-          navigate('/order-success', { 
-            state: { 
-              orderId: Math.floor(Math.random() * 1000000),
-              orderNumber: `ORD-${Date.now()}`,
-              totalAmount: selectedSubtotal + calculateShipping(),
-              paymentMethod: formData.payment_method
-            } 
-          });
-        }, 100);
+      const response = await createOrder(orderData);
+      console.log('✅ Create order response:', response);
+      console.log('🔍 Payment method selected:', formData.payment_method);
+      
+      // Nếu có voucher, tăng used_count
+      if (appliedVoucher?.voucher_id) {
+        const token = localStorage.getItem('token');
+        await fetch(`http://localhost:4000/api/v1/vouchers/${appliedVoucher.voucher_id}/use`, {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${token}`
+          }
+        });
       }
+      
+      // Extract order info from response
+      const orderInfo = response?.data || response || {};
+      const orderId = orderInfo.id || Math.floor(Math.random() * 1000000);
+      const orderNumber = orderInfo.order_number || `ORD-${Date.now()}`;
+      
+      console.log('📦 Order info extracted:', { orderId, orderNumber, total: orderInfo.total_amount });
+      
+      // Nếu chọn chuyển khoản ngân hàng, chuyển sang trang thanh toán
+      if (formData.payment_method === 'BANK_TRANSFER') {
+        console.log('🏦 Redirecting to banking payment page...');
+        
+        // Navigate to banking payment FIRST (don't clear cart yet)
+        navigate('/shop/banking-payment', {
+          state: {
+            orderData: orderData,
+            orderInfo: {
+              id: orderId,
+              order_number: orderNumber,
+              total_amount: orderInfo.total_amount || calculateTotal()
+            }
+          },
+          replace: true
+        });
+        return;
+      }
+      
+      // COD: Clear cart and show success
+      clearSelectedItems();
+      showSuccess('🎉 Đặt hàng thành công!');
+      
+      // Small delay then navigate to success page
+      setTimeout(() => {
+        navigate('/order-success', { 
+          state: { 
+            orderId: orderId,
+            orderNumber: orderNumber,
+            totalAmount: orderInfo.total_amount || calculateTotal(),
+            paymentMethod: orderInfo.payment_method || formData.payment_method
+          } 
+        });
+      }, 100);
+
     } catch (error) {
-      console.error('Create order error:', error);
-      alert(`Lỗi đặt hàng: ${error.message}`);
+      console.error('❌ Create order error:', error);
+      console.error('❌ Error response:', error.response?.data);
+      const errorMessage = error.response?.data?.errors?.[0] || error.response?.data?.message || error.message;
+      showError(`Lỗi đặt hàng: ${errorMessage}`);
     }
   };
 
@@ -227,6 +288,63 @@ const CheckoutPage = () => {
               ))}
             </div>
 
+            {/* Voucher Section */}
+            <div className="voucher-section">
+              <h3>🎟️ Mã giảm giá</h3>
+              
+              {!appliedVoucher ? (
+                <>
+                  <div className="voucher-input-group">
+                    <input
+                      type="text"
+                      placeholder="Nhập mã voucher (9 ký tự)"
+                      value={voucherCode}
+                      onChange={(e) => {
+                        setVoucherCode(e.target.value.toUpperCase());
+                        setVoucherError('');
+                      }}
+                      maxLength={9}
+                      className={voucherError ? 'error' : ''}
+                    />
+                    <button 
+                      type="button"
+                      className="btn-apply-voucher"
+                      onClick={handleApplyVoucher}
+                      disabled={voucherLoading || !voucherCode.trim()}
+                    >
+                      {voucherLoading ? 'Đang xử lý...' : 'Áp dụng'}
+                    </button>
+                  </div>
+                  {voucherError && (
+                    <div className="voucher-error">
+                      <FontAwesomeIcon icon={faTimesCircle} className="error-icon" />
+                      {voucherError}
+                    </div>
+                  )}
+                </>
+              ) : (
+                <div className="voucher-applied">
+                  <div className="voucher-success">
+                    <FontAwesomeIcon icon={faCheckCircle} className="success-icon" />
+                    <div>
+                      <div className="voucher-code">{appliedVoucher.voucher_code}</div>
+                      <div className="voucher-discount">Giảm {discount.toLocaleString('vi-VN')}đ</div>
+                    </div>
+                  </div>
+                  <button 
+                    type="button"
+                    className="btn-remove-voucher"
+                    onClick={handleRemoveVoucher}
+                  >
+                    ×
+                  </button>
+                </div>
+              )}
+              <div className="voucher-hint">
+                💡 Mã voucher có thể giảm giá lên đến 100% (miễn phí)
+              </div>
+            </div>
+
             <div className="order-totals">
               <div className="total-row">
                 <span>Tạm tính:</span>
@@ -236,6 +354,12 @@ const CheckoutPage = () => {
                 <span>Phí vận chuyển:</span>
                 <span>{formatCurrency(calculateShipping())}</span>
               </div>
+              {appliedVoucher && (
+                <div className="total-row discount-row">
+                  <span>Giảm giá ({appliedVoucher.voucher_code}):</span>
+                  <span className="discount-value">-{discount.toLocaleString('vi-VN')}đ</span>
+                </div>
+              )}
               {calculateShipping() === 0 && (
                 <div className="shipping-note">
                   🎉 Miễn phí vận chuyển cho đơn hàng trên 500.000đ
@@ -317,10 +441,8 @@ const CheckoutPage = () => {
                   value={formData.payment_method}
                   onChange={handleInputChange}
                 >
-                  <option value="COD">Thanh toán khi nhận hàng (COD)</option>
-                  <option value="BANK_TRANSFER">Chuyển khoản ngân hàng</option>
-                  <option value="MOMO">Ví MoMo</option>
-                  <option value="VNPAY">VNPay</option>
+                  <option value="COD">💵 Thanh toán khi nhận hàng (COD)</option>
+                  <option value="BANK_TRANSFER">🏦 Chuyển khoản ngân hàng</option>
                 </select>
               </div>
 
