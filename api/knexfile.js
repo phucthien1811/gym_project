@@ -6,11 +6,11 @@ export default {
   development: {
     client: 'mysql2',
     connection: {
-      host: '127.0.0.1',   // hoặc 'localhost'
+      host: '127.0.0.1',   
       port: 3306,
       user: 'root',
-      password: '',        // nếu MySQL của bạn có mật khẩu thì điền vào đây
-      database: 'gym_db'   // <-- tên DB bạn đã tạo trong phpMyAdmin
+      password: '',      
+      database: 'gym_db'   
     },
     migrations: {
       directory: './migrations',
