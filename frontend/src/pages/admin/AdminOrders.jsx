@@ -2,9 +2,11 @@ import React, { useState, useEffect } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faSearch, faFilter, faEye, faCheck, faTimes, faFileExcel } from '@fortawesome/free-solid-svg-icons';
 import { orderService } from '../../services/orderService';
+import { useToast } from '../../context/ToastContext';
 import './css/AdminOrders.css';
 
 export default function AdminOrders() {
+    const { showToast } = useToast();
     const [orders, setOrders] = useState([]);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
@@ -129,6 +131,7 @@ export default function AdminOrders() {
                 setPagination(data.data.pagination || { page: 1, limit: 10, total: 0 });
             } else {
                 setError(data.message || 'Không thể tải đơn hàng');
+                showToast(data.message || 'Không thể tải đơn hàng', 'error');
             }
         } catch (error) {
             console.error('❌ Error fetching admin orders:', error);
@@ -175,14 +178,15 @@ export default function AdminOrders() {
                 console.log('🔍 Shipping address:', data.data?.shipping_address);
                 setSelectedOrder(data.data);
                 setShowOrderDetails(true);
+                showToast('Đã tải chi tiết đơn hàng', 'success');
             } else {
                 const errorText = await response.text();
                 console.log('❌ Error response:', errorText);
-                alert('Không thể tải chi tiết đơn hàng: ' + response.status);
+                showToast('Không thể tải chi tiết đơn hàng: ' + response.status, 'error');
             }
         } catch (error) {
             console.error('Error fetching order details:', error);
-            alert('Lỗi tải chi tiết đơn hàng');
+            showToast('Lỗi tải chi tiết đơn hàng', 'error');
         }
     };
 
@@ -199,14 +203,14 @@ export default function AdminOrders() {
             });
             
             if (response.ok) {
-                alert('Cập nhật trạng thái thành công!');
+                showToast('Cập nhật trạng thái thành công!', 'success');
                 fetchAdminOrders(); // Refresh list
             } else {
-                alert('Lỗi cập nhật trạng thái');
+                showToast('Lỗi cập nhật trạng thái', 'error');
             }
         } catch (error) {
             console.error('Error updating order status:', error);
-            alert('Lỗi cập nhật trạng thái');
+            showToast('Lỗi cập nhật trạng thái', 'error');
         }
     };
 

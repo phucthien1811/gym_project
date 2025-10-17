@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { 
     faPlus, 
@@ -10,112 +10,10 @@ import {
     faEye,
     faFileExcel
 } from '@fortawesome/free-solid-svg-icons';
-import './css/AdminInvoices.css'; // File CSS mới
+import { useToast } from '../../context/ToastContext';
+import './css/AdminInvoices.css';
 
-const mockInvoices = [
-    { 
-        id: "INV-00123", 
-        memberName: "Nguyễn Văn Hùng", 
-        amount: 500000, 
-        issueDate: "2025-09-25", 
-        status: "Paid",
-        itemName: "Gói tập Basic",
-        quantity: 1,
-        unitPrice: 500000,
-        paymentMethod: "banking",
-        amountPaid: 500000,
-        changeAmount: 0,
-        description: "Đăng ký gói tập cơ bản 1 tháng"
-    },
-    { 
-        id: "INV-00124", 
-        memberName: "Trần Thị Mai", 
-        amount: 85000, 
-        issueDate: "2025-09-22", 
-        status: "Unpaid",
-        itemName: "Nước tăng lực + Protein shake",
-        quantity: 1,
-        unitPrice: 85000,
-        paymentMethod: "cash",
-        amountPaid: 0,
-        changeAmount: 0,
-        description: "Mua nước tăng lực và protein shake"
-    },
-    { 
-        id: "INV-00125", 
-        memberName: "Lê Minh Tuấn", 
-        amount: 1200000, 
-        issueDate: "2025-09-20", 
-        status: "Unpaid",
-        itemName: "Gói tập Standard",
-        quantity: 1,
-        unitPrice: 1200000,
-        paymentMethod: "card",
-        amountPaid: 0,
-        changeAmount: 0,
-        description: "Đăng ký gói tập tiêu chuẩn 3 tháng có HLV"
-    },
-    { 
-        id: "INV-00126", 
-        memberName: "Phạm Thu Hương", 
-        amount: 150000, 
-        issueDate: "2025-09-15", 
-        status: "Paid",
-        itemName: "Gói tập 1 buổi + Thuê tủ đồ",
-        quantity: 1,
-        unitPrice: 150000,
-        paymentMethod: "cash",
-        amountPaid: 200000,
-        changeAmount: 50000,
-        description: "Tập thử 1 buổi và thuê tủ đồ"
-    },
-    { 
-        id: "INV-00127", 
-        memberName: "Hoàng Đức Anh", 
-        amount: 2000000, 
-        issueDate: "2025-09-12", 
-        status: "Paid",
-        itemName: "Gói tập Premium",
-        quantity: 1,
-        unitPrice: 2000000,
-        paymentMethod: "banking",
-        amountPaid: 2000000,
-        changeAmount: 0,
-        description: "Đăng ký gói tập cao cấp 6 tháng với HLV riêng và tư vấn dinh dưỡng"
-    },
-    { 
-        id: "INV-00128", 
-        memberName: "Võ Thị Lan", 
-        amount: 320000, 
-        issueDate: "2025-09-10", 
-        status: "Unpaid",
-        itemName: "Găng tay tập + Khăn tập + Nước tăng lực",
-        quantity: 1,
-        unitPrice: 320000,
-        paymentMethod: "cash",
-        amountPaid: 0,
-        changeAmount: 0,
-        description: "Mua combo phụ kiện tập luyện và đồ uống"
-    },
-];
-
-// Mock data cho danh sách hội viên
-const mockMembers = [
-    { id: "M001", name: "Nguyễn Văn Hùng", email: "hungnv@example.com" },
-    { id: "M002", name: "Trần Thị Mai", email: "maitt@example.com" },
-    { id: "M003", name: "Lê Minh Tuấn", email: "tuanlm@example.com" },
-    { id: "M004", name: "Phạm Thu Hương", email: "huongpt@example.com" },
-    { id: "M005", name: "Hoàng Đức Anh", email: "anhhd@example.com" },
-    { id: "M006", name: "Võ Thị Lan", email: "lanvt@example.com" },
-];
-
-// Mock data cho các gói tập
-const mockPackages = [
-    { id: 1, name: "Gói Basic", price: 500000, description: "Tập luyện cơ bản" },
-    { id: 2, name: "Gói Standard", price: 1200000, description: "Tập luyện tiêu chuẩn với HLV" },
-    { id: 3, name: "Gói Premium", price: 2000000, description: "Tập luyện cao cấp + dinh dưỡng" },
-    { id: 4, name: "Gói VIP", price: 3500000, description: "Toàn diện 1 năm" }
-];
+const API_URL = 'http://localhost:3000/api/v1';
 
 // Mock data cho sản phẩm/dịch vụ thường dùng
 const commonItems = [
@@ -128,12 +26,16 @@ const commonItems = [
 ];
 
 export default function AdminInvoices() {
+    const { showToast } = useToast();
     const [showCreateModal, setShowCreateModal] = useState(false);
     const [showViewModal, setShowViewModal] = useState(false);
     const [viewingInvoice, setViewingInvoice] = useState(null);
     const [currentPage, setCurrentPage] = useState(1);
     const [itemsPerPage] = useState(6);
     const [searchTerm, setSearchTerm] = useState('');
+    const [invoices, setInvoices] = useState([]);
+    const [users, setUsers] = useState([]);
+    const [loading, setLoading] = useState(false);
     const [newInvoice, setNewInvoice] = useState({
         selectedMember: null,
         itemName: '',
@@ -147,10 +49,54 @@ export default function AdminInvoices() {
         description: ''
     });
 
+    // Fetch invoices from API
+    useEffect(() => {
+        fetchInvoices();
+        fetchUsers();
+    }, []);
+
+    const fetchInvoices = async () => {
+        try {
+            setLoading(true);
+            const token = localStorage.getItem('token');
+            const response = await fetch(`${API_URL}/invoices`, {
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            });
+            const data = await response.json();
+            if (data.success) {
+                setInvoices(data.data.invoices || []);
+            }
+        } catch (error) {
+            console.error('Lỗi khi tải hóa đơn:', error);
+            showToast('Không thể tải danh sách hóa đơn', 'error');
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const fetchUsers = async () => {
+        try {
+            const token = localStorage.getItem('token');
+            const response = await fetch(`${API_URL}/users`, {
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            });
+            const data = await response.json();
+            if (data.success) {
+                setUsers(data.data || []);
+            }
+        } catch (error) {
+            console.error('Lỗi khi tải danh sách người dùng:', error);
+        }
+    };
+
     // Filter invoices based on search term
-    const filteredInvoices = mockInvoices.filter(invoice =>
-        invoice.id.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        invoice.memberName.toLowerCase().includes(searchTerm.toLowerCase())
+    const filteredInvoices = invoices.filter(invoice =>
+        invoice.invoice_number?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        invoice.customer_name?.toLowerCase().includes(searchTerm.toLowerCase())
     );
 
     // Pagination logic
@@ -171,34 +117,59 @@ export default function AdminInvoices() {
 
     const handleExportExcel = () => {
         console.log('Exporting invoices to Excel...');
-        alert('Xuất danh sách hóa đơn ra Excel thành công!');
+        showToast('Xuất danh sách hóa đơn ra Excel thành công!', 'success');
     };
 
     const getStatusClass = (status) => {
-        switch (status) {
-            case 'Paid': return 'ai-status-paid';
-            case 'Unpaid': return 'ai-status-unpaid';
+        switch (status?.toLowerCase()) {
+            case 'paid': return 'ai-status-paid';
+            case 'pending': 
+            case 'unpaid': return 'ai-status-unpaid';
             default: return '';
         }
     };
 
     const handleExportPDF = (invoice) => {
-        console.log('Xuất PDF cho hóa đơn:', invoice.id);
+        console.log('Xuất PDF cho hóa đơn:', invoice.invoice_number);
         // Logic xuất PDF
     };
 
     const handleWarning = (invoice) => {
-        alert(`Gửi cảnh báo cho hội viên: ${invoice.memberName} về hóa đơn ${invoice.id}`);
+        showToast(`Đã gửi cảnh báo cho hội viên: ${invoice.customer_name}`, 'info');
         // Logic gửi cảnh báo
     };
 
-    const handleConfirmPayment = (invoice) => {
-        if (invoice.status === 'Paid') {
-            alert('Hóa đơn đã được thanh toán rồi!');
+    const handleConfirmPayment = async (invoice) => {
+        if (invoice.payment_status === 'paid') {
+            showToast('Hóa đơn đã được thanh toán rồi!', 'warning');
             return;
         }
-        console.log('Xác nhận thanh toán cho hóa đơn:', invoice.id);
-        // Logic xác nhận thanh toán
+        
+        try {
+            const token = localStorage.getItem('token');
+            const response = await fetch(`${API_URL}/invoices/${invoice.id}/confirm-payment`, {
+                method: 'PATCH',
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    amount_paid: parseFloat(invoice.total_amount),
+                    change_amount: 0
+                })
+            });
+            
+            const data = await response.json();
+            if (data.success) {
+                showToast('Xác nhận thanh toán thành công!', 'success');
+                fetchInvoices(); // Reload invoices
+            } else {
+                showToast(data.message || 'Không thể xác nhận thanh toán', 'error');
+            }
+        } catch (error) {
+            console.error('Lỗi khi xác nhận thanh toán:', error);
+            showToast('Có lỗi xảy ra khi xác nhận thanh toán', 'error');
+        }
     };
 
     const handleViewInvoice = (invoice) => {
@@ -232,7 +203,7 @@ export default function AdminInvoices() {
     };
 
     const handleMemberSelect = (e) => {
-        const selectedMember = mockMembers.find(member => member.id === e.target.value);
+        const selectedMember = users.find(user => user.id === parseInt(e.target.value));
         setNewInvoice(prev => ({
             ...prev,
             selectedMember: selectedMember || null
@@ -252,31 +223,63 @@ export default function AdminInvoices() {
         }
     };
 
-    const handleCreateInvoice = () => {
+    const handleCreateInvoice = async () => {
         // Add validation logic here
         if (!newInvoice.selectedMember || !newInvoice.itemName || !newInvoice.unitPrice) {
-            alert('Vui lòng điền đầy đủ thông tin bắt buộc');
+            showToast('Vui lòng điền đầy đủ thông tin bắt buộc', 'warning');
             return;
         }
         
-        // Here you would typically send data to API
-        console.log('Creating invoice:', newInvoice);
-        alert('Tạo hóa đơn thành công!');
-        
-        // Reset form and close modal
-        setNewInvoice({
-            selectedMember: null,
-            itemName: '',
-            quantity: 1,
-            unitPrice: 0,
-            totalAmount: 0,
-            amountPaid: 0,
-            changeAmount: 0,
-            paymentMethod: 'cash',
-            issueDate: new Date().toISOString().split('T')[0],
-            description: ''
-        });
-        setShowCreateModal(false);
+        try {
+            const token = localStorage.getItem('token');
+            const response = await fetch(`${API_URL}/invoices`, {
+                method: 'POST',
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    user_id: newInvoice.selectedMember.id,
+                    customer_name: newInvoice.selectedMember.name || newInvoice.selectedMember.username,
+                    customer_email: newInvoice.selectedMember.email,
+                    customer_phone: newInvoice.selectedMember.phone,
+                    item_name: newInvoice.itemName,
+                    description: newInvoice.description,
+                    quantity: newInvoice.quantity,
+                    unit_price: newInvoice.unitPrice,
+                    total_amount: newInvoice.totalAmount,
+                    payment_method: newInvoice.paymentMethod,
+                    amount_paid: newInvoice.amountPaid,
+                    change_amount: newInvoice.changeAmount
+                })
+            });
+            
+            const data = await response.json();
+            if (data.success) {
+                showToast('Tạo hóa đơn thành công!', 'success');
+                fetchInvoices(); // Reload invoices
+                
+                // Reset form and close modal
+                setNewInvoice({
+                    selectedMember: null,
+                    itemName: '',
+                    quantity: 1,
+                    unitPrice: 0,
+                    totalAmount: 0,
+                    amountPaid: 0,
+                    changeAmount: 0,
+                    paymentMethod: 'cash',
+                    issueDate: new Date().toISOString().split('T')[0],
+                    description: ''
+                });
+                setShowCreateModal(false);
+            } else {
+                showToast(data.message || 'Không thể tạo hóa đơn', 'error');
+            }
+        } catch (error) {
+            console.error('Lỗi khi tạo hóa đơn:', error);
+            showToast('Có lỗi xảy ra khi tạo hóa đơn', 'error');
+        }
     };
 
     return (
@@ -301,6 +304,15 @@ export default function AdminInvoices() {
             </div>
 
             <div className="ai-admin-table-container">
+                {loading ? (
+                    <div style={{ textAlign: 'center', padding: '40px' }}>
+                        <p>Đang tải dữ liệu...</p>
+                    </div>
+                ) : currentInvoices.length === 0 ? (
+                    <div style={{ textAlign: 'center', padding: '40px' }}>
+                        <p>Chưa có hóa đơn nào</p>
+                    </div>
+                ) : (
                 <table className="ai-admin-table">
                     <thead>
                         <tr>
@@ -315,13 +327,13 @@ export default function AdminInvoices() {
                     <tbody>
                         {currentInvoices.map((invoice) => (
                             <tr key={invoice.id}>
-                                <td><span className="ai-invoice-id">{invoice.id}</span></td>
-                                <td>{invoice.memberName}</td>
-                                <td className="ai-amount">{invoice.amount.toLocaleString('vi-VN')}đ</td>
-                                <td>{invoice.issueDate}</td>
+                                <td><span className="ai-invoice-id">{invoice.invoice_number}</span></td>
+                                <td>{invoice.customer_name}</td>
+                                <td className="ai-amount">{parseFloat(invoice.total_amount).toLocaleString('vi-VN')}đ</td>
+                                <td>{new Date(invoice.created_at).toLocaleDateString('vi-VN')}</td>
                                 <td>
-                                    <span className={`ai-status-pill ${getStatusClass(invoice.status)}`}>
-                                        {invoice.status === 'Paid' ? 'Đã thanh toán' : 'Chưa thanh toán'}
+                                    <span className={`ai-status-pill ${getStatusClass(invoice.payment_status)}`}>
+                                        {invoice.payment_status === 'paid' ? 'Đã thanh toán' : 'Chưa thanh toán'}
                                     </span>
                                 </td>
                                 <td>
@@ -348,10 +360,10 @@ export default function AdminInvoices() {
                                             <FontAwesomeIcon icon={faExclamationTriangle} />
                                         </button>
                                         <button 
-                                            className={`ai-action-btn ai-btn-confirm ${invoice.status === 'Paid' ? 'ai-disabled' : ''}`}
+                                            className={`ai-action-btn ai-btn-confirm ${invoice.payment_status === 'paid' ? 'ai-disabled' : ''}`}
                                             onClick={() => handleConfirmPayment(invoice)}
-                                            title={invoice.status === 'Paid' ? 'Đã thanh toán' : 'Xác nhận thanh toán'}
-                                            disabled={invoice.status === 'Paid'}
+                                            title={invoice.payment_status === 'paid' ? 'Đã thanh toán' : 'Xác nhận thanh toán'}
+                                            disabled={invoice.payment_status === 'paid'}
                                         >
                                             <FontAwesomeIcon icon={faCheck} />
                                         </button>
@@ -361,6 +373,7 @@ export default function AdminInvoices() {
                         ))}
                     </tbody>
                 </table>
+                )}
             </div>
 
             {/* Pagination Controls */}
@@ -423,9 +436,9 @@ export default function AdminInvoices() {
                                         required
                                     >
                                         <option value="">-- Chọn hội viên --</option>
-                                        {mockMembers.map(member => (
-                                            <option key={member.id} value={member.id}>
-                                                {member.name} ({member.email})
+                                        {users.map(user => (
+                                            <option key={user.id} value={user.id}>
+                                                {user.name || user.username} ({user.email})
                                             </option>
                                         ))}
                                     </select>
@@ -616,7 +629,7 @@ export default function AdminInvoices() {
                 <div className="ai-modal-overlay" onClick={() => setShowViewModal(false)}>
                     <div className="ai-modal-content" onClick={(e) => e.stopPropagation()}>
                         <div className="ai-modal-header">
-                            <h3>Chi Tiết Hóa Đơn {viewingInvoice.id}</h3>
+                            <h3>Chi Tiết Hóa Đơn {viewingInvoice.invoice_number}</h3>
                             <button 
                                 className="ai-modal-close-btn"
                                 onClick={() => setShowViewModal(false)}
@@ -630,12 +643,14 @@ export default function AdminInvoices() {
                                 <div className="ai-invoice-header">
                                     <h4>Thông tin khách hàng</h4>
                                     <div className="ai-customer-info">
-                                        <p><strong>Tên khách hàng:</strong> {viewingInvoice.memberName}</p>
-                                        <p><strong>Mã hóa đơn:</strong> {viewingInvoice.id}</p>
-                                        <p><strong>Ngày xuất:</strong> {viewingInvoice.issueDate}</p>
+                                        <p><strong>Tên khách hàng:</strong> {viewingInvoice.customer_name}</p>
+                                        <p><strong>Email:</strong> {viewingInvoice.customer_email}</p>
+                                        <p><strong>Số điện thoại:</strong> {viewingInvoice.customer_phone}</p>
+                                        <p><strong>Mã hóa đơn:</strong> {viewingInvoice.invoice_number}</p>
+                                        <p><strong>Ngày xuất:</strong> {new Date(viewingInvoice.created_at).toLocaleDateString('vi-VN')}</p>
                                         <p><strong>Trạng thái:</strong> 
-                                            <span className={`ai-status-pill ${getStatusClass(viewingInvoice.status)}`}>
-                                                {viewingInvoice.status === 'Paid' ? 'Đã thanh toán' : 'Chưa thanh toán'}
+                                            <span className={`ai-status-pill ${getStatusClass(viewingInvoice.payment_status)}`}>
+                                                {viewingInvoice.payment_status === 'paid' ? 'Đã thanh toán' : 'Chưa thanh toán'}
                                             </span>
                                         </p>
                                     </div>
@@ -646,7 +661,7 @@ export default function AdminInvoices() {
                                     <div className="ai-item-details">
                                         <div className="ai-item-row">
                                             <span>Tên sản phẩm/dịch vụ:</span>
-                                            <span>{viewingInvoice.itemName}</span>
+                                            <span>{viewingInvoice.item_name}</span>
                                         </div>
                                         <div className="ai-item-row">
                                             <span>Số lượng:</span>
@@ -654,11 +669,17 @@ export default function AdminInvoices() {
                                         </div>
                                         <div className="ai-item-row">
                                             <span>Đơn giá:</span>
-                                            <span>{viewingInvoice.unitPrice.toLocaleString('vi-VN')}đ</span>
+                                            <span>{parseFloat(viewingInvoice.unit_price).toLocaleString('vi-VN')}đ</span>
                                         </div>
+                                        {viewingInvoice.voucher_code && (
+                                            <div className="ai-item-row" style={{ color: '#22c55e', fontWeight: '500' }}>
+                                                <span>🎟️ Voucher giảm giá:</span>
+                                                <span>-{parseFloat(viewingInvoice.discount_amount || 0).toLocaleString('vi-VN')}đ ({viewingInvoice.voucher_code})</span>
+                                            </div>
+                                        )}
                                         <div className="ai-item-row ai-total-row">
                                             <span>Tổng tiền:</span>
-                                            <span className="ai-amount-highlight">{viewingInvoice.amount.toLocaleString('vi-VN')}đ</span>
+                                            <span className="ai-amount-highlight">{parseFloat(viewingInvoice.total_amount).toLocaleString('vi-VN')}đ</span>
                                         </div>
                                     </div>
                                 </div>
@@ -669,19 +690,29 @@ export default function AdminInvoices() {
                                         <div className="ai-payment-row">
                                             <span>Phương thức thanh toán:</span>
                                             <span>
-                                                {viewingInvoice.paymentMethod === 'cash' ? 'Tiền mặt' : 
-                                                 viewingInvoice.paymentMethod === 'banking' ? 'Chuyển khoản' : 
-                                                 'Thẻ tín dụng'}
+                                                {viewingInvoice.payment_method === 'cash' ? 'Tiền mặt' : 
+                                                 viewingInvoice.payment_method === 'banking' ? 'Chuyển khoản' : 
+                                                 viewingInvoice.payment_method === 'card' ? 'Thẻ tín dụng' :
+                                                 viewingInvoice.payment_method === 'momo' ? 'MoMo' :
+                                                 viewingInvoice.payment_method === 'vnpay' ? 'VNPay' :
+                                                 viewingInvoice.payment_method === 'cod' ? 'COD' :
+                                                 'Khác'}
                                             </span>
                                         </div>
                                         <div className="ai-payment-row">
                                             <span>Tiền khách đưa:</span>
-                                            <span>{viewingInvoice.amountPaid.toLocaleString('vi-VN')}đ</span>
+                                            <span>{parseFloat(viewingInvoice.amount_paid).toLocaleString('vi-VN')}đ</span>
                                         </div>
                                         <div className="ai-payment-row">
                                             <span>Tiền thối:</span>
-                                            <span className="ai-change-highlight">{viewingInvoice.changeAmount.toLocaleString('vi-VN')}đ</span>
+                                            <span className="ai-change-highlight">{parseFloat(viewingInvoice.change_amount).toLocaleString('vi-VN')}đ</span>
                                         </div>
+                                        {viewingInvoice.paid_at && (
+                                            <div className="ai-payment-row">
+                                                <span>Ngày thanh toán:</span>
+                                                <span>{new Date(viewingInvoice.paid_at).toLocaleString('vi-VN')}</span>
+                                            </div>
+                                        )}
                                     </div>
                                 </div>
 
