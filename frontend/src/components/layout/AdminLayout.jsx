@@ -75,9 +75,9 @@ export default function AdminLayout() {
 
           {/* SYSTEM */}
           <NavSectionTitle title="SYSTEM" />
-          <NavLink to="/admin/reports" className="admin__link">
+          <NavLink to="/admin/voucher" className="admin__link">
             <FontAwesomeIcon icon={faChartLine} className="admin__link-icon" />
-            DS Đen
+            Voucher
           </NavLink>
           <NavLink to="/admin/settings" className="admin__link">
             <FontAwesomeIcon icon={faGears} className="admin__link-icon" />
