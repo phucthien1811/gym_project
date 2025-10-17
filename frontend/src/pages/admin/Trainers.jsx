@@ -12,8 +12,10 @@ import {
   faTimes
 } from '@fortawesome/free-solid-svg-icons';
 import './css/Trainers.css';
+import { useToast } from '../../context/ToastContext';
 
 const Trainers = () => {
+  const { showSuccess, showError } = useToast();
   const [trainers, setTrainers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
@@ -129,7 +131,7 @@ const Trainers = () => {
       if (modalMode === 'create') {
         const response = await trainerService.createTrainer(formData);
         if (response.success) {
-          alert('Tạo huấn luyện viên thành công!');
+          showSuccess('Tạo huấn luyện viên thành công!');
           setShowModal(false);
           fetchTrainers();
           fetchStats();
@@ -137,13 +139,13 @@ const Trainers = () => {
       } else if (modalMode === 'edit') {
         const response = await trainerService.updateTrainer(selectedTrainer.id, formData);
         if (response.success) {
-          alert('Cập nhật huấn luyện viên thành công!');
+          showSuccess('Cập nhật huấn luyện viên thành công!');
           setShowModal(false);
           fetchTrainers();
         }
       }
     } catch (error) {
-      alert('Lỗi: ' + error.message);
+      showError('Lỗi: ' + error.message);
     } finally {
       setLoading(false);
     }
@@ -197,12 +199,12 @@ const Trainers = () => {
       try {
         const response = await trainerService.deleteTrainer(trainer.id);
         if (response.success) {
-          alert('Xóa huấn luyện viên thành công!');
+          showSuccess('Xóa huấn luyện viên thành công!');
           fetchTrainers();
           fetchStats();
         }
       } catch (error) {
-        alert('Lỗi: ' + error.message);
+        showError('Lỗi: ' + error.message);
       }
     }
   };
@@ -212,12 +214,12 @@ const Trainers = () => {
     try {
       const response = await trainerService.updateTrainerStatus(trainer.id, newStatus);
       if (response.success) {
-        alert('Cập nhật trạng thái thành công!');
+        showSuccess(newStatus === 'active' ? 'Đã kích hoạt huấn luyện viên' : 'Đã tạm dừng huấn luyện viên');
         fetchTrainers();
         fetchStats();
       }
     } catch (error) {
-      alert('Lỗi: ' + error.message);
+      showError('Lỗi: ' + error.message);
     }
   };
 

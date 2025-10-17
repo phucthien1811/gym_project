@@ -1,9 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faPlus, faPen, faTrash, faCheckCircle, faEye, faEyeSlash, faUsers, faSearch } from '@fortawesome/free-solid-svg-icons';
+import { useToast } from '../../context/ToastContext';
 import './css/AdminPlans.css';
 
 const AdminPlans = () => {
+    const { showSuccess, showError } = useToast();
     const [packages, setPackages] = useState([]);
     const [loading, setLoading] = useState(true);
     const [showModal, setShowModal] = useState(false);
@@ -50,7 +52,7 @@ const AdminPlans = () => {
     const handleSubmit = async (e) => {
         e.preventDefault();
         const method = currentPackage ? 'PUT' : 'POST';
-        const url = currentPackage ? `http://localhost:4000/api/v1/packages/${currentPackage.id}` : 'http://localhost:4000/api/v1/packages/test';
+        const url = currentPackage ? `http://localhost:4000/api/v1/packages/${currentPackage.id}` : 'http://localhost:4000/api/v1/packages';
         
         const submitData = {
             ...formData,
@@ -63,11 +65,12 @@ const AdminPlans = () => {
 
         try {
             console.log('Submitting data:', submitData);
+            const token = localStorage.getItem('token');
             const response = await fetch(url, {
                 method,
                 headers: {
-                    'Content-Type': 'application/json'
-                    // Tạm thời bỏ auth: 'Authorization': `Bearer ${localStorage.getItem('token')}`
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
                 },
                 body: JSON.stringify(submitData)
             });
@@ -77,6 +80,7 @@ const AdminPlans = () => {
             console.log('Response data:', data);
             
             if (data.success) {
+                showSuccess('Lưu gói tập thành công!');
                 setShowModal(false);
                 setCurrentPackage(null);
                 setFormData({
@@ -88,9 +92,12 @@ const AdminPlans = () => {
                     is_published: false
                 });
                 fetchPackages();
+            } else {
+                showError(data.message || 'Có lỗi xảy ra khi lưu gói tập');
             }
         } catch (error) {
             console.error('Error saving package:', error);
+            showError('Có lỗi xảy ra khi lưu gói tập');
         }
     };
 
@@ -102,7 +109,7 @@ const AdminPlans = () => {
             price: pkg.price.toString(),
             duration_days: pkg.duration_days.toString(),
             features: Array.isArray(pkg.features) ? pkg.features : [],
-            is_published: pkg.is_published
+            is_published: Boolean(pkg.is_published) // Convert 0/1 to false/true
         });
         setShowModal(true);
     };
@@ -120,12 +127,14 @@ const AdminPlans = () => {
 
             const data = await response.json();
             if (data.success) {
+                showSuccess('Xóa gói tập thành công!');
                 fetchPackages();
             } else {
-                alert(data.message);
+                showError(data.message || 'Có lỗi xảy ra khi xóa gói tập');
             }
         } catch (error) {
             console.error('Error deleting package:', error);
+            showError('Có lỗi xảy ra khi xóa gói tập');
         }
     };
 
@@ -140,10 +149,12 @@ const AdminPlans = () => {
 
             const data = await response.json();
             if (data.success) {
+                showSuccess(data.data.is_published ? 'Đã hiển thị gói tập' : 'Đã ẩn gói tập');
                 fetchPackages();
             }
         } catch (error) {
             console.error('Error toggling published status:', error);
+            showError('Có lỗi xảy ra khi cập nhật trạng thái');
         }
     };
 
@@ -259,7 +270,7 @@ const AdminPlans = () => {
                             </div>
                         </div>
                         <div className="apl-plan-pricing">
-                            <span className="apl-plan-price">{pkg.price.toLocaleString('vi-VN')}đ</span>
+                            <span className="apl-plan-price">{parseInt(pkg.price).toLocaleString('vi-VN')}đ</span>
                             <span className="apl-plan-duration">/ {Math.floor(pkg.duration_days / 30)} tháng</span>
                         </div>
                         <ul className="apl-plan-features">

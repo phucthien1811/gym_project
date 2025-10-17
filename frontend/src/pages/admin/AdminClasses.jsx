@@ -16,8 +16,10 @@ import {
 } from '@fortawesome/free-solid-svg-icons';
 import './css/AdminClasses.css';
 import SimpleClassForm from './components/SimpleClassForm';
+import { useToast } from '../../context/ToastContext';
 
 const AdminClasses = () => {
+  const { showSuccess, showError } = useToast();
   const [classes, setClasses] = useState([]);
   const [trainers, setTrainers] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -134,9 +136,9 @@ const AdminClasses = () => {
       }
 
       await loadClasses();
-      alert('Xóa lớp học thành công!');
+      showSuccess('Xóa lớp học thành công!');
     } catch (err) {
-      alert(err.message || 'Không thể xóa lớp học');
+      showError(err.message || 'Không thể xóa lớp học');
     }
   };
 
@@ -193,9 +195,9 @@ const AdminClasses = () => {
       // Reload enrolled users and classes
       await loadEnrolledUsers(selectedClass.id);
       await loadClasses();
-      alert('Đã hủy đăng ký thành công!');
+      showSuccess('Đã hủy đăng ký thành công!');
     } catch (err) {
-      alert(err.message || 'Không thể hủy đăng ký');
+      showError(err.message || 'Không thể hủy đăng ký');
     }
   };
 
@@ -266,8 +268,9 @@ const AdminClasses = () => {
       a.click();
       window.URL.revokeObjectURL(url);
       document.body.removeChild(a);
+      showSuccess('Xuất file Excel thành công!');
     } catch (err) {
-      alert('Không thể xuất file Excel');
+      showError('Không thể xuất file Excel');
       console.error(err);
     }
   };
