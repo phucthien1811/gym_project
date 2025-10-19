@@ -1,7 +1,6 @@
 import { registerUser, loginUserWithEmailAndPassword, refreshAuthToken } from '../service/auth.js';
 import { loginSchema, registerSchema } from '../validations/auth.js';
 
-// Register controller
 export const register = async (req, res) => {
     try {
         const { error, value } = registerSchema.validate(req.body);
@@ -23,7 +22,6 @@ export const register = async (req, res) => {
     }
 };
 
-// Sử dụng export const thay vì gán vào object
 export const login = async (req, res) => {
     try {
         const { error, value } = loginSchema.validate(req.body);
@@ -40,7 +38,6 @@ export const login = async (req, res) => {
     }
 };
 
-// Thêm controller cho refresh token
 export const refresh = async (req, res) => {
     try {
         const { refreshToken } = req.body;
