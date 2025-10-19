@@ -1,4 +1,5 @@
 import orderRepo from '../repositories/order.repo.js';
+import invoiceService from './invoice.service.js';
 
 class OrderService {
   // Tạo đơn hàng từ giỏ hàng
@@ -50,6 +51,35 @@ class OrderService {
       };
 
       const order = await orderRepo.createOrder(newOrder);
+      
+      // Tự động tạo hóa đơn cho đơn hàng
+      try {
+        // Tạo tóm tắt sản phẩm
+        const itemsSummary = processedItems.map(item => 
+          `${item.product_name} (x${item.quantity})`
+        ).join(', ');
+        
+        const invoiceData = {
+          order_id: order.id,
+          user_id: userId,
+          customer_email: orderData.customer_email || null,
+          shipping_address: orderData.shipping_address,
+          items_summary: itemsSummary.length > 250 ? itemsSummary.substring(0, 247) + '...' : itemsSummary,
+          total_items: processedItems.reduce((sum, item) => sum + item.quantity, 0),
+          total_amount: totalAmount,
+          discount_amount: discountAmount,
+          voucher_code: orderData.voucher_code || null,
+          payment_method: orderData.payment_method.toUpperCase(),
+          notes: orderData.notes
+        };
+        
+        await invoiceService.createShopOrderInvoice(invoiceData);
+        console.log('✅ Đã tạo hóa đơn tự động cho đơn hàng:', order.order_number);
+      } catch (invoiceError) {
+        console.error('❌ Lỗi khi tạo hóa đơn tự động:', invoiceError.message);
+        // Không throw error để không ảnh hưởng đến việc tạo đơn hàng
+      }
+      
       return {
         success: true,
         data: order,

@@ -35,12 +35,12 @@
 
 .header__extra {
   display: none;
-  transform: translateX(-100px);
+  margin-left: auto;
 }
 
 @media (min-width: 768px) {
   .header__extra {
-    display: block;
+    display: flex;
   }
 }
 

@@ -1,7 +1,9 @@
 import React, { useState } from 'react';
 import '../css/SimpleClassForm.css';
+import { useToast } from '../../../context/ToastContext';
 
 const SimpleClassForm = ({ isOpen, onClose, onSuccess, editingClass, trainers = [] }) => {
+  const { showSuccess, showError } = useToast();
   const [formData, setFormData] = useState({
     class_name: editingClass?.class_name || '',
     description: editingClass?.description || '',
@@ -50,10 +52,10 @@ const SimpleClassForm = ({ isOpen, onClose, onSuccess, editingClass, trainers = 
         throw new Error(errorData.message || 'Failed to save class');
       }
 
-      alert(editingClass ? 'Cập nhật lớp học thành công!' : 'Tạo lớp học thành công!');
+      showSuccess(editingClass ? 'Cập nhật lớp học thành công!' : 'Tạo lớp học thành công!');
       onSuccess();
     } catch (err) {
-      alert(err.message || 'Có lỗi xảy ra');
+      showError(err.message || 'Có lỗi xảy ra');
     } finally {
       setLoading(false);
     }

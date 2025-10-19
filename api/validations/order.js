@@ -26,10 +26,11 @@ export const createOrderSchema = Joi.object({
     postal_code: Joi.string().max(10).allow('')
   }).required(),
   
-  payment_method: Joi.string().valid('COD', 'BANK_TRANSFER', 'MOMO', 'VNPAY', 'CREDIT_CARD', 'cod', 'bank_transfer', 'momo', 'vnpay', 'credit_card').required(),
+  payment_method: Joi.string().valid('COD', 'BANK_TRANSFER', 'MOMO', 'VNPAY', 'ZALOPAY', 'CREDIT_CARD', 'cod', 'bank_transfer', 'momo', 'vnpay', 'zalopay', 'credit_card').required(),
   shipping_fee: Joi.number().min(0).default(0),
   discount_amount: Joi.number().min(0).default(0),
-  notes: Joi.string().max(500).allow('')
+  voucher_code: Joi.string().max(20).optional().allow(null, ''),
+  notes: Joi.string().max(500).optional().allow('', null)
 });
 
 // Validation cho cập nhật trạng thái đơn hàng

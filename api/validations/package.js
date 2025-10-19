@@ -3,7 +3,7 @@ import Joi from 'joi';
 export const packageValidation = {
   create: Joi.object({
     name: Joi.string().min(2).max(100).required(),
-    description: Joi.string().max(500).optional(),
+    description: Joi.string().max(500).optional().allow(''),
     price: Joi.number().positive().required(),
     duration_days: Joi.number().integer().positive().required(),
     features: Joi.array().items(Joi.string()).default([]),
@@ -14,7 +14,7 @@ export const packageValidation = {
 
   update: Joi.object({
     name: Joi.string().min(2).max(100).optional(),
-    description: Joi.string().max(500).optional(),
+    description: Joi.string().max(500).optional().allow(''),
     price: Joi.number().positive().optional(),
     duration_days: Joi.number().integer().positive().optional(),
     features: Joi.array().items(Joi.string()).optional(),

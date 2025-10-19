@@ -286,17 +286,19 @@ function Header() {
                         color: "#e0e0e0",
                         textDecoration: "none",
                         fontSize: "14px",
+                        textAlign: "left",
                         transition: "background-color 0.2s ease"
                       }}
                       onMouseEnter={(e) => e.target.style.backgroundColor = "rgba(255, 255, 255, 0.05)"}
                       onMouseLeave={(e) => e.target.style.backgroundColor = "transparent"}
                     >
-                     Trang Cá Nhân
+                      Trang Cá Nhân
                     </Link>
                     
                     <button
                       onClick={handleLogout}
                       style={{
+                        display: "block",
                         width: "100%",
                         padding: "10px 16px",
                         background: "none",
@@ -310,7 +312,7 @@ function Header() {
                       onMouseEnter={(e) => e.target.style.backgroundColor = "rgba(255, 107, 107, 0.1)"}
                       onMouseLeave={(e) => e.target.style.backgroundColor = "transparent"}
                     >
-                       Logout
+                      Đăng Xuất
                     </button>
                   </div>
                 </div>

@@ -15,6 +15,7 @@ class OrderService {
       console.error('❌ API Error:', error);
       console.error('❌ Error response:', error.response);
       console.error('❌ Error data:', error.response?.data);
+      console.error('❌ Validation errors:', error.response?.data?.errors);
       console.error('❌ Error status:', error.response?.status);
       throw new Error(error.response?.data?.message || 'Không thể tạo đơn hàng');
     }

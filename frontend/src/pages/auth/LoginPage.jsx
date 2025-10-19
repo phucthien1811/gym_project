@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { useNavigate, useLocation, Link } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext.jsx";
 
 // Import file CSS mới
@@ -97,10 +97,7 @@ export default function LoginPage() {
             {loading ? 'Signing in...' : 'Sign In'}
           </button>
 
-          <p className="register-link">
-            Don't have an account?{' '}
-            <Link to="/register">Sign up here</Link>
-          </p>
+          {/* Removed register link as per request */}
         </form>
       </div>
     </div>
