@@ -13,7 +13,6 @@ import {
     faTimes,
     faFileExcel
 } from '@fortawesome/free-solid-svg-icons';
-import * as XLSX from 'xlsx';
 import './css/AdminMembers.css';
 import { useToast } from '../../context/ToastContext';
 
@@ -286,63 +285,36 @@ export default function AdminMembers() {
 
     const handleExportExcel = async () => {
         try {
-            setLoading(true);
             const token = localStorage.getItem('token');
-            
-            // Lấy tất cả users (không phân trang) để xuất
-            const response = await fetch(`/api/v1/users?page=1&limit=9999&search=${searchTerm}&status=${statusFilter}`, {
+            const queryParams = new URLSearchParams({
+                search: searchTerm,
+                status: statusFilter
+            });
+
+            const response = await fetch(`/api/v1/users/export?${queryParams}`, {
                 headers: {
                     'Authorization': `Bearer ${token}`
                 }
             });
 
-            if (!response.ok) throw new Error('Failed to fetch users');
-
-            const data = await response.json();
-            if (!data.success || !data.data || data.data.length === 0) {
-                showError('Không có dữ liệu để xuất');
-                return;
+            if (!response.ok) {
+                const errorData = await response.json();
+                throw new Error(errorData.message || 'Failed to export data');
             }
 
-            // Chuẩn bị dữ liệu cho Excel
-            const excelData = data.data.map(user => ({
-                'Họ và Tên': user.name || '',
-                'Email': user.email || '',
-                'Số Điện Thoại': user.phone || '',
-                'Vai Trò': getRoleName(user.role),
-                'Trạng Thái': user.is_active ? 'Hoạt động' : 'Không hoạt động'
-            }));
-
-            // Tạo workbook và worksheet
-            const wb = XLSX.utils.book_new();
-            const ws = XLSX.utils.json_to_sheet(excelData);
-
-            // Tự động điều chỉnh độ rộng cột
-            const colWidths = [
-                { wch: 25 }, // Họ và Tên
-                { wch: 30 }, // Email
-                { wch: 15 }, // Số Điện Thoại
-                { wch: 20 }, // Vai Trò
-                { wch: 20 }  // Trạng Thái
-            ];
-            ws['!cols'] = colWidths;
-
-            // Thêm worksheet vào workbook
-            XLSX.utils.book_append_sheet(wb, ws, 'Danh sách người dùng');
-
-            // Tạo tên file với thời gian hiện tại
-            const now = new Date();
-            const fileName = `DanhSachNguoiDung_${now.getFullYear()}${(now.getMonth()+1).toString().padStart(2,'0')}${now.getDate().toString().padStart(2,'0')}_${now.getHours().toString().padStart(2,'0')}${now.getMinutes().toString().padStart(2,'0')}.xlsx`;
-
-            // Xuất file
-            XLSX.writeFile(wb, fileName);
-            
-            showSuccess(`Đã xuất ${excelData.length} người dùng ra file Excel`);
+            const blob = await response.blob();
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `users_${new Date().toISOString().split('T')[0]}.xlsx`;
+            document.body.appendChild(a);
+            a.click();
+            window.URL.revokeObjectURL(url);
+            document.body.removeChild(a);
+            showSuccess('Xuất file Excel thành công!');
         } catch (error) {
             console.error('Error exporting Excel:', error);
-            showError('Không thể xuất file Excel');
-        } finally {
-            setLoading(false);
+            showError(error.message || 'Không thể xuất file Excel');
         }
     };
 

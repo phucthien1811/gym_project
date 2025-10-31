@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { 
     faPlus, 
@@ -11,84 +11,21 @@ import {
     faTimes,
     faFileExcel
 } from '@fortawesome/free-solid-svg-icons';
+import { useToast } from '../../context/ToastContext';
 import './css/AdminProducts.css';
 
-const mockProducts = [
-    { 
-        id: 1,
-        code: "SP001",
-        name: "Whey Protein Gold Standard", 
-        category: "Thực phẩm bổ sung", 
-        description: "Protein whey cao cấp từ Optimum Nutrition, hỗ trợ tăng cơ hiệu quả",
-        price: 1850000, 
-        stock: 50, 
-        image_url: "https://placehold.co/300x300/374151/FFFFFF?text=Whey",
-        status: "Còn hàng",
-        visibility: "Hiển thị"
-    },
-    { 
-        id: 2,
-        code: "SP002",
-        name: "BCAA Xtend", 
-        category: "Thực phẩm bổ sung", 
-        description: "Axit amin thiết yếu hỗ trợ phục hồi cơ bắp sau tập luyện",
-        price: 650000, 
-        stock: 120, 
-        image_url: "https://placehold.co/300x300/374151/FFFFFF?text=BCAA",
-        status: "Còn hàng",
-        visibility: "Hiển thị"
-    },
-    { 
-        id: 3,
-        code: "SP003",
-        name: "Găng tay tập gym", 
-        category: "Phụ kiện", 
-        description: "Găng tay chống trượt, bảo vệ bàn tay khi tập luyện với tạ",
-        price: 250000, 
-        stock: 5, 
-        image_url: "https://placehold.co/300x300/374151/FFFFFF?text=Glove",
-        status: "Sắp hết",
-        visibility: "Hiển thị"
-    },
-    { 
-        id: 4,
-        code: "SP004",
-        name: "Creatine Monohydrate", 
-        category: "Thực phẩm bổ sung", 
-        description: "Tăng sức mạnh và độ bền trong tập luyện cường độ cao",
-        price: 450000, 
-        stock: 0, 
-        image_url: "https://placehold.co/300x300/374151/FFFFFF?text=Creatine",
-        status: "Hết hàng",
-        visibility: "Ẩn"
-    },
-    { 
-        id: 5,
-        code: "SP005",
-        name: "Áo tank top gym", 
-        category: "Trang phục", 
-        description: "Áo tank top thoáng khí, co giãn tốt cho việc tập luyện",
-        price: 350000, 
-        stock: 30, 
-        image_url: "https://placehold.co/300x300/374151/FFFFFF?text=Tank",
-        status: "Còn hàng",
-        visibility: "Hiển thị"
-    },
-    { 
-        id: 6,
-        code: "SP006",
-        name: "Máy tập tay kéo", 
-        category: "Thiết bị", 
-        description: "Thiết bị tập luyện cơ tay và vai tại nhà",
-        price: 1200000, 
-        stock: 8, 
-        image_url: "https://placehold.co/300x300/374151/FFFFFF?text=Pull",
-        status: "Còn hàng",
-        visibility: "Hiển thị"
-    },
+const API_URL = 'http://localhost:4000/api/v1';
+
+// Danh sách categories có sẵn
+const CATEGORIES = [
+    'Thực phẩm bổ sung',
+    'Thiết bị',
+    'Trang phục',
+    'Phụ kiện'
 ];
 
 export default function AdminProducts() {
+    const { showToast } = useToast();
     const [searchTerm, setSearchTerm] = useState('');
     const [currentPage, setCurrentPage] = useState(1);
     const [itemsPerPage] = useState(6);
@@ -97,16 +34,61 @@ export default function AdminProducts() {
     const [showViewModal, setShowViewModal] = useState(false);
     const [editingProduct, setEditingProduct] = useState(null);
     const [viewingProduct, setViewingProduct] = useState(null);
+    const [products, setProducts] = useState([]);
+    const [loading, setLoading] = useState(false);
+    const [totalPages, setTotalPages] = useState(1);
     const [newProduct, setNewProduct] = useState({
+        code: '',
         name: '',
         category: 'Thực phẩm bổ sung',
         description: '',
         price: 0,
         stock: 0,
-        image_url: '',
-        status: 'Còn hàng',
+        image_url: 'https://placehold.co/300x300/374151/FFFFFF?text=Product',
         visibility: 'Hiển thị'
     });
+
+    // Generate product code automatically
+    const generateProductCode = () => {
+        const prefix = 'SP';
+        const timestamp = Date.now().toString().slice(-6);
+        const random = Math.floor(Math.random() * 100).toString().padStart(2, '0');
+        return `${prefix}${timestamp}${random}`;
+    };
+
+    // Fetch products from API
+    useEffect(() => {
+        fetchProducts();
+    }, [currentPage, searchTerm]);
+
+    const fetchProducts = async () => {
+        try {
+            setLoading(true);
+            const queryParams = new URLSearchParams({
+                page: currentPage,
+                limit: itemsPerPage,
+                ...(searchTerm && { search: searchTerm })
+            });
+
+            const response = await fetch(`${API_URL}/products?${queryParams}`, {
+                headers: {
+                    'Authorization': `Bearer ${localStorage.getItem('token')}`
+                }
+            });
+
+            const data = await response.json();
+            
+            if (data.success) {
+                setProducts(data.data);
+                setTotalPages(data.pagination.totalPages);
+            }
+        } catch (error) {
+            console.error('Error fetching products:', error);
+            showToast('Không thể tải danh sách sản phẩm', 'error');
+        } finally {
+            setLoading(false);
+        }
+    };
 
     const getCategoryClass = (category) => {
         switch(category) {
@@ -120,41 +102,29 @@ export default function AdminProducts() {
 
     const getStockClass = (stock) => {
         if (stock === 0) return 'ap-stock-out';
-        if (stock < 10) return 'ap-stock-low';
-        return 'ap-stock-in';
+        if (stock <= 10) return 'ap-stock-low';
+        return 'ap-stock-good';
     };
 
     const getStockText = (stock) => {
         if (stock === 0) return 'Hết hàng';
-        if (stock < 10) return `${stock} (Sắp hết)`;
-        return stock.toString();
+        if (stock <= 10) return 'Sắp hết';
+        return 'Còn hàng';
     };
 
     const getStatusClass = (status) => {
         switch(status) {
-            case 'Còn hàng': return 'ap-status-available';
-            case 'Hết hàng': return 'ap-status-out-of-stock';
+            case 'Hết hàng': return 'ap-status-out';
             case 'Sắp hết': return 'ap-status-low';
-            default: return 'ap-status-available';
+            case 'Còn hàng': return 'ap-status-good';
+            default: return 'ap-status-good';
         }
     };
 
     const getVisibilityClass = (visibility) => {
-        return visibility === 'Hiển thị' ? 'ap-status-visible' : 'ap-status-hidden';
+        return visibility === 'Hiển thị' ? 'ap-visibility-visible' : 'ap-visibility-hidden';
     };
 
-    const filteredProducts = mockProducts.filter(product =>
-        product.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        product.category.toLowerCase().includes(searchTerm.toLowerCase())
-    );
-
-    // Pagination logic
-    const totalPages = Math.ceil(filteredProducts.length / itemsPerPage);
-    const indexOfLastItem = currentPage * itemsPerPage;
-    const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-    const currentProducts = filteredProducts.slice(indexOfFirstItem, indexOfLastItem);
-
-    // Reset to page 1 when search term changes
     const handleSearchChange = (e) => {
         setSearchTerm(e.target.value);
         setCurrentPage(1);
@@ -164,10 +134,40 @@ export default function AdminProducts() {
         setCurrentPage(pageNumber);
     };
 
-    const handleExportExcel = () => {
-        // Export logic here
-        console.log('Exporting to Excel...');
-        alert('Xuất Excel thành công!');
+    const handleExportExcel = async () => {
+        try {
+            showToast('Đang xuất Excel...', 'info');
+            
+            const response = await fetch(`${API_URL}/products/export/excel`, {
+                headers: {
+                    'Authorization': `Bearer ${localStorage.getItem('token')}`
+                }
+            });
+
+            if (!response.ok) {
+                throw new Error('Không thể xuất Excel');
+            }
+
+            // Get blob from response
+            const blob = await response.blob();
+            
+            // Create download link
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `DanhSachSanPham_${new Date().toLocaleDateString('vi-VN').replace(/\//g, '-')}.xlsx`;
+            document.body.appendChild(a);
+            a.click();
+            
+            // Cleanup
+            window.URL.revokeObjectURL(url);
+            document.body.removeChild(a);
+
+            showToast('✅ Xuất Excel thành công!', 'success');
+        } catch (error) {
+            console.error('Error exporting Excel:', error);
+            showToast('❌ Lỗi khi xuất Excel', 'error');
+        }
     };
 
     const handleInputChange = (e, isEdit = false) => {
@@ -185,24 +185,51 @@ export default function AdminProducts() {
         }
     };
 
-    const handleAddProduct = () => {
+    const handleAddProduct = async () => {
         if (!newProduct.name || !newProduct.price) {
-            alert('Vui lòng điền đầy đủ thông tin bắt buộc');
+            showToast('Vui lòng điền đầy đủ thông tin bắt buộc', 'error');
             return;
         }
-        console.log('Adding product:', newProduct);
-        alert('Thêm sản phẩm thành công!');
-        setNewProduct({
-            name: '',
-            category: 'Thực phẩm bổ sung',
-            description: '',
-            price: 0,
-            stock: 0,
-            image_url: '',
-            status: 'Còn hàng',
-            visibility: 'Hiển thị'
-        });
-        setShowAddModal(false);
+
+        try {
+            // Auto-generate product code if not provided
+            const productData = {
+                ...newProduct,
+                code: newProduct.code || generateProductCode()
+            };
+
+            const response = await fetch(`${API_URL}/products`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${localStorage.getItem('token')}`
+                },
+                body: JSON.stringify(productData)
+            });
+
+            const data = await response.json();
+
+            if (data.success) {
+                showToast('Thêm sản phẩm thành công!', 'success');
+                setNewProduct({
+                    code: '',
+                    name: '',
+                    category: 'Thực phẩm bổ sung',
+                    description: '',
+                    price: 0,
+                    stock: 0,
+                    image_url: 'https://placehold.co/300x300/374151/FFFFFF?text=Product',
+                    visibility: 'Hiển thị'
+                });
+                setShowAddModal(false);
+                fetchProducts();
+            } else {
+                showToast(data.message || 'Không thể thêm sản phẩm', 'error');
+            }
+        } catch (error) {
+            console.error('Error adding product:', error);
+            showToast('Lỗi khi thêm sản phẩm', 'error');
+        }
     };
 
     const handleEditClick = (product) => {
@@ -210,15 +237,86 @@ export default function AdminProducts() {
         setShowEditModal(true);
     };
 
-    const handleUpdateProduct = () => {
-        if (!editingProduct.name || !editingProduct.price) {
-            alert('Vui lòng điền đầy đủ thông tin bắt buộc');
+    const handleUpdateProduct = async () => {
+        if (!editingProduct.code || !editingProduct.name || !editingProduct.price) {
+            showToast('Vui lòng điền đầy đủ thông tin bắt buộc', 'error');
             return;
         }
-        console.log('Updating product:', editingProduct);
-        alert('Cập nhật sản phẩm thành công!');
-        setShowEditModal(false);
-        setEditingProduct(null);
+
+        try {
+            const response = await fetch(`${API_URL}/products/${editingProduct.id}`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${localStorage.getItem('token')}`
+                },
+                body: JSON.stringify(editingProduct)
+            });
+
+            const data = await response.json();
+
+            if (data.success) {
+                showToast('Cập nhật sản phẩm thành công!', 'success');
+                setShowEditModal(false);
+                setEditingProduct(null);
+                fetchProducts();
+            } else {
+                showToast(data.message || 'Không thể cập nhật sản phẩm', 'error');
+            }
+        } catch (error) {
+            console.error('Error updating product:', error);
+            showToast('Lỗi khi cập nhật sản phẩm', 'error');
+        }
+    };
+
+    const handleDeleteProduct = async (productId) => {
+        if (!window.confirm('Bạn có chắc chắn muốn xóa sản phẩm này?')) {
+            return;
+        }
+
+        try {
+            const response = await fetch(`${API_URL}/products/${productId}`, {
+                method: 'DELETE',
+                headers: {
+                    'Authorization': `Bearer ${localStorage.getItem('token')}`
+                }
+            });
+
+            const data = await response.json();
+
+            if (data.success) {
+                showToast('Xóa sản phẩm thành công!', 'success');
+                fetchProducts();
+            } else {
+                showToast(data.message || 'Không thể xóa sản phẩm', 'error');
+            }
+        } catch (error) {
+            console.error('Error deleting product:', error);
+            showToast('Lỗi khi xóa sản phẩm', 'error');
+        }
+    };
+
+    const handleToggleVisibility = async (productId) => {
+        try {
+            const response = await fetch(`${API_URL}/products/${productId}/visibility`, {
+                method: 'PATCH',
+                headers: {
+                    'Authorization': `Bearer ${localStorage.getItem('token')}`
+                }
+            });
+
+            const data = await response.json();
+
+            if (data.success) {
+                showToast('Cập nhật hiển thị thành công!', 'success');
+                fetchProducts();
+            } else {
+                showToast(data.message || 'Không thể cập nhật', 'error');
+            }
+        } catch (error) {
+            console.error('Error toggling visibility:', error);
+            showToast('Lỗi khi cập nhật', 'error');
+        }
     };
 
     const handleViewClick = (product) => {
@@ -244,231 +342,216 @@ export default function AdminProducts() {
                         <FontAwesomeIcon icon={faPlus} />
                         <span>Thêm Sản Phẩm</span>
                     </button>
+                    <button className="ap-btn-excel" onClick={handleExportExcel}>
+                        <FontAwesomeIcon icon={faFileExcel} />
+                        <span>Xuất Excel</span>
+                    </button>
                 </div>
             </div>
 
-            <div className="ap-products-table-container">
-                <table className="ap-products-table">
-                    <thead>
-                        <tr>
-                            <th>Mã SP</th>
-                            <th>Tên Sản Phẩm</th>
-                            <th>Danh Mục</th>
-                            <th>Mô Tả</th>
-                            <th>Giá</th>
-                            <th>Số Lượng</th>
-                            <th>Trạng Thái</th>
-                            <th>Hiển Thị</th>
-                            <th>Hành Động</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {currentProducts.map(product => (
-                            <tr key={product.id}>
-                                <td className="ap-product-code-cell">
-                                    <span className="ap-product-code">{product.code}</span>
-                                </td>
-                                <td className="ap-product-name-cell" title={product.name}>
-                                    {product.name}
-                                </td>
-                                <td>
-                                    <span className={`ap-category-badge ${getCategoryClass(product.category)}`}>
-                                        {product.category}
-                                    </span>
-                                </td>
-                                <td className="ap-product-description" title={product.description}>
-                                    {product.description}
-                                </td>
-                                <td className="ap-product-price-cell">
-                                    {product.price.toLocaleString('vi-VN')}đ
-                                </td>
-                                <td className="ap-stock-cell">
-                                    <span className={`ap-stock-badge ${getStockClass(product.stock)}`}>
-                                        {getStockText(product.stock)}
-                                    </span>
-                                </td>
-                                <td>
-                                    <span className={`ap-status-badge ${getStatusClass(product.status)}`}>
-                                        {product.status}
-                                    </span>
-                                </td>
-                                <td>
-                                    <span className={`ap-status-badge ${getVisibilityClass(product.visibility)}`}>
-                                        {product.visibility}
-                                    </span>
-                                </td>
-                                <td className="ap-actions-cell">
-                                    <div className="ap-action-buttons">
-                                        <button className="ap-action-btn ap-btn-view" title="Xem chi tiết" onClick={() => handleViewClick(product)}>
-                                            <FontAwesomeIcon icon={faInfo} />
-                                        </button>
-                                        <button className="ap-action-btn ap-btn-edit" title="Chỉnh sửa" onClick={() => handleEditClick(product)}>
-                                            <FontAwesomeIcon icon={faPen} />
-                                        </button>
-                                        <button className="ap-action-btn ap-btn-toggle" title="Ẩn/Hiện">
-                                            <FontAwesomeIcon icon={product.visibility === 'Hiển thị' ? faEyeSlash : faEye} />
-                                        </button>
-                                        <button className="ap-action-btn ap-btn-delete" title="Xóa">
-                                            <FontAwesomeIcon icon={faTrash} />
-                                        </button>
-                                    </div>
-                                </td>
-                            </tr>
-                        ))}
-                    </tbody>
-                </table>
-            </div>
+            {loading ? (
+                <div className="ap-loading">Đang tải...</div>
+            ) : (
+                <>
+                    <div className="ap-products-table-container">
+                        <table className="ap-products-table">
+                            <thead>
+                                <tr>
+                                    <th>Mã SP</th>
+                                    <th>Tên Sản Phẩm</th>
+                                    <th>Danh Mục</th>
+                                    <th>Mô Tả</th>
+                                    <th>Giá</th>
+                                    <th>Số Lượng</th>
+                                    <th>Trạng Thái</th>
+                                    <th>Hiển Thị</th>
+                                    <th>Hành Động</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {products.map(product => (
+                                    <tr key={product.id}>
+                                        <td className="ap-product-code-cell">
+                                            <span className="ap-product-code">{product.code}</span>
+                                        </td>
+                                        <td className="ap-product-name-cell" title={product.name}>
+                                            {product.name}
+                                        </td>
+                                        <td>
+                                            <span className={`ap-category-badge ${getCategoryClass(product.category)}`}>
+                                                {product.category}
+                                            </span>
+                                        </td>
+                                        <td className="ap-description-cell" title={product.description}>
+                                            {product.description || '—'}
+                                        </td>
+                                        <td className="ap-price-cell">
+                                            {product.price.toLocaleString('vi-VN')}đ
+                                        </td>
+                                        <td className="ap-stock-cell">
+                                            <span className={`ap-stock-badge ${getStockClass(product.stock)}`}>
+                                                {product.stock}
+                                            </span>
+                                        </td>
+                                        <td>
+                                            <span className={`ap-status-badge ${getStatusClass(product.status)}`}>
+                                                {product.status}
+                                            </span>
+                                        </td>
+                                        <td>
+                                            <button 
+                                                className={`ap-visibility-btn ${getVisibilityClass(product.visibility)}`}
+                                                onClick={() => handleToggleVisibility(product.id)}
+                                                title={product.visibility === 'Hiển thị' ? 'Ẩn sản phẩm' : 'Hiển thị sản phẩm'}
+                                            >
+                                                <FontAwesomeIcon icon={product.visibility === 'Hiển thị' ? faEye : faEyeSlash} />
+                                            </button>
+                                        </td>
+                                        <td className="ap-action-cell">
+                                            <button 
+                                                className="ap-btn-action ap-btn-info"
+                                                onClick={() => handleViewClick(product)}
+                                                title="Xem chi tiết"
+                                            >
+                                                <FontAwesomeIcon icon={faInfo} />
+                                            </button>
+                                            <button 
+                                                className="ap-btn-action ap-btn-edit"
+                                                onClick={() => handleEditClick(product)}
+                                                title="Chỉnh sửa"
+                                            >
+                                                <FontAwesomeIcon icon={faPen} />
+                                            </button>
+                                            <button 
+                                                className="ap-btn-action ap-btn-delete"
+                                                onClick={() => handleDeleteProduct(product.id)}
+                                                title="Xóa"
+                                            >
+                                                <FontAwesomeIcon icon={faTrash} />
+                                            </button>
+                                        </td>
+                                    </tr>
+                                ))}
+                            </tbody>
+                        </table>
+                    </div>
 
-            {/* Pagination Controls */}
-            <div className="ap-pagination-container">
-                <button className="ap-btn-excel" onClick={handleExportExcel}>
-                    <FontAwesomeIcon icon={faFileExcel} />
-                    Xuất Excel
-                </button>
-
-                <div className="ap-pagination-controls">
-                    <button 
-                        className="ap-pagination-btn"
-                        onClick={() => handlePageChange(currentPage - 1)}
-                        disabled={currentPage === 1}
-                    >
-                        «
-                    </button>
-                    
-                    {[...Array(totalPages)].map((_, index) => (
-                        <button
-                            key={index + 1}
-                            className={`ap-pagination-btn ${currentPage === index + 1 ? 'active' : ''}`}
-                            onClick={() => handlePageChange(index + 1)}
+                    {/* Pagination */}
+                    <div className="ap-pagination">
+                        <button 
+                            className="ap-pagination-btn"
+                            onClick={() => handlePageChange(currentPage - 1)}
+                            disabled={currentPage === 1}
                         >
-                            {index + 1}
+                            Trước
                         </button>
-                    ))}
-                    
-                    <button 
-                        className="ap-pagination-btn"
-                        onClick={() => handlePageChange(currentPage + 1)}
-                        disabled={currentPage === totalPages}
-                    >
-                        »
-                    </button>
-                </div>
-            </div>
+                        {[...Array(totalPages)].map((_, i) => (
+                            <button
+                                key={i + 1}
+                                className={`ap-pagination-btn ${currentPage === i + 1 ? 'active' : ''}`}
+                                onClick={() => handlePageChange(i + 1)}
+                            >
+                                {i + 1}
+                            </button>
+                        ))}
+                        <button 
+                            className="ap-pagination-btn"
+                            onClick={() => handlePageChange(currentPage + 1)}
+                            disabled={currentPage === totalPages}
+                        >
+                            Sau
+                        </button>
+                    </div>
+                </>
+            )}
 
-            {/* Modal Thêm Sản Phẩm */}
+            {/* Add Product Modal */}
             {showAddModal && (
                 <div className="ap-modal-overlay" onClick={() => setShowAddModal(false)}>
                     <div className="ap-modal-content" onClick={(e) => e.stopPropagation()}>
                         <div className="ap-modal-header">
                             <h3>Thêm Sản Phẩm Mới</h3>
-                            <button className="ap-modal-close-btn" onClick={() => setShowAddModal(false)}>
+                            <button className="ap-modal-close" onClick={() => setShowAddModal(false)}>
                                 <FontAwesomeIcon icon={faTimes} />
                             </button>
                         </div>
-
                         <div className="ap-modal-body">
-                            <div className="ap-form-grid">
-                                <div className="ap-form-group">
-                                    <label>Tên sản phẩm *</label>
-                                    <input
-                                        type="text"
-                                        name="name"
-                                        value={newProduct.name}
-                                        onChange={(e) => handleInputChange(e, false)}
-                                        placeholder="Nhập tên sản phẩm"
-                                        required
-                                    />
-                                </div>
-
-                                <div className="ap-form-group">
-                                    <label>Danh mục *</label>
-                                    <select
-                                        name="category"
-                                        value={newProduct.category}
-                                        onChange={(e) => handleInputChange(e, false)}
-                                    >
-                                        <option value="Thực phẩm bổ sung">Thực phẩm bổ sung</option>
-                                        <option value="Thiết bị">Thiết bị</option>
-                                        <option value="Trang phục">Trang phục</option>
-                                        <option value="Phụ kiện">Phụ kiện</option>
-                                    </select>
-                                </div>
-
-                                <div className="ap-form-group">
-                                    <label>Giá (VNĐ) *</label>
-                                    <input
-                                        type="number"
-                                        name="price"
-                                        value={newProduct.price}
-                                        onChange={(e) => handleInputChange(e, false)}
-                                        placeholder="Nhập giá"
-                                        min="0"
-                                        required
-                                    />
-                                </div>
-
-                                <div className="ap-form-group">
-                                    <label>Số lượng *</label>
-                                    <input
-                                        type="number"
-                                        name="stock"
-                                        value={newProduct.stock}
-                                        onChange={(e) => handleInputChange(e, false)}
-                                        placeholder="Nhập số lượng"
-                                        min="0"
-                                        required
-                                    />
-                                </div>
-
-                                <div className="ap-form-group">
-                                    <label>Trạng thái</label>
-                                    <select
-                                        name="status"
-                                        value={newProduct.status}
-                                        onChange={(e) => handleInputChange(e, false)}
-                                    >
-                                        <option value="Còn hàng">Còn hàng</option>
-                                        <option value="Sắp hết">Sắp hết</option>
-                                        <option value="Hết hàng">Hết hàng</option>
-                                    </select>
-                                </div>
-
-                                <div className="ap-form-group">
-                                    <label>Hiển thị</label>
-                                    <select
-                                        name="visibility"
-                                        value={newProduct.visibility}
-                                        onChange={(e) => handleInputChange(e, false)}
-                                    >
-                                        <option value="Hiển thị">Hiển thị</option>
-                                        <option value="Ẩn">Ẩn</option>
-                                    </select>
-                                </div>
-                            </div>
-
                             <div className="ap-form-group">
-                                <label>URL hình ảnh</label>
-                                <input
-                                    type="text"
-                                    name="image_url"
-                                    value={newProduct.image_url}
-                                    onChange={(e) => handleInputChange(e, false)}
-                                    placeholder="Nhập URL hình ảnh"
+                                <label>Tên Sản Phẩm <span className="ap-required">*</span></label>
+                                <input 
+                                    type="text" 
+                                    name="name"
+                                    value={newProduct.name}
+                                    onChange={(e) => handleInputChange(e)}
+                                    placeholder="Whey Protein..."
                                 />
                             </div>
-
                             <div className="ap-form-group">
-                                <label>Mô tả</label>
-                                <textarea
+                                <label>Danh Mục</label>
+                                <select 
+                                    name="category"
+                                    value={newProduct.category}
+                                    onChange={(e) => handleInputChange(e)}
+                                >
+                                    {CATEGORIES.map(cat => (
+                                        <option key={cat} value={cat}>{cat}</option>
+                                    ))}
+                                </select>
+                            </div>
+                            <div className="ap-form-group">
+                                <label>Mô Tả</label>
+                                <textarea 
                                     name="description"
                                     value={newProduct.description}
-                                    onChange={(e) => handleInputChange(e, false)}
-                                    placeholder="Nhập mô tả sản phẩm..."
+                                    onChange={(e) => handleInputChange(e)}
                                     rows="3"
+                                    placeholder="Mô tả sản phẩm..."
+                                ></textarea>
+                            </div>
+                            <div className="ap-form-row">
+                                <div className="ap-form-group">
+                                    <label>Giá (VNĐ) <span className="ap-required">*</span></label>
+                                    <input 
+                                        type="number" 
+                                        name="price"
+                                        value={newProduct.price}
+                                        onChange={(e) => handleInputChange(e)}
+                                        placeholder="0"
+                                    />
+                                </div>
+                                <div className="ap-form-group">
+                                    <label>Số Lượng</label>
+                                    <input 
+                                        type="number" 
+                                        name="stock"
+                                        value={newProduct.stock}
+                                        onChange={(e) => handleInputChange(e)}
+                                        placeholder="0"
+                                    />
+                                </div>
+                            </div>
+                            <div className="ap-form-group">
+                                <label>URL Hình Ảnh</label>
+                                <input 
+                                    type="text" 
+                                    name="image_url"
+                                    value={newProduct.image_url}
+                                    onChange={(e) => handleInputChange(e)}
+                                    placeholder="https://..."
                                 />
                             </div>
+                            <div className="ap-form-group">
+                                <label>Hiển Thị</label>
+                                <select 
+                                    name="visibility"
+                                    value={newProduct.visibility}
+                                    onChange={(e) => handleInputChange(e)}
+                                >
+                                    <option value="Hiển thị">Hiển thị</option>
+                                    <option value="Ẩn">Ẩn</option>
+                                </select>
+                            </div>
                         </div>
-
                         <div className="ap-modal-footer">
                             <button className="ap-btn-secondary" onClick={() => setShowAddModal(false)}>
                                 Hủy
@@ -481,120 +564,97 @@ export default function AdminProducts() {
                 </div>
             )}
 
-            {/* Modal Chỉnh Sửa Sản Phẩm */}
+            {/* Edit Product Modal */}
             {showEditModal && editingProduct && (
                 <div className="ap-modal-overlay" onClick={() => setShowEditModal(false)}>
                     <div className="ap-modal-content" onClick={(e) => e.stopPropagation()}>
                         <div className="ap-modal-header">
                             <h3>Chỉnh Sửa Sản Phẩm</h3>
-                            <button className="ap-modal-close-btn" onClick={() => setShowEditModal(false)}>
+                            <button className="ap-modal-close" onClick={() => setShowEditModal(false)}>
                                 <FontAwesomeIcon icon={faTimes} />
                             </button>
                         </div>
-
                         <div className="ap-modal-body">
-                            <div className="ap-form-grid">
+                            <div className="ap-form-group">
+                                <label>Mã Sản Phẩm <span className="ap-required">*</span></label>
+                                <input 
+                                    type="text" 
+                                    name="code"
+                                    value={editingProduct.code}
+                                    onChange={(e) => handleInputChange(e, true)}
+                                />
+                            </div>
+                            <div className="ap-form-group">
+                                <label>Tên Sản Phẩm <span className="ap-required">*</span></label>
+                                <input 
+                                    type="text" 
+                                    name="name"
+                                    value={editingProduct.name}
+                                    onChange={(e) => handleInputChange(e, true)}
+                                />
+                            </div>
+                            <div className="ap-form-group">
+                                <label>Danh Mục</label>
+                                <select 
+                                    name="category"
+                                    value={editingProduct.category}
+                                    onChange={(e) => handleInputChange(e, true)}
+                                >
+                                    {CATEGORIES.map(cat => (
+                                        <option key={cat} value={cat}>{cat}</option>
+                                    ))}
+                                </select>
+                            </div>
+                            <div className="ap-form-group">
+                                <label>Mô Tả</label>
+                                <textarea 
+                                    name="description"
+                                    value={editingProduct.description || ''}
+                                    onChange={(e) => handleInputChange(e, true)}
+                                    rows="3"
+                                ></textarea>
+                            </div>
+                            <div className="ap-form-row">
                                 <div className="ap-form-group">
-                                    <label>Tên sản phẩm *</label>
-                                    <input
-                                        type="text"
-                                        name="name"
-                                        value={editingProduct.name}
-                                        onChange={(e) => handleInputChange(e, true)}
-                                        placeholder="Nhập tên sản phẩm"
-                                        required
-                                    />
-                                </div>
-
-                                <div className="ap-form-group">
-                                    <label>Danh mục *</label>
-                                    <select
-                                        name="category"
-                                        value={editingProduct.category}
-                                        onChange={(e) => handleInputChange(e, true)}
-                                    >
-                                        <option value="Thực phẩm bổ sung">Thực phẩm bổ sung</option>
-                                        <option value="Thiết bị">Thiết bị</option>
-                                        <option value="Trang phục">Trang phục</option>
-                                        <option value="Phụ kiện">Phụ kiện</option>
-                                    </select>
-                                </div>
-
-                                <div className="ap-form-group">
-                                    <label>Giá (VNĐ) *</label>
-                                    <input
-                                        type="number"
+                                    <label>Giá (VNĐ) <span className="ap-required">*</span></label>
+                                    <input 
+                                        type="number" 
                                         name="price"
                                         value={editingProduct.price}
                                         onChange={(e) => handleInputChange(e, true)}
-                                        placeholder="Nhập giá"
-                                        min="0"
-                                        required
                                     />
                                 </div>
-
                                 <div className="ap-form-group">
-                                    <label>Số lượng *</label>
-                                    <input
-                                        type="number"
+                                    <label>Số Lượng</label>
+                                    <input 
+                                        type="number" 
                                         name="stock"
                                         value={editingProduct.stock}
                                         onChange={(e) => handleInputChange(e, true)}
-                                        placeholder="Nhập số lượng"
-                                        min="0"
-                                        required
                                     />
                                 </div>
-
-                                <div className="ap-form-group">
-                                    <label>Trạng thái</label>
-                                    <select
-                                        name="status"
-                                        value={editingProduct.status}
-                                        onChange={(e) => handleInputChange(e, true)}
-                                    >
-                                        <option value="Còn hàng">Còn hàng</option>
-                                        <option value="Sắp hết">Sắp hết</option>
-                                        <option value="Hết hàng">Hết hàng</option>
-                                    </select>
-                                </div>
-
-                                <div className="ap-form-group">
-                                    <label>Hiển thị</label>
-                                    <select
-                                        name="visibility"
-                                        value={editingProduct.visibility}
-                                        onChange={(e) => handleInputChange(e, true)}
-                                    >
-                                        <option value="Hiển thị">Hiển thị</option>
-                                        <option value="Ẩn">Ẩn</option>
-                                    </select>
-                                </div>
                             </div>
-
                             <div className="ap-form-group">
-                                <label>URL hình ảnh</label>
-                                <input
-                                    type="text"
+                                <label>URL Hình Ảnh</label>
+                                <input 
+                                    type="text" 
                                     name="image_url"
-                                    value={editingProduct.image_url}
+                                    value={editingProduct.image_url || ''}
                                     onChange={(e) => handleInputChange(e, true)}
-                                    placeholder="Nhập URL hình ảnh"
                                 />
                             </div>
-
                             <div className="ap-form-group">
-                                <label>Mô tả</label>
-                                <textarea
-                                    name="description"
-                                    value={editingProduct.description}
+                                <label>Hiển Thị</label>
+                                <select 
+                                    name="visibility"
+                                    value={editingProduct.visibility}
                                     onChange={(e) => handleInputChange(e, true)}
-                                    placeholder="Nhập mô tả sản phẩm..."
-                                    rows="3"
-                                />
+                                >
+                                    <option value="Hiển thị">Hiển thị</option>
+                                    <option value="Ẩn">Ẩn</option>
+                                </select>
                             </div>
                         </div>
-
                         <div className="ap-modal-footer">
                             <button className="ap-btn-secondary" onClick={() => setShowEditModal(false)}>
                                 Hủy
@@ -607,76 +667,68 @@ export default function AdminProducts() {
                 </div>
             )}
 
-            {/* Modal Xem Chi Tiết Sản Phẩm */}
+            {/* View Product Modal */}
             {showViewModal && viewingProduct && (
                 <div className="ap-modal-overlay" onClick={() => setShowViewModal(false)}>
-                    <div className="ap-modal-content" onClick={(e) => e.stopPropagation()}>
+                    <div className="ap-modal-content ap-view-modal" onClick={(e) => e.stopPropagation()}>
                         <div className="ap-modal-header">
                             <h3>Chi Tiết Sản Phẩm</h3>
-                            <button className="ap-modal-close-btn" onClick={() => setShowViewModal(false)}>
+                            <button className="ap-modal-close" onClick={() => setShowViewModal(false)}>
                                 <FontAwesomeIcon icon={faTimes} />
                             </button>
                         </div>
-
                         <div className="ap-modal-body">
-                            <div className="ap-product-view">
-                                <div className="ap-product-image-section">
-                                    <img src={viewingProduct.image_url} alt={viewingProduct.name} className="ap-product-full-image" />
+                            <div className="ap-view-grid">
+                                <div className="ap-view-image">
+                                    <img src={viewingProduct.image_url || 'https://placehold.co/300x300'} alt={viewingProduct.name} />
                                 </div>
-
-                                <div className="ap-product-details-section">
-                                    <h4>Thông tin cơ bản</h4>
-                                    <div className="ap-detail-row">
-                                        <span className="ap-detail-label">Tên sản phẩm:</span>
-                                        <span className="ap-detail-value">{viewingProduct.name}</span>
+                                <div className="ap-view-info">
+                                    <div className="ap-view-field">
+                                        <label>Mã sản phẩm:</label>
+                                        <span>{viewingProduct.code}</span>
                                     </div>
-                                    <div className="ap-detail-row">
-                                        <span className="ap-detail-label">Danh mục:</span>
+                                    <div className="ap-view-field">
+                                        <label>Tên sản phẩm:</label>
+                                        <span>{viewingProduct.name}</span>
+                                    </div>
+                                    <div className="ap-view-field">
+                                        <label>Danh mục:</label>
                                         <span className={`ap-category-badge ${getCategoryClass(viewingProduct.category)}`}>
                                             {viewingProduct.category}
                                         </span>
                                     </div>
-                                    <div className="ap-detail-row">
-                                        <span className="ap-detail-label">Giá bán:</span>
-                                        <span className="ap-detail-price">{viewingProduct.price.toLocaleString('vi-VN')}đ</span>
+                                    <div className="ap-view-field">
+                                        <label>Giá:</label>
+                                        <span className="ap-view-price">{viewingProduct.price.toLocaleString('vi-VN')}đ</span>
                                     </div>
-                                    <div className="ap-detail-row">
-                                        <span className="ap-detail-label">Số lượng:</span>
+                                    <div className="ap-view-field">
+                                        <label>Số lượng:</label>
                                         <span className={`ap-stock-badge ${getStockClass(viewingProduct.stock)}`}>
-                                            {getStockText(viewingProduct.stock)}
+                                            {viewingProduct.stock}
                                         </span>
                                     </div>
-                                    <div className="ap-detail-row">
-                                        <span className="ap-detail-label">Trạng thái:</span>
+                                    <div className="ap-view-field">
+                                        <label>Trạng thái:</label>
                                         <span className={`ap-status-badge ${getStatusClass(viewingProduct.status)}`}>
                                             {viewingProduct.status}
                                         </span>
                                     </div>
-                                    <div className="ap-detail-row">
-                                        <span className="ap-detail-label">Hiển thị:</span>
-                                        <span className={`ap-status-badge ${getVisibilityClass(viewingProduct.visibility)}`}>
+                                    <div className="ap-view-field">
+                                        <label>Hiển thị:</label>
+                                        <span className={`ap-visibility-badge ${getVisibilityClass(viewingProduct.visibility)}`}>
                                             {viewingProduct.visibility}
                                         </span>
                                     </div>
-                                </div>
-
-                                <div className="ap-product-description-section">
-                                    <h4>Mô tả sản phẩm</h4>
-                                    <p>{viewingProduct.description}</p>
+                                    <div className="ap-view-field ap-view-description">
+                                        <label>Mô tả:</label>
+                                        <p>{viewingProduct.description || 'Không có mô tả'}</p>
+                                    </div>
                                 </div>
                             </div>
                         </div>
-
                         <div className="ap-modal-footer">
                             <button className="ap-btn-secondary" onClick={() => setShowViewModal(false)}>
                                 Đóng
-                            </button>
-                            <button className="ap-btn-primary" onClick={() => {
-                                setShowViewModal(false);
-                                handleEditClick(viewingProduct);
-                            }}>
-                                <FontAwesomeIcon icon={faPen} />
-                                Chỉnh Sửa
                             </button>
                         </div>
                     </div>

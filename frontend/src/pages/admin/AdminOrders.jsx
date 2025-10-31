@@ -53,37 +53,48 @@ export default function AdminOrders() {
 
     // Export to Excel
     const handleExportExcel = () => {
-        // Tạo dữ liệu cho Excel
-        const dataToExport = orders.map(order => ({
-            'Mã Đơn Hàng': order.order_number,
-            'Khách Hàng': order.shipping_name || 'N/A',
-            'Ngày Đặt': new Date(order.created_at).toLocaleDateString('vi-VN'),
-            'Tổng Tiền': order.total_amount,
-            'Trạng Thái': getStatusText(order.status)
-        }));
-
-        // Chuyển đổi sang CSV
-        const headers = Object.keys(dataToExport[0] || {});
-        const csvContent = [
-            headers.join(','),
-            ...dataToExport.map(row => 
-                headers.map(header => {
-                    const value = row[header];
-                    return typeof value === 'string' && value.includes(',') ? `"${value}"` : value;
-                }).join(',')
-            )
-        ].join('\n');
-
-        // Tạo Blob và download
-        const blob = new Blob(['\uFEFF' + csvContent], { type: 'text/csv;charset=utf-8;' });
-        const link = document.createElement('a');
-        const url = URL.createObjectURL(blob);
-        link.setAttribute('href', url);
-        link.setAttribute('download', `don-hang-${new Date().toISOString().split('T')[0]}.csv`);
-        link.style.visibility = 'hidden';
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
+        try {
+            const token = JSON.parse(localStorage.getItem('rf_auth_v1'))?.accessToken;
+            
+            // Tạo query params từ các filter hiện tại
+            const params = new URLSearchParams();
+            if (statusFilter) params.append('status', statusFilter);
+            if (searchTerm) params.append('search', searchTerm);
+            
+            // Tạo URL với query params
+            const url = `http://localhost:4000/api/v1/orders/admin/export-excel?${params.toString()}`;
+            
+            // Tải file bằng fetch
+            fetch(url, {
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Không thể xuất file Excel');
+                }
+                return response.blob();
+            })
+            .then(blob => {
+                const url = window.URL.createObjectURL(blob);
+                const link = document.createElement('a');
+                link.href = url;
+                link.setAttribute('download', `Don-Hang-${new Date().toISOString().split('T')[0]}.xlsx`);
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+                window.URL.revokeObjectURL(url);
+                showToast('Xuất file Excel thành công!', 'success');
+            })
+            .catch(error => {
+                console.error('Export error:', error);
+                showToast('Lỗi xuất file Excel: ' + error.message, 'error');
+            });
+        } catch (error) {
+            console.error('Export error:', error);
+            showToast('Lỗi xuất file Excel', 'error');
+        }
     };
 
     // Fetch admin orders

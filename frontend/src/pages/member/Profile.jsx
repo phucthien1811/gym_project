@@ -12,6 +12,7 @@ const Profile = () => {
     const [formData, setFormData] = useState({
         full_name: '',
         phone: '',
+        phone_number: '',
         birth_date: '',
         gender: '',
         address: '',
@@ -30,20 +31,24 @@ const Profile = () => {
         if (profile) {
             setFormData({
                 full_name: profile.name || profile.full_name || '',
-                phone: profile.phone || '',
-                birth_date: profile.birth_date || '',
+                phone: profile.phone || profile.phone_number || '',
+                phone_number: profile.phone || profile.phone_number || '',
+                birth_date: profile.birth_date ? profile.birth_date.split('T')[0] : '',
                 gender: profile.gender || '',
                 address: profile.address || '',
                 height: profile.height || '',
                 weight: profile.weight || '',
-                fitness_goal: profile.fitness_goal || ''
+                fitness_goal: profile.fitness_goals || profile.fitness_goal || ''
             });
         }
     }, [profile]);
 
     // Helper function to format avatar URL
     const getAvatarUrl = (avatarPath) => {
-        if (!avatarPath) return '/default-avatar.png';
+        if (!avatarPath) {
+            // Use a placeholder avatar URL instead of local file
+            return 'https://ui-avatars.com/api/?name=' + encodeURIComponent(profile?.name || profile?.full_name || 'User') + '&size=200&background=4f46e5&color=fff&bold=true';
+        }
         if (avatarPath.startsWith('blob:') || avatarPath.startsWith('http')) return avatarPath;
         // Use API endpoint instead of direct static file access
         const filename = avatarPath.replace('/uploads/avatars/', '');
@@ -61,6 +66,9 @@ const Profile = () => {
             console.log('🔍 Fetching profile from API...');
             const response = await memberProfileService.getProfile();
             console.log('📥 API Response:', response);
+            console.log('📥 Profile data received:', response.data);
+            console.log('📞 Phone from response:', response.data?.phone);
+            console.log('📞 Phone_number from response:', response.data?.phone_number);
             
             if (response.success) {
                 setProfile(response.data);
@@ -107,14 +115,26 @@ const Profile = () => {
             setLoading(true);
             
             const profileData = new FormData();
+            
+            // Add all form fields to FormData
             Object.keys(formData).forEach(key => {
-                if (formData[key]) {
-                    profileData.append(key, formData[key]);
+                if (formData[key] && formData[key] !== '') {
+                    // Map phone to phone_number for API
+                    if (key === 'phone') {
+                        profileData.append('phone_number', formData[key]);
+                    } else {
+                        profileData.append(key, formData[key]);
+                    }
                 }
             });
             
             if (avatarFile) {
                 profileData.append('avatar', avatarFile);
+            }
+
+            console.log('📤 Sending profile update...');
+            for (let pair of profileData.entries()) {
+                console.log(pair[0] + ': ' + pair[1]);
             }
 
             const response = await memberProfileService.updateProfile(profileData);
@@ -124,11 +144,11 @@ const Profile = () => {
                 setIsEditing(false);
                 setAvatarFile(null);
                 setAvatarPreview(null);
-                alert('Cập nhật hồ sơ thành công!');
+                alert('✅ Cập nhật hồ sơ thành công!');
             }
         } catch (error) {
             console.error('❌ Error updating profile:', error);
-            alert('Có lỗi xảy ra khi cập nhật hồ sơ: ' + (error.response?.data?.message || error.message));
+            alert('❌ Có lỗi xảy ra khi cập nhật hồ sơ: ' + (error.response?.data?.message || error.message));
         } finally {
             setLoading(false);
         }
@@ -141,13 +161,14 @@ const Profile = () => {
         if (profile) {
             setFormData({
                 full_name: profile.name || profile.full_name || '',
-                phone: profile.phone || '',
-                birth_date: profile.birth_date || '',
+                phone: profile.phone || profile.phone_number || '',
+                phone_number: profile.phone || profile.phone_number || '',
+                birth_date: profile.birth_date ? profile.birth_date.split('T')[0] : '',
                 gender: profile.gender || '',
                 address: profile.address || '',
                 height: profile.height || '',
                 weight: profile.weight || '',
-                fitness_goal: profile.fitness_goal || ''
+                fitness_goal: profile.fitness_goals || profile.fitness_goal || ''
             });
         }
     };
@@ -255,6 +276,23 @@ const Profile = () => {
                             <div className="mp-info-row">
                                 <span className="mp-info-label">Email</span>
                                 <span className="mp-info-value">{user?.email}</span>
+                            </div>
+                            <div className="mp-info-row">
+                                <span className="mp-info-label">Số điện thoại</span>
+                                {isEditing ? (
+                                    <input
+                                        type="tel"
+                                        name="phone"
+                                        value={formData.phone}
+                                        onChange={handleInputChange}
+                                        className="mp-input"
+                                        placeholder="Nhập số điện thoại"
+                                    />
+                                ) : (
+                                    <span className="mp-info-value">
+                                        {profile?.phone || profile?.phone_number || 'Chưa cập nhật'}
+                                    </span>
+                                )}
                             </div>
                             <div className="mp-info-row">
                                 <span className="mp-info-label">Ngày sinh</span>

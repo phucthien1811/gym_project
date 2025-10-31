@@ -103,8 +103,14 @@
 }
 
 .ao-order-id {
-    font-weight: 500;
-    color: var(--admin-brand-color);
+    display: inline-block;
+    padding: 4px 12px;
+    background-color: #e9ecef;
+    color: #495057;
+    border-radius: 6px;
+    font-weight: 600;
+    font-size: 13px;
+    font-family: 'Courier New', monospace;
 }
 
 .ao-total-amount {
@@ -113,95 +119,114 @@
 
 /* Kế thừa .status-pill từ Members.css nếu có */
 .ao-status-pill {
-    padding: 4px 10px;
-    border-radius: 20px;
+    padding: 6px 12px;
+    border-radius: 16px;
     font-size: 12px;
     font-weight: 600;
     text-transform: uppercase;
+    display: inline-block;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 .ao-status-processing {
-    background-color: rgba(59, 130, 246, 0.2);
-    color: #60a5fa;
+    background: linear-gradient(135deg, rgba(59, 130, 246, 0.2) 0%, rgba(37, 99, 235, 0.3) 100%);
+    color: #1d4ed8;
+    border: 1px solid rgba(59, 130, 246, 0.4);
 }
 
 .ao-status-shipped {
-    background-color: rgba(245, 158, 11, 0.2);
-    color: #fbbf24;
+    background: linear-gradient(135deg, rgba(245, 158, 11, 0.2) 0%, rgba(217, 119, 6, 0.3) 100%);
+    color: #b45309;
+    border: 1px solid rgba(245, 158, 11, 0.4);
 }
 
 .ao-status-delivered {
-    background-color: rgba(16, 185, 129, 0.2);
-    color: #34d399;
+    background: linear-gradient(135deg, rgba(16, 185, 129, 0.2) 0%, rgba(5, 150, 105, 0.3) 100%);
+    color: #047857;
+    border: 1px solid rgba(16, 185, 129, 0.4);
 }
 
 .ao-status-cancelled {
-    background-color: rgba(107, 114, 128, 0.2);
-    color: #9ca3af;
+    background: linear-gradient(135deg, rgba(107, 114, 128, 0.2) 0%, rgba(75, 85, 99, 0.3) 100%);
+    color: #374151;
+    border: 1px solid rgba(107, 114, 128, 0.4);
 }
 
 /* Action Buttons */
 .ao-action-buttons {
     display: flex;
-    gap: 8px;
+    gap: 6px;
     justify-content: center;
 }
 
 .ao-action-btn {
-    padding: 6px 8px;
+    padding: 8px 10px;
     border: none;
-    border-radius: 4px;
+    border-radius: 6px;
     cursor: pointer;
-    font-size: 12px;
-    transition: all 0.2s;
-    display: flex;
+    font-size: 14px;
+    transition: all 0.2s ease;
+    display: inline-flex;
     align-items: center;
     justify-content: center;
+    min-width: 36px;
+    min-height: 36px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.ao-action-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+}
+
+.ao-action-btn:active {
+    transform: translateY(0);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 .ao-view-btn {
-    background: #3b82f6;
+    background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
     color: white;
 }
 
 .ao-view-btn:hover {
-    background: #2563eb;
+    background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
 }
 
 .ao-confirm-btn {
-    background: #10b981;
+    background: linear-gradient(135deg, #10b981 0%, #059669 100%);
     color: white;
 }
 
 .ao-confirm-btn:hover {
-    background: #059669;
+    background: linear-gradient(135deg, #059669 0%, #047857 100%);
 }
 
 .ao-processing-btn {
-    background: #f59e0b;
+    background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
     color: white;
 }
 
 .ao-processing-btn:hover {
-    background: #d97706;
+    background: linear-gradient(135deg, #d97706 0%, #b45309 100%);
 }
 
 .ao-ship-btn {
-    background: #6366f1;
+    background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%);
     color: white;
 }
 
 .ao-ship-btn:hover {
-    background: #4f46e5;
+    background: linear-gradient(135deg, #4f46e5 0%, #4338ca 100%);
 }
 
 .ao-cancel-btn {
-    background: #ef4444;
+    background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
     color: white;
 }
 
 .ao-cancel-btn:hover {
-    background: #dc2626;
+    background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%);
 }
 
 .ao-loading {
@@ -350,30 +375,30 @@
 
 /* Excel Export Button */
 .ao-btn-excel {
-    background: #28a745;
+    background: linear-gradient(135deg, #28a745 0%, #218838 100%);
     color: white;
     border: none;
     border-radius: 8px;
     padding: 10px 16px;
     font-size: 14px;
-    font-weight: 500;
+    font-weight: 600;
     cursor: pointer;
     display: flex;
     align-items: center;
     gap: 8px;
-    transition: all 0.3s ease;
-    box-shadow: 0 2px 4px rgba(40, 167, 69, 0.2);
+    transition: all 0.2s ease;
+    box-shadow: 0 2px 4px rgba(40, 167, 69, 0.3);
 }
 
 .ao-btn-excel:hover {
-    background: #218838;
+    background: linear-gradient(135deg, #218838 0%, #1e7e34 100%);
     transform: translateY(-2px);
-    box-shadow: 0 4px 8px rgba(40, 167, 69, 0.3);
+    box-shadow: 0 4px 8px rgba(40, 167, 69, 0.4);
 }
 
 .ao-btn-excel:active {
     transform: translateY(0);
-    box-shadow: 0 2px 4px rgba(40, 167, 69, 0.2);
+    box-shadow: 0 2px 4px rgba(40, 167, 69, 0.3);
 }
 
 .ao-btn-excel svg {

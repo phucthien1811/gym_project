@@ -1,20 +1,59 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faShoppingCart, faEye } from '@fortawesome/free-solid-svg-icons';
 import Header from '../../components/common/Header';
 import { useCart } from '../../context/CartContext';
 import { useToast } from '../../context/ToastContext';
-import { gymProducts, categories } from '../../data/gymProducts';
 import './css/ShopPage.css';
+
+const API_URL = 'http://localhost:3000/api/v1';
 
 const ShopPage = () => {
   const [selectedCategory, setSelectedCategory] = useState('all');
   const [searchQuery, setSearchQuery] = useState('');
   const [priceRange, setPriceRange] = useState([0, 5000000]);
+  const [products, setProducts] = useState([]);
+  const [categories, setCategories] = useState(['all']);
+  const [loading, setLoading] = useState(false);
   
   const { addItem } = useCart();
   const { showSuccess } = useToast();
+
+  // Fetch products from API
+  useEffect(() => {
+    fetchProducts();
+    fetchCategories();
+  }, []);
+
+  const fetchProducts = async () => {
+    try {
+      setLoading(true);
+      const response = await fetch(`${API_URL}/products?visibility=Hiển thị&limit=100`);
+      const data = await response.json();
+      
+      if (data.success) {
+        setProducts(data.data);
+      }
+    } catch (error) {
+      console.error('Error fetching products:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const fetchCategories = async () => {
+    try {
+      const response = await fetch(`${API_URL}/products/categories`);
+      const data = await response.json();
+      
+      if (data.success) {
+        setCategories(['all', ...data.data]);
+      }
+    } catch (error) {
+      console.error('Error fetching categories:', error);
+    }
+  };
 
   const handleAddToCart = (product) => {
     addItem(product, 1);
@@ -23,7 +62,7 @@ const ShopPage = () => {
 
   // Filter and sort products
   const filteredProducts = useMemo(() => {
-    let filtered = gymProducts.filter(product => {
+    let filtered = products.filter(product => {
       // Category filter
       if (selectedCategory !== 'all' && product.category !== selectedCategory) {
         return false;
@@ -31,7 +70,7 @@ const ShopPage = () => {
       
       // Search filter
       if (searchQuery && !product.name.toLowerCase().includes(searchQuery.toLowerCase()) && 
-          !product.description.toLowerCase().includes(searchQuery.toLowerCase())) {
+          !product.description?.toLowerCase().includes(searchQuery.toLowerCase())) {
         return false;
       }
       
@@ -39,12 +78,17 @@ const ShopPage = () => {
       if (product.price < priceRange[0] || product.price > priceRange[1]) {
         return false;
       }
+
+      // Only show products with stock > 0
+      if (product.stock <= 0) {
+        return false;
+      }
       
       return true;
     });
 
     return filtered;
-  }, [selectedCategory, searchQuery, priceRange]);
+  }, [products, selectedCategory, searchQuery, priceRange]);
 
   const formatPrice = (price) => {
     return new Intl.NumberFormat('vi-VN', {
@@ -83,13 +127,13 @@ const ShopPage = () => {
             <div className="filter-section">
               <h3>DANH MỤC</h3>
               <div className="category-list">
-                {categories.map(category => (
+                {categories.map((category, index) => (
                   <button
-                    key={category.id}
-                    className={`category-btn ${selectedCategory === category.id ? 'active' : ''}`}
-                    onClick={() => setSelectedCategory(category.id)}
+                    key={index}
+                    className={`category-btn ${selectedCategory === category ? 'active' : ''}`}
+                    onClick={() => setSelectedCategory(category)}
                   >
-                    {category.name.toUpperCase()}
+                    {category === 'all' ? 'TẤT CẢ' : category.toUpperCase()}
                   </button>
                 ))}
               </div>
@@ -100,48 +144,54 @@ const ShopPage = () => {
 
           {/* Main Content */}
           <main className="shop-content">
-            {/* Products Grid */}
-            <div className="products-grid">
-              {filteredProducts.map(product => (
-                <div key={product.id} className="product-card">
-                  <div className="product-image">
-                    <img src={product.image} alt={product.name} />
-                  </div>
-                  
-                  <div className="product-info">
-                    <h4 className="product-name">{product.name}</h4>
+            {loading ? (
+              <div className="loading-message">Đang tải sản phẩm...</div>
+            ) : (
+              <>
+                {/* Products Grid */}
+                <div className="products-grid">
+                  {filteredProducts.map(product => (
+                    <div key={product.id} className="product-card">
+                      <div className="product-image">
+                        <img src={product.image_url || 'https://placehold.co/300x300'} alt={product.name} />
+                      </div>
+                      
+                      <div className="product-info">
+                        <h4 className="product-name">{product.name}</h4>
 
-                    <div className="product-price">
-                      <span className="current-price">{formatPrice(product.price)}</span>
-                    </div>
+                        <div className="product-price">
+                          <span className="current-price">{formatPrice(product.price)}</span>
+                        </div>
 
-                    <div className="product-actions">
-                      <button 
-                        className={`add-to-cart-btn ${!product.inStock ? 'disabled' : ''}`}
-                        disabled={!product.inStock}
-                        onClick={() => handleAddToCart(product)}
-                        title={product.inStock ? 'Thêm vào giỏ hàng' : 'Hết hàng'}
-                      >
-                        <FontAwesomeIcon icon={faShoppingCart} />
-                      </button>
-                      <Link 
-                        to={`/shop/product/${product.id}`} 
-                        className="view-details-btn"
-                        title="Xem chi tiết"
-                      >
-                        <FontAwesomeIcon icon={faEye} />
-                      </Link>
+                        <div className="product-actions">
+                          <button 
+                            className={`add-to-cart-btn ${product.stock <= 0 ? 'disabled' : ''}`}
+                            disabled={product.stock <= 0}
+                            onClick={() => handleAddToCart(product)}
+                            title={product.stock > 0 ? 'Thêm vào giỏ hàng' : 'Hết hàng'}
+                          >
+                            <FontAwesomeIcon icon={faShoppingCart} />
+                          </button>
+                          <Link 
+                            to={`/shop/product/${product.id}`} 
+                            className="view-details-btn"
+                            title="Xem chi tiết"
+                          >
+                            <FontAwesomeIcon icon={faEye} />
+                          </Link>
+                        </div>
+                      </div>
                     </div>
-                  </div>
+                  ))}
                 </div>
-              ))}
-            </div>
 
-            {filteredProducts.length === 0 && (
-              <div className="no-products">
-                <h3>😞 Không tìm thấy sản phẩm nào</h3>
-                <p>Thử thay đổi bộ lọc hoặc từ khóa tìm kiếm</p>
-              </div>
+                {filteredProducts.length === 0 && (
+                  <div className="no-products">
+                    <h3>😞 Không tìm thấy sản phẩm nào</h3>
+                    <p>Thử thay đổi bộ lọc hoặc từ khóa tìm kiếm</p>
+                  </div>
+                )}
+              </>
             )}
           </main>
         </div>

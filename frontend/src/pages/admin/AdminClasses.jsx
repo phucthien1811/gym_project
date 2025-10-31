@@ -10,8 +10,6 @@ import {
   faSearch,
   faFilter,
   faEye,
-  faDumbbell,
-  faMapMarkerAlt,
   faFileExcel
 } from '@fortawesome/free-solid-svg-icons';
 import './css/AdminClasses.css';
@@ -275,6 +273,37 @@ const AdminClasses = () => {
     }
   };
 
+  const handleExportEnrolledUsers = async () => {
+    if (!selectedClass) return;
+
+    try {
+      const token = localStorage.getItem('token');
+      const response = await fetch(`/api/v1/schedules/${selectedClass.id}/enrollments/export`, {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to export enrolled users');
+      }
+
+      const blob = await response.blob();
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `enrolled_users_${selectedClass.class_name}_${new Date().toISOString().split('T')[0]}.xlsx`;
+      document.body.appendChild(a);
+      a.click();
+      window.URL.revokeObjectURL(url);
+      document.body.removeChild(a);
+      showSuccess('Xuất danh sách học viên thành công!');
+    } catch (err) {
+      showError('Không thể xuất danh sách học viên');
+      console.error(err);
+    }
+  };
+
   if (loading && classes.length === 0) {
     return (
       <div className="ad-class-admin-page-container">
@@ -389,110 +418,148 @@ const AdminClasses = () => {
 
       {error && <div className="error-message">{error}</div>}
 
-      {/* Classes Grid */}
-      <div className="ad-class-classes-grid">
-        {classes.map(classItem => (
-          <div key={classItem.id} className="ad-class-class-card">
-            <div className="ad-class-class-card-header">
-              <h4 className="ad-class-class-name">{classItem.class_name}</h4>
-              <div className="ad-class-class-badges">
-                <span className={`ad-class-badge ${getStatusBadgeClass(classItem.status)}`}>
-                  {classItem.status === 'scheduled' && 'Đã lên lịch'}
-                  {classItem.status === 'ongoing' && 'Đang diễn ra'}
-                  {classItem.status === 'completed' && 'Hoàn thành'}
-                  {classItem.status === 'cancelled' && 'Đã hủy'}
-                </span>
-                <span className={`ad-class-badge ${getDifficultyBadgeClass(classItem.difficulty_level)}`}>
-                  {classItem.difficulty_level === 'beginner' && 'Cơ bản'}
-                  {classItem.difficulty_level === 'intermediate' && 'Trung cấp'}
-                  {classItem.difficulty_level === 'advanced' && 'Nâng cao'}
-                </span>
-              </div>
-            </div>
-
-            <div className="ad-class-class-info">
-              {classItem.trainer_name && (
-                <p className="ad-class-class-trainer">
-                  <FontAwesomeIcon icon={faUsers} />
-                  HLV: {classItem.trainer_name}
-                </p>
-              )}
-              
-              <p className="ad-class-class-time">
-                <FontAwesomeIcon icon={faClock} />
-                {formatTime(classItem.start_time)} - {formatTime(classItem.end_time)}
-              </p>
-              
-              <p className="ad-class-class-date">
-                <FontAwesomeIcon icon={faCalendar} />
-                {formatDate(classItem.class_date)}
-              </p>
-              
-              {classItem.location && (
-                <p className="ad-class-class-location">
-                  <FontAwesomeIcon icon={faMapMarkerAlt} />
-                  {classItem.location}
-                </p>
-              )}
-              
-              <div className="ad-class-class-participants">
-                <FontAwesomeIcon icon={faUsers} />
-                <span className="ad-class-participants-count">
-                  {classItem.current_participants || 0}/{classItem.max_participants || 0}
-                </span>
-                <div className="ad-class-participants-bar">
-                  <div 
-                    className="ad-class-participants-fill"
-                    style={{
-                      width: `${((classItem.current_participants || 0) / (classItem.max_participants || 1)) * 100}%`
-                    }}
-                  ></div>
-                </div>
-              </div>
-              
-              {classItem.price > 0 && (
-                <p className="ad-class-class-price">
-                  <FontAwesomeIcon icon={faDumbbell} />
-                  {classItem.price.toLocaleString('vi-VN')} VNĐ
-                </p>
-              )}
-            </div>
-
-            <div className="ad-class-class-actions">
-              <button 
-                className="ad-class-action-btn ad-class-view-btn"
-                onClick={() => handleViewDetails(classItem)}
-                title="Xem chi tiết"
-              >
-                <FontAwesomeIcon icon={faEye} />
-              </button>
-              
-              <button 
-                className="ad-class-action-btn ad-class-edit-btn"
-                onClick={() => handleEditClass(classItem)}
-                title="Chỉnh sửa"
-              >
-                <FontAwesomeIcon icon={faPen} />
-              </button>
-              
-              <button 
-                className="ad-class-action-btn ad-class-enroll-btn"
-                onClick={() => handleManageEnrollment(classItem)}
-                title="Quản lý học viên"
-              >
-                <FontAwesomeIcon icon={faUsers} />
-              </button>
-              
-              <button 
-                className="ad-class-action-btn ad-class-delete-btn"
-                onClick={() => handleDeleteClass(classItem.id)}
-                title="Xóa"
-              >
-                <FontAwesomeIcon icon={faTrash} />
-              </button>
-            </div>
-          </div>
-        ))}
+      {/* Classes Table */}
+      <div className="ad-class-admin-table-container">
+        <table className="ad-class-admin-table">
+          <thead>
+            <tr>
+              <th>Tên Lớp Học</th>
+              <th>Huấn Luyện Viên</th>
+              <th>Thời Gian</th>
+              <th>Ngày Học</th>
+              <th>Vị Trí</th>
+              <th>Học Viên</th>
+              <th>Trạng Thái</th>
+              <th>Độ Khó</th>
+              <th>Hành Động</th>
+            </tr>
+          </thead>
+          <tbody>
+            {classes.length === 0 ? (
+              <tr>
+                <td colSpan="9" style={{ textAlign: 'center', padding: '2rem' }}>
+                  Không có dữ liệu
+                </td>
+              </tr>
+            ) : (
+              classes.map(classItem => (
+                <tr key={classItem.id}>
+                  <td>
+                    <div className="ad-class-class-name-cell">
+                      <strong>{classItem.class_name}</strong>
+                      {classItem.description && (
+                        <small style={{ display: 'block', color: '#6b7280', marginTop: '4px' }}>
+                          {classItem.description.length > 50 
+                            ? `${classItem.description.substring(0, 50)}...` 
+                            : classItem.description}
+                        </small>
+                      )}
+                    </div>
+                  </td>
+                  <td>
+                    {classItem.trainer_name ? (
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                        <FontAwesomeIcon icon={faUsers} style={{ color: '#6b7280' }} />
+                        {classItem.trainer_name}
+                      </div>
+                    ) : (
+                      <span style={{ color: '#9ca3af' }}>Chưa có HLV</span>
+                    )}
+                  </td>
+                  <td>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                      <FontAwesomeIcon icon={faClock} style={{ color: '#6b7280' }} />
+                      <span>{formatTime(classItem.start_time)} - {formatTime(classItem.end_time)}</span>
+                    </div>
+                  </td>
+                  <td>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                      <FontAwesomeIcon icon={faCalendar} style={{ color: '#6b7280' }} />
+                      {formatDate(classItem.class_date)}
+                    </div>
+                  </td>
+                  <td>
+                    {classItem.floor && classItem.room ? (
+                      <div>
+                        <div style={{ fontWeight: '500' }}>Tầng {classItem.floor} - {classItem.room}</div>
+                        {classItem.location && (
+                          <small style={{ color: '#6b7280' }}>{classItem.location}</small>
+                        )}
+                      </div>
+                    ) : (
+                      <span style={{ color: '#9ca3af' }}>Chưa có</span>
+                    )}
+                  </td>
+                  <td>
+                    <div className="ad-class-participants-cell">
+                      <span className="ad-class-participants-count">
+                        {classItem.current_participants || 0}/{classItem.max_participants || 0}
+                      </span>
+                      <div className="ad-class-participants-bar-small">
+                        <div 
+                          className="ad-class-participants-fill"
+                          style={{
+                            width: `${((classItem.current_participants || 0) / (classItem.max_participants || 1)) * 100}%`
+                          }}
+                        ></div>
+                      </div>
+                    </div>
+                  </td>
+                  <td>
+                    <span className={`ad-class-badge ${getStatusBadgeClass(classItem.status)}`}>
+                      {classItem.status === 'scheduled' && 'Đã lên lịch'}
+                      {classItem.status === 'ongoing' && 'Đang diễn ra'}
+                      {classItem.status === 'completed' && 'Hoàn thành'}
+                      {classItem.status === 'cancelled' && 'Đã hủy'}
+                    </span>
+                  </td>
+                  <td>
+                    <span className={`ad-class-badge ${getDifficultyBadgeClass(classItem.difficulty_level)}`}>
+                      {classItem.difficulty_level === 'beginner' && 'Cơ bản'}
+                      {classItem.difficulty_level === 'intermediate' && 'Trung cấp'}
+                      {classItem.difficulty_level === 'advanced' && 'Nâng cao'}
+                    </span>
+                  </td>
+                  <td>
+                    <div className="ad-class-action-buttons">
+                      <button 
+                        className="ad-class-action-btn ad-class-view-btn"
+                        onClick={() => handleViewDetails(classItem)}
+                        title="Xem chi tiết"
+                      >
+                        <FontAwesomeIcon icon={faEye} />
+                      </button>
+                      
+                      <button 
+                        className="ad-class-action-btn ad-class-edit-btn"
+                        onClick={() => handleEditClass(classItem)}
+                        title="Chỉnh sửa"
+                      >
+                        <FontAwesomeIcon icon={faPen} />
+                      </button>
+                      
+                      <button 
+                        className="ad-class-action-btn ad-class-enroll-btn"
+                        onClick={() => handleManageEnrollment(classItem)}
+                        title="Quản lý học viên"
+                      >
+                        <FontAwesomeIcon icon={faUsers} />
+                      </button>
+                      
+                      <button 
+                        className="ad-class-action-btn ad-class-delete-btn"
+                        onClick={() => handleDeleteClass(classItem.id)}
+                        title="Xóa"
+                      >
+                        <FontAwesomeIcon icon={faTrash} />
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              ))
+            )}
+          </tbody>
+        </table>
       </div>
 
       {/* Pagination */}
@@ -560,24 +627,30 @@ const AdminClasses = () => {
                 <div className="loading-spinner">Đang tải danh sách học viên...</div>
               ) : (
                 <div className="ad-class-enrollments-container">
-                  <div className="ad-class-enrollment-summary">
-                    <h4>Tổng quan</h4>
-                    <div className="ad-class-summary-stats">
-                      <div className="ad-class-stat-item">
-                        <span className="ad-class-stat-label">Đã đăng ký:</span>
-                        <span className="ad-class-stat-value">{enrolledUsers.length}</span>
-                      </div>
-                      <div className="ad-class-stat-item">
-                        <span className="ad-class-stat-label">Sức chứa tối đa:</span>
-                        <span className="ad-class-stat-value">{selectedClass?.max_participants || 0}</span>
-                      </div>
-                      <div className="ad-class-stat-item">
-                        <span className="ad-class-stat-label">Còn lại:</span>
-                        <span className="ad-class-stat-value">
-                          {(selectedClass?.max_participants || 0) - enrolledUsers.length}
-                        </span>
-                      </div>
+                  {/* Stats Summary - Compact Version */}
+                  <div className="ad-class-enrollment-summary-compact">
+                    <div className="ad-class-stat-card">
+                      <span className="ad-class-stat-label">Tổng:</span>
+                      <strong className="ad-class-stat-value">{selectedClass?.max_participants || 0}</strong>
                     </div>
+                    <div className="ad-class-stat-card ad-class-stat-active">
+                      <span className="ad-class-stat-label">Đã đăng ký:</span>
+                      <strong className="ad-class-stat-value">{enrolledUsers.length}</strong>
+                    </div>
+                    <div className="ad-class-stat-card ad-class-stat-remaining">
+                      <span className="ad-class-stat-label">Còn lại:</span>
+                      <strong className="ad-class-stat-value">
+                        {(selectedClass?.max_participants || 0) - enrolledUsers.length}
+                      </strong>
+                    </div>
+                    <button 
+                      className="ad-class-btn-export-users"
+                      onClick={handleExportEnrolledUsers}
+                      title="Xuất danh sách học viên"
+                    >
+                      <FontAwesomeIcon icon={faFileExcel} />
+                      Xuất Excel
+                    </button>
                   </div>
 
                   <div className="ad-class-enrolled-users-list">

@@ -20,16 +20,77 @@ const CheckoutPage = () => {
   const [voucherError, setVoucherError] = useState('');
   const [voucherLoading, setVoucherLoading] = useState(false);
   const [discount, setDiscount] = useState(0);
+  const [profileLoading, setProfileLoading] = useState(true);
 
   const [formData, setFormData] = useState({
-    shipping_name: user?.full_name || '',
-    shipping_phone: user?.phone || '',
+    shipping_name: '',
+    shipping_phone: '',
     shipping_address: '',
     payment_method: 'COD',
     notes: ''
   });
 
   const [errors, setErrors] = useState({});
+
+  // Fetch user profile data when component mounts
+  useEffect(() => {
+    const fetchUserProfile = async () => {
+      if (!user) return;
+      
+      try {
+        setProfileLoading(true);
+        const token = localStorage.getItem('token');
+        
+        // Fetch member profile
+        const profileResponse = await fetch('http://localhost:4000/api/v1/member-profiles/my-profile', {
+          headers: {
+            'Authorization': `Bearer ${token}`
+          }
+        });
+        
+        if (profileResponse.ok) {
+          const profileData = await profileResponse.json();
+          console.log('📋 Profile data loaded:', profileData);
+          
+          const profile = profileData.data;
+          
+          // Auto-fill form with profile data
+          // Backend returns: name (from users), phone (from member_profiles), address (from member_profiles)
+          setFormData(prev => ({
+            ...prev,
+            shipping_name: profile.name || user?.full_name || user?.name || '',
+            shipping_phone: profile.phone || user?.phone || '',
+            shipping_address: profile.address || ''
+          }));
+          
+          console.log('✅ Form auto-filled:', {
+            name: profile.name,
+            phone: profile.phone,
+            address: profile.address
+          });
+        } else {
+          // Fallback to user data if no profile exists
+          setFormData(prev => ({
+            ...prev,
+            shipping_name: user?.full_name || user?.name || '',
+            shipping_phone: user?.phone || ''
+          }));
+        }
+      } catch (error) {
+        console.error('Error fetching profile:', error);
+        // Fallback to user data on error
+        setFormData(prev => ({
+          ...prev,
+          shipping_name: user?.full_name || '',
+          shipping_phone: user?.phone || ''
+        }));
+      } finally {
+        setProfileLoading(false);
+      }
+    };
+
+    fetchUserProfile();
+  }, [user]);
 
   useEffect(() => {
     // Debug authentication state
@@ -260,6 +321,14 @@ const CheckoutPage = () => {
     return (
       <div className="checkout-page">
         <div className="loading">Đang chuyển hướng...</div>
+      </div>
+    );
+  }
+
+  if (profileLoading) {
+    return (
+      <div className="checkout-page">
+        <div className="loading">Đang tải thông tin...</div>
       </div>
     );
   }

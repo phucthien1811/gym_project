@@ -1154,3 +1154,250 @@
     color: #495057;
   }
 }
+
+/* Table Styles */
+.ad-class-admin-table-container {
+  background: white;
+  border-radius: 1rem;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  border: 1px solid #e9ecef;
+  overflow: hidden;
+  margin-bottom: 2rem;
+}
+
+.ad-class-admin-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.ad-class-admin-table thead {
+  background: linear-gradient(135deg, #22c55e, #16a34a);
+  color: white;
+}
+
+.ad-class-admin-table thead th {
+  padding: 1rem;
+  text-align: left;
+  font-weight: 600;
+  font-size: 0.95rem;
+  letter-spacing: 0.5px;
+  white-space: nowrap;
+}
+
+.ad-class-admin-table tbody tr {
+  border-bottom: 1px solid #e9ecef;
+  transition: background-color 0.2s ease;
+}
+
+.ad-class-admin-table tbody tr:hover {
+  background-color: #f8f9fa;
+}
+
+.ad-class-admin-table tbody td {
+  padding: 1rem;
+  vertical-align: middle;
+  font-size: 0.9rem;
+  color: #495057;
+}
+
+.ad-class-class-name-cell strong {
+  color: #2c3e50;
+  font-size: 1rem;
+  font-weight: 600;
+}
+
+.ad-class-participants-cell {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  min-width: 80px;
+}
+
+.ad-class-participants-count {
+  font-weight: 600;
+  color: #495057;
+  font-size: 0.9rem;
+}
+
+.ad-class-participants-bar-small {
+  width: 100%;
+  height: 6px;
+  background: #e9ecef;
+  border-radius: 3px;
+  overflow: hidden;
+}
+
+.ad-class-participants-bar-small .ad-class-participants-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+  transition: width 0.3s ease;
+}
+
+.ad-class-action-buttons {
+  display: flex;
+  gap: 0.5rem;
+  justify-content: center;
+}
+
+.ad-class-action-btn {
+  width: 36px;
+  height: 36px;
+  border: none;
+  border-radius: 0.5rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.9rem;
+  transition: all 0.3s ease;
+  color: white;
+}
+
+.ad-class-view-btn {
+  background: #6c757d;
+}
+
+.ad-class-view-btn:hover {
+  background: #5a6268;
+  transform: translateY(-2px);
+}
+
+.ad-class-edit-btn {
+  background: #ffc107;
+}
+
+.ad-class-edit-btn:hover {
+  background: #e0a800;
+  transform: translateY(-2px);
+}
+
+.ad-class-enroll-btn {
+  background: #17a2b8;
+}
+
+.ad-class-enroll-btn:hover {
+  background: #138496;
+  transform: translateY(-2px);
+}
+
+.ad-class-delete-btn {
+  background: #dc3545;
+}
+
+.ad-class-delete-btn:hover {
+  background: #c82333;
+  transform: translateY(-2px);
+}
+
+/* Responsive Table */
+@media (max-width: 1200px) {
+  .ad-class-admin-table {
+    font-size: 0.85rem;
+  }
+  
+  .ad-class-admin-table thead th,
+  .ad-class-admin-table tbody td {
+    padding: 0.75rem 0.5rem;
+  }
+}
+
+@media (max-width: 992px) {
+  .ad-class-admin-table-container {
+    overflow-x: auto;
+  }
+  
+  .ad-class-admin-table {
+    min-width: 1000px;
+  }
+}
+
+/* Enrollment Summary - Compact Version */
+.ad-class-enrollment-summary-compact {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1rem;
+  background: white;
+  border-radius: 8px;
+  border: 1px solid #e9ecef;
+  margin-bottom: 1.5rem;
+  flex-wrap: wrap;
+}
+
+.ad-class-stat-card {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1rem;
+  background: #f8f9fa;
+  border-radius: 6px;
+  border: 1px solid #e9ecef;
+  font-size: 0.9rem;
+}
+
+.ad-class-stat-card .ad-class-stat-label {
+  color: #6b7280;
+  font-weight: 400;
+}
+
+.ad-class-stat-card .ad-class-stat-value {
+  color: #2c3e50;
+  font-weight: 700;
+  font-size: 1.1rem;
+}
+
+.ad-class-stat-card.ad-class-stat-active {
+  background: #d1fae5;
+  border-color: #22c55e;
+}
+
+.ad-class-stat-card.ad-class-stat-active .ad-class-stat-value {
+  color: #16a34a;
+}
+
+.ad-class-stat-card.ad-class-stat-remaining {
+  background: #fef3c7;
+  border-color: #f59e0b;
+}
+
+.ad-class-stat-card.ad-class-stat-remaining .ad-class-stat-value {
+  color: #d97706;
+}
+
+.ad-class-btn-export-users {
+  margin-left: auto;
+  padding: 0.75rem 1.5rem;
+  background: linear-gradient(135deg, #22c55e, #16a34a);
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 4px rgba(34, 197, 94, 0.2);
+}
+
+.ad-class-btn-export-users:hover {
+  background: linear-gradient(135deg, #16a34a, #15803d);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(34, 197, 94, 0.3);
+}
+
+.ad-class-btn-export-users svg {
+  font-size: 1rem;
+}
+
+@media (max-width: 768px) {
+  .ad-class-enrollment-summary-compact {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  
+  .ad-class-btn-export-users {
+    margin-left: 0;
+    justify-content: center;
+  }
+}

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Bar, Line, Doughnut } from 'react-chartjs-2';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { 
@@ -6,13 +6,9 @@ import {
     faDollarSign, 
     faUserPlus, 
     faCalendarCheck,
-    faDumbbell,
     faBoxOpen,
-    faChartLine,
     faClock,
-    faShoppingCart,
     faExclamationTriangle,
-    faTrophy,
     faFire
 } from '@fortawesome/free-solid-svg-icons';
 import './css/Dashboard.css'; 
@@ -42,24 +38,158 @@ ChartJS.register(
     Legend
 );
 
+const API_URL = 'http://localhost:4000/api/v1';
+
 const AdminDashboard = () => {
-    // Dữ liệu thống kê tổng quan
-    const stats = {
-        totalMembers: 1250,
-        revenue: 150_000_000,
-        newMembers: 45,
-        activeClasses: 32,
-        totalProducts: 156,
-        pendingOrders: 12,
-        revenueGrowth: 12.5,
-        memberGrowth: 8.3
+    // State để lưu dữ liệu từ API
+    const [stats, setStats] = useState({
+        totalMembers: 0,
+        revenue: 0,
+        newMembers: 0,
+        activeClasses: 0,
+        totalProducts: 0,
+        pendingOrders: 0,
+        lowStockProducts: 0
+    });
+    const [recentMembers, setRecentMembers] = useState([]);
+    const [upcomingClasses, setUpcomingClasses] = useState([]);
+    const [alerts, setAlerts] = useState([]);
+    const [monthlyRevenue, setMonthlyRevenue] = useState(Array(12).fill(0));
+    const [newMembersChartData, setNewMembersChartData] = useState([]);
+    const [packageChartData, setPackageChartData] = useState([]);
+    const [loading, setLoading] = useState(true);
+    const [currentTime, setCurrentTime] = useState(new Date());
+
+    // Cập nhật đồng hồ mỗi giây
+    useEffect(() => {
+        const timer = setInterval(() => {
+            setCurrentTime(new Date());
+        }, 1000);
+
+        return () => clearInterval(timer);
+    }, []);
+
+    // Lấy dữ liệu thống kê từ API
+    useEffect(() => {
+        const fetchStats = async () => {
+            try {
+                setLoading(true);
+                const token = localStorage.getItem('token');
+                
+                // Gọi API dashboard tổng hợp
+                const dashboardResponse = await fetch(`${API_URL}/dashboard/stats`, {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+
+                if (dashboardResponse.ok) {
+                    const dashboardData = await dashboardResponse.json();
+                    console.log('📊 Dashboard data:', dashboardData);
+                    
+                    if (dashboardData.success) {
+                        const data = dashboardData.data;
+                        
+                        // Cập nhật stats
+                        setStats({
+                            totalMembers: data.stats.totalMembers || 0,
+                            revenue: data.stats.totalRevenue || 0,
+                            newMembers: data.stats.newMembers || 0,
+                            activeClasses: data.stats.activeClasses || 0,
+                            totalProducts: data.stats.totalProducts || 0,
+                            pendingOrders: data.stats.pendingOrders || 0,
+                            lowStockProducts: data.stats.lowStockProducts || 0
+                        });
+
+                        // Cập nhật hội viên mới
+                        if (data.recentMembers) {
+                            setRecentMembers(data.recentMembers.map(member => ({
+                                id: member.id,
+                                name: member.name,
+                                joinDate: new Date(member.created_at).toLocaleDateString('vi-VN'),
+                                plan: member.package_name || 'Chưa đăng ký',
+                                status: member.membership_status || 'active'
+                            })));
+                        }
+
+                        // Cập nhật lịch học hôm nay
+                        if (data.todaySchedules) {
+                            setUpcomingClasses(data.todaySchedules.map(schedule => ({
+                                id: schedule.id,
+                                name: schedule.class_name,
+                                time: schedule.start_time,
+                                date: new Date(schedule.class_date).toLocaleDateString('vi-VN'),
+                                trainer: schedule.trainer_name || 'Chưa phân công',
+                                participants: schedule.current_participants || 0,
+                                maxParticipants: schedule.max_participants || 20
+                            })));
+                        }
+
+                        // Cập nhật alerts
+                        if (data.alerts) {
+                            setAlerts(data.alerts);
+                        }
+
+                        // Cập nhật doanh thu theo tháng
+                        if (data.monthlyRevenue) {
+                            setMonthlyRevenue(data.monthlyRevenue);
+                        }
+
+                        // Cập nhật hội viên mới 6 tháng
+                        if (data.newMembersLast6Months) {
+                            setNewMembersChartData(data.newMembersLast6Months);
+                        }
+
+                        // Cập nhật phân bổ gói tập
+                        if (data.packageDistribution) {
+                            setPackageChartData(data.packageDistribution);
+                        }
+                    }
+                }
+            } catch (error) {
+                console.error('Error fetching dashboard stats:', error);
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchStats();
+    }, []);
+
+    // Tạo labels và data cho biểu đồ hội viên mới (6 tháng gần nhất)
+    const monthNames = ['Thg 1', 'Thg 2', 'Thg 3', 'Thg 4', 'Thg 5', 'Thg 6', 'Thg 7', 'Thg 8', 'Thg 9', 'Thg 10', 'Thg 11', 'Thg 12'];
+    
+    // Tạo mảng 6 tháng gần nhất
+    const getLast6Months = () => {
+        const months = [];
+        const now = new Date();
+        for (let i = 5; i >= 0; i--) {
+            const date = new Date(now.getFullYear(), now.getMonth() - i, 1);
+            months.push({
+                year: date.getFullYear(),
+                month: date.getMonth() + 1,
+                label: monthNames[date.getMonth()]
+            });
+        }
+        return months;
     };
+
+    const last6Months = getLast6Months();
+    
+    // Map data từ API vào 6 tháng gần nhất
+    const newMembersLabels = last6Months.map(m => m.label);
+    const newMembersCounts = last6Months.map(monthInfo => {
+        const found = newMembersChartData.find(
+            item => item.year === monthInfo.year && item.month === monthInfo.month
+        );
+        return found ? parseInt(found.count) : 0;
+    });
 
     const revenueData = {
         labels: ['Thg 1', 'Thg 2', 'Thg 3', 'Thg 4', 'Thg 5', 'Thg 6', 'Thg 7', 'Thg 8', 'Thg 9', 'Thg 10', 'Thg 11', 'Thg 12'],
         datasets: [{
             label: 'Doanh thu (triệu VND)',
-            data: [80, 85, 92, 100, 90, 110, 125, 140, 130, 150, 160, 170],
+            data: monthlyRevenue.map(revenue => (revenue / 1000000).toFixed(1)),
             backgroundColor: 'rgba(59, 130, 246, 0.6)',
             borderColor: '#3b82f6',
             borderWidth: 1,
@@ -68,13 +198,16 @@ const AdminDashboard = () => {
     };
 
     const newMembersData = {
-        labels: ['Thg 5', 'Thg 6', 'Thg 7', 'Thg 8', 'Thg 9', 'Thg 10'],
+        labels: newMembersLabels,
         datasets: [{
             label: 'Hội viên mới',
-            data: [30, 25, 40, 35, 50, 45],
+            data: newMembersCounts,
             borderColor: '#10b981',
+            backgroundColor: 'rgba(16, 185, 129, 0.1)',
             tension: 0.4,
-            fill: false,
+            fill: true,
+            pointRadius: 4,
+            pointHoverRadius: 6,
         }],
     };
 
@@ -88,51 +221,46 @@ const AdminDashboard = () => {
         },
     };
 
-    // Biểu đồ phân bổ gói tập
+    // Biểu đồ phân bổ gói tập (real data)
+    const packageLabels = packageChartData.map(item => item.name);
+    const packageCounts = packageChartData.map(item => parseInt(item.count));
+    
+    // Màu sắc động dựa trên số lượng packages
+    const packageColors = [
+        'rgba(239, 68, 68, 0.8)',   // Red
+        'rgba(59, 130, 246, 0.8)',  // Blue
+        'rgba(245, 158, 11, 0.8)',  // Orange
+        'rgba(16, 185, 129, 0.8)',  // Green
+        'rgba(139, 92, 246, 0.8)',  // Purple
+    ];
+
     const packageDistribution = {
-        labels: ['VIP', 'BASIC', 'PREMIUM'],
+        labels: packageLabels.length > 0 ? packageLabels : ['Chưa có dữ liệu'],
         datasets: [{
-            data: [200, 320, 280],
-            backgroundColor: [
-                'rgba(239, 68, 68, 0.8)',   // VIP - red
-                'rgba(59, 130, 246, 0.8)',  // BASIC - blue
-                'rgba(245, 158, 11, 0.8)',  // PREMIUM - orange
-            ],
+            data: packageCounts.length > 0 ? packageCounts : [1],
+            backgroundColor: packageColors.slice(0, packageLabels.length),
             borderWidth: 0,
         }],
     };
 
-    // Hội viên mới gần đây
-    const recentMembers = [
-        { id: 1, name: 'Trần Văn Hoàng', joinDate: '2025-10-09', plan: 'Gold 12 Tháng', status: 'active' },
-        { id: 2, name: 'Lê Thị Mỹ Duyên', joinDate: '2025-10-08', plan: 'Silver 3 Tháng', status: 'active' },
-        { id: 3, name: 'Phạm Minh Nhật', joinDate: '2025-10-08', plan: 'PT 10 Buổi', status: 'active' },
-        { id: 4, name: 'Nguyễn Thu Hà', joinDate: '2025-10-07', plan: 'Basic 1 Tháng', status: 'active' },
-        { id: 5, name: 'Võ Minh Tuấn', joinDate: '2025-10-06', plan: 'Premium 6 Tháng', status: 'active' },
-    ];
-
-    // Lớp học sắp diễn ra
-    const upcomingClasses = [
-        { id: 1, name: 'Yoga Buổi Sáng', time: '06:00', date: '2025-10-12', trainer: 'HLV Mai Anh', participants: 15, maxParticipants: 20 },
-        { id: 2, name: 'HIIT Training', time: '08:30', date: '2025-10-12', trainer: 'HLV Tuấn Anh', participants: 18, maxParticipants: 20 },
-        { id: 3, name: 'Boxing Cơ Bản', time: '17:00', date: '2025-10-12', trainer: 'HLV Minh Đức', participants: 12, maxParticipants: 15 },
-        { id: 4, name: 'Pilates', time: '18:30', date: '2025-10-12', trainer: 'HLV Lan Hương', participants: 10, maxParticipants: 12 },
-    ];
-
-    // Sản phẩm bán chạy
-    const topProducts = [
-        { id: 1, name: 'Whey Protein Gold Standard', sold: 156, revenue: 288600000 },
-        { id: 2, name: 'BCAA Xtend', sold: 234, revenue: 152100000 },
-        { id: 3, name: 'Găng tay tập gym', sold: 89, revenue: 22250000 },
-        { id: 4, name: 'Áo tank top gym', sold: 67, revenue: 23450000 },
-    ];
-
-    // Cảnh báo và thông báo
-    const alerts = [
-        { id: 1, type: 'warning', message: 'Có 12 đơn hàng chưa xử lý', time: '5 phút trước' },
-        { id: 2, type: 'info', message: 'Lớp Yoga Buổi Sáng sắp đầy (15/20)', time: '1 giờ trước' },
-        { id: 3, type: 'danger', message: 'Sản phẩm Creatine sắp hết hàng', time: '2 giờ trước' },
-    ];
+    // Hiển thị loading
+    if (loading) {
+        return (
+            <div className="db-admin-dashboard-container">
+                <div style={{ 
+                    display: 'flex', 
+                    justifyContent: 'center', 
+                    alignItems: 'center', 
+                    minHeight: '400px',
+                    fontSize: '18px',
+                    color: '#6b7280'
+                }}>
+                    <FontAwesomeIcon icon={faClock} spin style={{ marginRight: '10px' }} />
+                    Đang tải dữ liệu...
+                </div>
+            </div>
+        );
+    }
 
     return (
         <div className="db-admin-dashboard-container">
@@ -143,7 +271,13 @@ const AdminDashboard = () => {
                     <p className="db-dashboard-subtitle">Chào mừng quay trở lại! Đây là tổng quan hệ thống của bạn.</p>
                 </div>
                 <div className="db-header-actions">
-                    <span className="db-last-updated">Cập nhật lần cuối: {new Date().toLocaleString('vi-VN')}</span>
+                    <span className="db-last-updated">
+                        Thành phố Hồ Chí Minh - {currentTime.toLocaleDateString('vi-VN', { 
+                            day: '2-digit', 
+                            month: '2-digit', 
+                            year: 'numeric' 
+                        })} {currentTime.toLocaleTimeString('vi-VN')}
+                    </span>
                 </div>
             </div>
 
@@ -156,9 +290,6 @@ const AdminDashboard = () => {
                     <div className="db-stat-info">
                         <p className="db-stat-label">Tổng Hội Viên</p>
                         <p className="db-stat-value">{stats.totalMembers.toLocaleString()}</p>
-                        <span className="db-stat-growth db-positive">
-                            <FontAwesomeIcon icon={faChartLine} /> +{stats.memberGrowth}% so với tháng trước
-                        </span>
                     </div>
                 </div>
 
@@ -168,10 +299,7 @@ const AdminDashboard = () => {
                     </div>
                     <div className="db-stat-info">
                         <p className="db-stat-label">Doanh Thu Tháng Này</p>
-                        <p className="db-stat-value">{(stats.revenue / 1000000).toFixed(0)}M</p>
-                        <span className="db-stat-growth db-positive">
-                            <FontAwesomeIcon icon={faChartLine} /> +{stats.revenueGrowth}% so với tháng trước
-                        </span>
+                        <p className="db-stat-value">{(stats.revenue / 1000000).toFixed(1)}M </p>
                     </div>
                 </div>
 
@@ -182,9 +310,6 @@ const AdminDashboard = () => {
                     <div className="db-stat-info">
                         <p className="db-stat-label">Hội Viên Mới Tháng Này</p>
                         <p className="db-stat-value">+{stats.newMembers}</p>
-                        <span className="db-stat-growth db-neutral">
-                            <FontAwesomeIcon icon={faClock} /> 12 người trong tuần này
-                        </span>
                     </div>
                 </div>
 
@@ -193,11 +318,8 @@ const AdminDashboard = () => {
                         <FontAwesomeIcon icon={faCalendarCheck} className="db-stat-icon" />
                     </div>
                     <div className="db-stat-info">
-                        <p className="db-stat-label">Lớp Học Đang Hoạt Động</p>
+                        <p className="db-stat-label">Lớp Học Hôm Nay</p>
                         <p className="db-stat-value">{stats.activeClasses}</p>
-                        <span className="db-stat-growth db-neutral">
-                            <FontAwesomeIcon icon={faDumbbell} /> 8 lớp hôm nay
-                        </span>
                     </div>
                 </div>
 
@@ -208,9 +330,6 @@ const AdminDashboard = () => {
                     <div className="db-stat-info">
                         <p className="db-stat-label">Sản Phẩm Trong Kho</p>
                         <p className="db-stat-value">{stats.totalProducts}</p>
-                        <span className="db-stat-growth db-neutral">
-                            <FontAwesomeIcon icon={faShoppingCart} /> 5 sản phẩm sắp hết
-                        </span>
                     </div>
                 </div>
 
@@ -221,9 +340,6 @@ const AdminDashboard = () => {
                     <div className="db-stat-info">
                         <p className="db-stat-label">Đơn Hàng Chờ Xử Lý</p>
                         <p className="db-stat-value">{stats.pendingOrders}</p>
-                        <span className="db-stat-growth db-negative">
-                            <FontAwesomeIcon icon={faClock} /> Cần xử lý ngay
-                        </span>
                     </div>
                 </div>
             </div>
@@ -327,35 +443,6 @@ const AdminDashboard = () => {
                                 <div className="db-class-participants">
                                     <FontAwesomeIcon icon={faUsers} />
                                     <span>{classItem.participants}/{classItem.maxParticipants}</span>
-                                </div>
-                            </div>
-                        ))}
-                    </div>
-                </div>
-
-                {/* Sản phẩm bán chạy */}
-                <div className="db-list-card">
-                    <div className="db-card-header">
-                        <h3 className="db-card-title">
-                            <FontAwesomeIcon icon={faTrophy} /> Sản Phẩm Bán Chạy
-                        </h3>
-                    </div>
-                    <div className="db-product-list">
-                        {topProducts.map((product, index) => (
-                            <div key={product.id} className="db-product-item">
-                                <div className="db-product-rank">
-                                    <span className={`db-rank-badge db-rank-${index + 1}`}>#{index + 1}</span>
-                                </div>
-                                <div className="db-product-info">
-                                    <h4 className="db-product-name">{product.name}</h4>
-                                    <div className="db-product-stats">
-                                        <span className="db-product-sold">
-                                            <FontAwesomeIcon icon={faShoppingCart} /> {product.sold} đã bán
-                                        </span>
-                                        <span className="db-product-revenue">
-                                            {(product.revenue / 1000000).toFixed(1)}M VNĐ
-                                        </span>
-                                    </div>
                                 </div>
                             </div>
                         ))}

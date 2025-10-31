@@ -116,8 +116,47 @@ export default function AdminInvoices() {
     };
 
     const handleExportExcel = () => {
-        console.log('Exporting invoices to Excel...');
-        showToast('Xuất danh sách hóa đơn ra Excel thành công!', 'success');
+        try {
+            const token = JSON.parse(localStorage.getItem('rf_auth_v1'))?.accessToken;
+            
+            // Tạo query params từ các filter hiện tại
+            const params = new URLSearchParams();
+            if (searchTerm) params.append('search', searchTerm);
+            
+            // Tạo URL với query params
+            const url = `${API_URL}/invoices/export-excel?${params.toString()}`;
+            
+            // Tải file bằng fetch
+            fetch(url, {
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Không thể xuất file Excel');
+                }
+                return response.blob();
+            })
+            .then(blob => {
+                const url = window.URL.createObjectURL(blob);
+                const link = document.createElement('a');
+                link.href = url;
+                link.setAttribute('download', `Hoa-Don-${new Date().toISOString().split('T')[0]}.xlsx`);
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+                window.URL.revokeObjectURL(url);
+                showToast('Xuất file Excel thành công!', 'success');
+            })
+            .catch(error => {
+                console.error('Export error:', error);
+                showToast('Lỗi xuất file Excel: ' + error.message, 'error');
+            });
+        } catch (error) {
+            console.error('Export error:', error);
+            showToast('Lỗi xuất file Excel', 'error');
+        }
     };
 
     const getStatusClass = (status) => {
@@ -130,8 +169,48 @@ export default function AdminInvoices() {
     };
 
     const handleExportPDF = (invoice) => {
-        console.log('Xuất PDF cho hóa đơn:', invoice.invoice_number);
-        // Logic xuất PDF
+        try {
+            const token = localStorage.getItem('token');
+            
+            if (!invoice || !invoice.id) {
+                showToast('Không thể xuất PDF: Thông tin hóa đơn không hợp lệ', 'error');
+                return;
+            }
+            
+            // Tạo URL để tải PDF
+            const url = `${API_URL}/invoices/${invoice.id}/export-pdf`;
+            
+            // Tải file bằng fetch
+            fetch(url, {
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Không thể xuất file PDF');
+                }
+                return response.blob();
+            })
+            .then(blob => {
+                const url = window.URL.createObjectURL(blob);
+                const link = document.createElement('a');
+                link.href = url;
+                link.setAttribute('download', `Hoa-Don-${invoice.invoice_number}.pdf`);
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+                window.URL.revokeObjectURL(url);
+                showToast('Xuất file PDF thành công!', 'success');
+            })
+            .catch(error => {
+                console.error('Export PDF error:', error);
+                showToast('Lỗi xuất file PDF: ' + error.message, 'error');
+            });
+        } catch (error) {
+            console.error('Export PDF error:', error);
+            showToast('Có lỗi xảy ra khi xuất PDF', 'error');
+        }
     };
 
     const handleWarning = (invoice) => {
