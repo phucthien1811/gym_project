@@ -119,9 +119,18 @@ class UserService {
     const byRole = await userRepo.countByRole();
     const byStatus = await userRepo.countByStatus();
 
+    // Đếm members mới trong tháng này
+    const startOfMonth = new Date();
+    startOfMonth.setDate(1);
+    startOfMonth.setHours(0, 0, 0, 0);
+
+    const newMembersThisMonth = await userRepo.countNewMembersThisMonth(startOfMonth);
+
     return {
       ...byRole,
-      ...byStatus
+      ...byStatus,
+      totalMembers: byRole.member || 0,
+      newMembersThisMonth
     };
   }
 }

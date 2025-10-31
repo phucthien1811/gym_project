@@ -1,5 +1,6 @@
 import orderRepo from '../repositories/order.repo.js';
 import invoiceService from './invoice.service.js';
+import { exportToExcel } from '../utils/excelExporter.js';
 
 class OrderService {
   // Tạo đơn hàng từ giỏ hàng
@@ -245,6 +246,160 @@ class OrderService {
       return await this.updateOrderStatus(orderId, 'cancelled', 'Order cancelled by user', userId);
     } catch (error) {
       throw new Error(`Failed to cancel order: ${error.message}`);
+    }
+  }
+
+  // Xuất Excel danh sách đơn hàng
+  async exportOrdersToExcel(filters) {
+    try {
+      // Lấy tất cả đơn hàng theo filter (không phân trang)
+      const allOrders = await orderRepo.getAllOrders({
+        ...filters,
+        page: 1,
+        limit: 10000 // Lấy tối đa 10000 bản ghi
+      });
+
+      const orders = allOrders.orders || [];
+
+      // Helper function để format tiền VNĐ
+      const formatCurrency = (amount) => {
+        return new Intl.NumberFormat('vi-VN', {
+          style: 'currency',
+          currency: 'VND'
+        }).format(amount);
+      };
+
+      // Helper function để format ngày
+      const formatDate = (date) => {
+        if (!date) return '';
+        return new Date(date).toLocaleString('vi-VN', {
+          year: 'numeric',
+          month: '2-digit',
+          day: '2-digit',
+          hour: '2-digit',
+          minute: '2-digit'
+        });
+      };
+
+      // Helper function để lấy tên trạng thái
+      const getStatusText = (status) => {
+        const statusMap = {
+          'pending': 'Chờ xác nhận',
+          'confirmed': 'Đã xác nhận',
+          'processing': 'Đang xử lý',
+          'shipped': 'Đang giao hàng',
+          'delivered': 'Đã giao hàng',
+          'cancelled': 'Đã hủy'
+        };
+        return statusMap[status] || status;
+      };
+
+      // Helper function để lấy phương thức thanh toán
+      const getPaymentMethod = (method) => {
+        const methodMap = {
+          'cod': 'Thanh toán khi nhận hàng',
+          'bank_transfer': 'Chuyển khoản',
+          'card': 'Thẻ',
+          'momo': 'MoMo',
+          'vnpay': 'VNPay'
+        };
+        return methodMap[method] || method;
+      };
+
+      // Helper function để lấy trạng thái thanh toán
+      const getPaymentStatus = (status) => {
+        const statusMap = {
+          'pending': 'Chờ thanh toán',
+          'paid': 'Đã thanh toán',
+          'failed': 'Thanh toán thất bại'
+        };
+        return statusMap[status] || status;
+      };
+
+      // Cấu hình Excel
+      const config = {
+        fileName: `Don-Hang-${new Date().toISOString().split('T')[0]}.xlsx`,
+        sheetName: 'Danh Sách Đơn Hàng',
+        headers: [
+          {
+            type: 'title',
+            value: 'DANH SÁCH ĐƠN HÀNG'
+          },
+          {
+            type: 'info',
+            value: `Ngày xuất: ${formatDate(new Date())}`
+          },
+          {
+            type: 'info',
+            value: `Tổng số đơn hàng: ${orders.length}`
+          },
+          {
+            type: 'empty'
+          }
+        ],
+        columns: [
+          { header: 'Mã ĐH', key: 'order_number', width: 15 },
+          { header: 'Khách hàng', key: 'shipping_name', width: 25 },
+          { header: 'Điện thoại', key: 'shipping_phone', width: 15 },
+          { header: 'Địa chỉ', key: 'shipping_address', width: 40 },
+          { header: 'Tổng tiền', key: 'total_amount', width: 18 },
+          { header: 'Phí vận chuyển', key: 'shipping_fee', width: 18 },
+          { header: 'PT Thanh toán', key: 'payment_method', width: 25 },
+          { header: 'TT Thanh toán', key: 'payment_status', width: 18 },
+          { header: 'Trạng thái ĐH', key: 'status', width: 18 },
+          { header: 'Ngày tạo', key: 'created_at', width: 20 }
+        ],
+        data: orders.map(order => {
+          // Parse shipping_address if it's JSON
+          let shippingAddress = '';
+          if (order.shipping_address) {
+            if (typeof order.shipping_address === 'string') {
+              try {
+                const addr = JSON.parse(order.shipping_address);
+                shippingAddress = `${addr.address || ''}, ${addr.ward || ''}, ${addr.district || ''}, ${addr.province || ''}`.replace(/^,\s*|,\s*$/g, '');
+              } catch (e) {
+                shippingAddress = order.shipping_address;
+              }
+            } else {
+              const addr = order.shipping_address;
+              shippingAddress = `${addr.address || ''}, ${addr.ward || ''}, ${addr.district || ''}, ${addr.province || ''}`.replace(/^,\s*|,\s*$/g, '');
+            }
+          }
+
+          return {
+            order_number: order.order_number,
+            shipping_name: order.shipping_name || 'N/A',
+            shipping_phone: order.shipping_phone || 'N/A',
+            shipping_address: shippingAddress || 'N/A',
+            total_amount: formatCurrency(order.total_amount),
+            shipping_fee: formatCurrency(order.shipping_fee || 0),
+            payment_method: getPaymentMethod(order.payment_method),
+            payment_status: getPaymentStatus(order.payment_status),
+            status: getStatusText(order.status),
+            created_at: formatDate(order.created_at)
+          };
+        })
+      };
+
+      const buffer = await exportToExcel(config);
+      return buffer;
+    } catch (error) {
+      throw new Error(`Failed to export orders: ${error.message}`);
+    }
+  }
+
+  // Lấy thống kê đơn hàng
+  async getOrderStats() {
+    try {
+      const stats = await orderRepo.getOrderStats();
+      
+      return {
+        success: true,
+        data: stats,
+        message: 'Order stats retrieved successfully'
+      };
+    } catch (error) {
+      throw new Error(`Failed to get order stats: ${error.message}`);
     }
   }
 }
