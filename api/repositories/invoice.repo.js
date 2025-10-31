@@ -213,6 +213,77 @@ class InvoiceRepository {
 
     return stats;
   }
+
+  // Lấy thống kê doanh thu từ hóa đơn
+  async getInvoiceStats() {
+    const startOfMonth = new Date();
+    startOfMonth.setDate(1);
+    startOfMonth.setHours(0, 0, 0, 0);
+
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    // Tổng doanh thu (tất cả hóa đơn đã thanh toán)
+    const totalRevenueResult = await knex('invoices')
+      .sum('total_amount as total')
+      .where('payment_status', 'paid')
+      .first();
+
+    // Doanh thu tháng này
+    const monthRevenueResult = await knex('invoices')
+      .sum('total_amount as total')
+      .where('payment_status', 'paid')
+      .where('created_at', '>=', startOfMonth)
+      .first();
+
+    // Doanh thu hôm nay
+    const todayRevenueResult = await knex('invoices')
+      .sum('total_amount as total')
+      .where('payment_status', 'paid')
+      .where('created_at', '>=', today)
+      .first();
+
+    // Đếm hóa đơn chờ thanh toán
+    const pendingInvoicesResult = await knex('invoices')
+      .count('* as count')
+      .where('payment_status', 'pending')
+      .first();
+
+    return {
+      totalRevenue: parseFloat(totalRevenueResult?.total || 0),
+      monthRevenue: parseFloat(monthRevenueResult?.total || 0),
+      todayRevenue: parseFloat(todayRevenueResult?.total || 0),
+      pendingInvoices: parseInt(pendingInvoicesResult?.count || 0)
+    };
+  }
+
+  // Lấy doanh thu theo tháng từ hóa đơn (invoices)
+  async getMonthlyRevenue(year = new Date().getFullYear()) {
+    const results = await knex('invoices')
+      .select(
+        knex.raw('MONTH(created_at) as month'),
+        knex.raw('SUM(total_amount) as revenue')
+      )
+      .where('payment_status', 'paid')
+      .whereRaw('YEAR(created_at) = ?', [year])
+      .groupByRaw('MONTH(created_at)')
+      .orderByRaw('MONTH(created_at)');
+
+    console.log('📊 Invoice Monthly Revenue Query Results:', results);
+
+    // Khởi tạo mảng 12 tháng với giá trị 0
+    const monthlyRevenue = Array(12).fill(0);
+
+    // Điền dữ liệu thực tế vào các tháng có doanh thu
+    results.forEach(row => {
+      const monthIndex = row.month - 1; // Chuyển từ 1-12 sang 0-11
+      monthlyRevenue[monthIndex] = parseFloat(row.revenue) || 0;
+    });
+
+    console.log('📊 Monthly Revenue Array:', monthlyRevenue);
+
+    return monthlyRevenue;
+  }
 }
 
 export default new InvoiceRepository();

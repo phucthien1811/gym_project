@@ -193,6 +193,40 @@ class OrderController {
       return errorResponse(res, error.message, statusCode);
     }
   }
+
+  // Xuất Excel danh sách đơn hàng (Admin)
+  async exportOrdersToExcel(req, res) {
+    try {
+      const { status, search, startDate, endDate } = req.query;
+      
+      const filters = {
+        status,
+        search,
+        startDate,
+        endDate
+      };
+
+      const buffer = await orderService.exportOrdersToExcel(filters);
+      
+      // Set headers cho file Excel
+      res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+      res.setHeader('Content-Disposition', `attachment; filename=Don-Hang-${new Date().toISOString().split('T')[0]}.xlsx`);
+      
+      return res.send(buffer);
+    } catch (error) {
+      return errorResponse(res, error.message, 400);
+    }
+  }
+
+  // Lấy thống kê đơn hàng
+  async getOrderStats(req, res) {
+    try {
+      const result = await orderService.getOrderStats();
+      return successResponse(res, result.data, result.message);
+    } catch (error) {
+      return errorResponse(res, error.message, 400);
+    }
+  }
 }
 
 export default new OrderController();

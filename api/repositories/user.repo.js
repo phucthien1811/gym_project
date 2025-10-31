@@ -1,7 +1,6 @@
 import db from '../config/knex.js';
 
 class UserRepository {
-  // Lấy tất cả users với phân trang và filter
   async findAll({ page = 1, limit = 10, search = '', status = '' }) {
     const offset = (page - 1) * limit;
     
@@ -17,7 +16,7 @@ class UserRepository {
         'users.created_at',
         'users.updated_at'
       )
-      .where('users.role', '=', 'member'); // Chỉ hiển thị members
+      .where('users.role', '=', 'member'); 
 
     // Filter theo search
     if (search) {
@@ -147,6 +146,79 @@ class UserRepository {
       inactive: parseInt(inactive.count),
       total: parseInt(active.count) + parseInt(inactive.count)
     };
+  }
+
+  // Đếm số lượng members mới trong tháng
+  async countNewMembersThisMonth(startOfMonth) {
+    const [result] = await db('users')
+      .where('role', 'member')
+      .where('created_at', '>=', startOfMonth)
+      .count('* as count');
+    
+    return parseInt(result.count);
+  }
+
+  // Lấy danh sách members mới gần đây
+  async getRecentMembers(limit = 5) {
+    const members = await db('users')
+      .leftJoin('member_packages', function() {
+        this.on('users.id', '=', 'member_packages.user_id')
+            .andOn('member_packages.status', '=', db.raw('?', ['active']));
+      })
+      .leftJoin('packages', 'member_packages.package_id', 'packages.id')
+      .select(
+        'users.id',
+        'users.name',
+        'users.email',
+        'users.created_at',
+        'packages.name as package_name',
+        'member_packages.status as membership_status'
+      )
+      .where('users.role', 'member')
+      .orderBy('users.created_at', 'desc')
+      .limit(limit);
+
+    return members;
+  }
+
+  // Lấy số lượng members mới theo 6 tháng gần nhất
+  async getNewMembersLast6Months() {
+    const sixMonthsAgo = new Date();
+    sixMonthsAgo.setMonth(sixMonthsAgo.getMonth() - 5); // 6 tháng bao gồm tháng hiện tại
+    sixMonthsAgo.setDate(1);
+    sixMonthsAgo.setHours(0, 0, 0, 0);
+
+    const results = await db('users')
+      .select(
+        db.raw('YEAR(created_at) as year'),
+        db.raw('MONTH(created_at) as month'),
+        db.raw('COUNT(*) as count')
+      )
+      .where('role', 'member')
+      .where('created_at', '>=', sixMonthsAgo)
+      .groupByRaw('YEAR(created_at), MONTH(created_at)')
+      .orderByRaw('YEAR(created_at), MONTH(created_at)');
+
+    console.log('📊 New Members Last 6 Months:', results);
+    return results;
+  }
+
+  // Đếm phân bổ gói tập (VIP, BASIC, PREMIUM)
+  async getPackageDistribution() {
+    const results = await db('packages')
+      .leftJoin('member_packages', function() {
+        this.on('packages.id', '=', 'member_packages.package_id')
+            .andOn('member_packages.status', '=', db.raw('?', ['active']));
+      })
+      .select(
+        'packages.name',
+        db.raw('COUNT(member_packages.id) as count')
+      )
+      .groupBy('packages.id', 'packages.name')
+      .orderBy('count', 'desc');
+
+    console.log('📊 Package Distribution:', results);
+    return results;
   }
 }
 

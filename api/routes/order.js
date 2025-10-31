@@ -36,12 +36,26 @@ router.patch('/my-orders/:orderId/cancel', auth, orderController.cancelMyOrder);
 router.get('/number/:orderNumber', auth, orderController.getOrderByNumber);
 
 // === ADMIN ROUTES ===
+// Lấy thống kê đơn hàng
+router.get('/admin/stats',
+  auth,
+  authorizeRoles(['admin']),
+  orderController.getOrderStats
+);
+
 // Lấy tất cả đơn hàng
 router.get('/admin/all', 
   auth, 
   authorizeRoles(['admin']), 
   validateOrderQuery,
   orderController.getAllOrders
+);
+
+// Xuất Excel danh sách đơn hàng
+router.get('/admin/export-excel',
+  auth,
+  authorizeRoles(['admin']),
+  orderController.exportOrdersToExcel
 );
 
 // Lấy chi tiết đơn hàng (admin)

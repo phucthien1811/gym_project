@@ -250,14 +250,40 @@ class OrderRepository {
       .count('* as count')
       .first();
 
+    // Count pending orders (status = 'pending')
+    const pendingOrders = await db('orders')
+      .where('status', 'pending')
+      .count('* as count')
+      .first();
+
     return {
       statusCounts: stats.reduce((acc, stat) => {
         acc[stat.status] = parseInt(stat.count);
         return acc;
       }, {}),
       totalRevenue: parseFloat(totalRevenue.revenue || 0),
-      todayOrders: parseInt(todayOrders.count || 0)
+      todayOrders: parseInt(todayOrders.count || 0),
+      pendingOrders: parseInt(pendingOrders.count || 0)
     };
+  }
+
+  // Lấy doanh thu theo tháng trong năm
+  async getMonthlyRevenue(year = new Date().getFullYear()) {
+    const monthlyRevenue = await db('orders')
+      .select(db.raw('MONTH(created_at) as month'))
+      .sum('total_amount as revenue')
+      .whereRaw('YEAR(created_at) = ?', [year])
+      .where('payment_status', 'paid')
+      .groupBy(db.raw('MONTH(created_at)'))
+      .orderBy(db.raw('MONTH(created_at)'));
+
+    // Tạo array 12 tháng, điền 0 cho tháng không có dữ liệu
+    const revenueByMonth = Array(12).fill(0);
+    monthlyRevenue.forEach(item => {
+      revenueByMonth[item.month - 1] = parseFloat(item.revenue || 0);
+    });
+
+    return revenueByMonth;
   }
 
   // Xóa đơn hàng (soft delete)

@@ -15,7 +15,9 @@ import {
   getSchedulesByWeek,
   getMyEnrollments,
   userEnrollClass,
-  userUnenrollClass
+  userUnenrollClass,
+  exportEnrolledUsers,
+  exportSchedules
 } from "../controllers/schedule.controller.js";
 
 const router = Router();
@@ -32,6 +34,9 @@ router.get('/test', (req, res) => {
 // User specific routes - phải đặt trước các route có params
 router.get("/my-enrollments", getMyEnrollments); // User xem lịch của mình
 
+// Export routes - phải đặt trước các route có params
+router.get("/export", authorizeRoles(['admin']), exportSchedules); // Export all schedules
+
 // Public routes - xem lịch học (nhưng vẫn cần auth để biết user nào)
 router.get("/", listSchedules);
 router.get("/week", getSchedulesByWeek);
@@ -47,8 +52,12 @@ router.post("/:id/enroll", userEnrollClass); // User đăng ký lớp học
 router.post("/:id/unenroll", userUnenrollClass); // User hủy đăng ký
 
 // Admin enrollment management
+// Admin enrollment management
 router.post("/:scheduleId/enroll", authorizeRoles(['admin']), enrollStudent);
 router.delete("/:scheduleId/users/:userId", authorizeRoles(['admin']), removeEnrollment);
 router.patch("/enrollments/:enrollmentId/status", authorizeRoles(['admin']), updateEnrollmentStatus);
+
+// Export enrolled users to Excel
+router.get("/:id/enrollments/export", authorizeRoles(['admin']), exportEnrolledUsers);
 
 export default router;

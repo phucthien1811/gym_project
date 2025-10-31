@@ -20,7 +20,38 @@ class MemberProfileRepository {
       WHERE u.id = ?
     `, [userId]);
     
-    return profiles[0] || null;
+    const profile = profiles[0];
+    
+    // If no profile exists in member_profiles table, create a blank one
+    if (profile && profile.user_id === null) {
+      console.log('📝 Creating initial profile for user:', userId);
+      await db.execute(`
+        INSERT INTO member_profiles (user_id, created_at, updated_at)
+        VALUES (?, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
+      `, [userId]);
+      
+      // Re-fetch with the new profile
+      const [newProfiles] = await db.execute(`
+        SELECT 
+          mp.*, 
+          u.name, 
+          u.email, 
+          u.role,
+          p.name as membership_plan,
+          mpkg.start_date as membership_start_date,
+          mpkg.end_date as membership_end_date,
+          mpkg.status as membership_status
+        FROM users u
+        LEFT JOIN member_profiles mp ON u.id = mp.user_id
+        LEFT JOIN member_packages mpkg ON u.id = mpkg.user_id AND mpkg.status = 'active'
+        LEFT JOIN packages p ON mpkg.package_id = p.id
+        WHERE u.id = ?
+      `, [userId]);
+      
+      return newProfiles[0];
+    }
+    
+    return profile || null;
   }
 
   // Tạo profile mới
@@ -73,6 +104,11 @@ class MemberProfileRepository {
         updateData[field] = profileData[field];
       }
     });
+    
+    // Handle phone_number mapping (frontend sends phone_number, DB uses phone)
+    if (profileData.phone_number) {
+      updateData.phone = profileData.phone_number;
+    }
     
     // Handle fitness_goal vs fitness_goals mapping
     if (profileData.fitness_goal) {

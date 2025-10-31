@@ -1,4 +1,5 @@
 import userService from '../services/user.js';
+import { exportToExcel, presetStyles } from '../utils/excelExporter.js';
 
 class UserController {
   // GET /api/v1/users - Lấy danh sách users
@@ -152,6 +153,102 @@ class UserController {
       res.status(error.message === 'User not found' ? 404 : 400).json({
         success: false,
         message: error.message || 'Failed to toggle user status'
+      });
+    }
+  }
+
+  // Export users to Excel
+  async exportUsers(req, res) {
+    try {
+      console.log('📊 Export users called');
+      console.log('Query params:', req.query);
+      
+      const { search = '', status = '' } = req.query;
+
+      // Lấy tất cả users (không phân trang)
+      const result = await userService.getAllUsers({
+        page: 1,
+        limit: 10000,
+        search,
+        status
+      });
+
+      const users = result.data || [];
+
+      if (users.length === 0) {
+        return res.status(404).json({
+          success: false,
+          message: 'Không có dữ liệu để xuất'
+        });
+      }
+
+      // Helper functions
+      const getRoleName = (role) => {
+        const roleMap = {
+          'admin': 'Quản trị viên',
+          'trainer': 'Huấn luyện viên',
+          'member': 'Hội viên'
+        };
+        return roleMap[role] || role;
+      };
+
+      // Chuẩn bị data cho Excel
+      const excelData = users.map((user, index) => ({
+        stt: index + 1,
+        name: user.name || 'N/A',
+        email: user.email || 'N/A',
+        phone: user.phone || 'N/A',
+        role: getRoleName(user.role),
+        status: user.is_active ? 'Hoạt động' : 'Không hoạt động'
+      }));
+
+      // Tạo filter summary
+      const filterSummary = [];
+      if (search) filterSummary.push(`Tìm kiếm: "${search}"`);
+      if (status) filterSummary.push(`Trạng thái: ${status === 'active' ? 'Hoạt động' : 'Không hoạt động'}`);
+
+      const headers = [
+        { type: 'title', value: 'DANH SÁCH NGƯỜI DÙNG' },
+        { type: 'info', value: `Ngày xuất: ${new Date().toLocaleDateString('vi-VN')} ${new Date().toLocaleTimeString('vi-VN')}` },
+        { type: 'info', value: `Tổng số người dùng: ${users.length}` }
+      ];
+
+      if (filterSummary.length > 0) {
+        headers.push({ type: 'info', value: `Bộ lọc: ${filterSummary.join(', ')}` });
+      }
+
+      headers.push({ type: 'empty' });
+
+      // Cấu hình xuất Excel
+      const config = {
+        fileName: `users_${new Date().toISOString().split('T')[0]}.xlsx`,
+        sheetName: 'Danh sách người dùng',
+        headers,
+        columns: [
+          { header: 'STT', key: 'stt', width: 8 },
+          { header: 'Họ và Tên', key: 'name', width: 30 },
+          { header: 'Email', key: 'email', width: 35 },
+          { header: 'Số Điện Thoại', key: 'phone', width: 18 },
+          { header: 'Vai Trò', key: 'role', width: 20 },
+          { header: 'Trạng Thái', key: 'status', width: 18 }
+        ],
+        data: excelData,
+        styles: presetStyles.blue // Sử dụng theme xanh dương cho users
+      };
+
+      // Tạo file Excel
+      const buffer = await exportToExcel(config);
+
+      // Gửi file về client
+      res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+      res.setHeader('Content-Disposition', `attachment; filename="${encodeURIComponent(config.fileName)}"`);
+      res.send(buffer);
+
+    } catch (error) {
+      console.error('Export users error:', error);
+      res.status(500).json({
+        success: false,
+        message: error.message || 'Failed to export users'
       });
     }
   }

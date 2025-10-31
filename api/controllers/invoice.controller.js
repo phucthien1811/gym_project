@@ -81,6 +81,48 @@ class InvoiceController {
       return errorResponse(res, error.message, 400);
     }
   }
+
+  // Xuất Excel danh sách hóa đơn
+  async exportInvoicesToExcel(req, res) {
+    try {
+      const { source_type, payment_status, search, startDate, endDate } = req.query;
+      
+      const filters = {
+        source_type,
+        payment_status,
+        search,
+        startDate,
+        endDate
+      };
+
+      const buffer = await invoiceService.exportInvoicesToExcel(filters);
+      
+      // Set headers cho file Excel
+      res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+      res.setHeader('Content-Disposition', `attachment; filename=Hoa-Don-${new Date().toISOString().split('T')[0]}.xlsx`);
+      
+      return res.send(buffer);
+    } catch (error) {
+      return errorResponse(res, error.message, 400);
+    }
+  }
+
+  // Xuất PDF một hóa đơn cụ thể
+  async exportInvoicePDF(req, res) {
+    try {
+      const { invoiceId } = req.params;
+      const result = await invoiceService.generateInvoicePDF(invoiceId);
+      
+      // Set headers cho file PDF
+      res.setHeader('Content-Type', 'application/pdf');
+      res.setHeader('Content-Disposition', `attachment; filename=Hoa-Don-${result.invoiceNumber}.pdf`);
+      
+      return res.send(result.buffer);
+    } catch (error) {
+      const statusCode = error.message.includes('not found') ? 404 : 400;
+      return errorResponse(res, error.message, statusCode);
+    }
+  }
 }
 
 export default new InvoiceController();

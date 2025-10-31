@@ -14,6 +14,8 @@ import scheduleRoutes from "./schedule.js";
 import userRoutes from "./user.js";
 import voucherRoutes from "./voucher.js";
 import invoiceRoutes from "./invoice.js";
+import productRoutes from "./product.js";
+import dashboardRoutes from "./dashboard.js";
 
 const r = Router();
 
@@ -31,6 +33,8 @@ r.use("/schedules", scheduleRoutes);
 r.use("/users", userRoutes);
 r.use("/vouchers", voucherRoutes);
 r.use("/invoices", invoiceRoutes);
+r.use("/products", productRoutes);
+r.use("/dashboard", dashboardRoutes);
 
 
 

@@ -14,6 +14,9 @@ router.use(requireAdmin);
 // GET /api/v1/users/stats - Lấy thống kê
 router.get('/stats', userController.getStats);
 
+// GET /api/v1/users/export - Export users to Excel (phải đặt trước /:id)
+router.get('/export', userController.exportUsers);
+
 // GET /api/v1/users - Lấy danh sách users
 router.get('/', userController.getUsers);
 

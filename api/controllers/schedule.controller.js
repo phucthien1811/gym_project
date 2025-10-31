@@ -1,6 +1,7 @@
 import { scheduleService } from "../services/schedule.service.js";
 import scheduleRepo from "../repositories/schedule.repo.js";
 import knex from '../config/knex.js';
+import { exportToExcel, presetStyles } from '../utils/excelExporter.js';
 
 export const listSchedules = async (req, res, next) => {
   try {
@@ -301,6 +302,184 @@ export const getSchedulesByWeek = async (req, res, next) => {
       data: schedules 
     });
   } catch (e) { 
+    next(e); 
+  }
+};
+
+// Export all classes/schedules to Excel
+export const exportSchedules = async (req, res, next) => {
+  try {
+    console.log('📊 Export schedules called');
+    console.log('Query params:', req.query);
+    console.log('User:', req.user);
+    
+    const { trainer_id, from, to, status, difficulty_level, search } = req.query;
+    
+    const filters = {
+      trainer_id: trainer_id ? Number(trainer_id) : null,
+      from: from || null,
+      to: to || null,
+      status: status || null,
+      difficulty_level: difficulty_level || null,
+      class_name: search || null,
+      page: 1,
+      limit: 10000 // Get all data for export
+    };
+    
+    const schedules = await scheduleService.list(filters);
+    
+    // Chuẩn bị data cho Excel
+    const excelData = schedules.map((schedule, index) => ({
+      stt: index + 1,
+      className: schedule.class_name || 'N/A',
+      trainer: schedule.trainer_name || 'Chưa có HLV',
+      date: schedule.class_date ? new Date(schedule.class_date).toLocaleDateString('vi-VN') : 'N/A',
+      time: `${schedule.start_time?.substring(0, 5)} - ${schedule.end_time?.substring(0, 5)}`,
+      location: schedule.floor && schedule.room ? `Tầng ${schedule.floor} - ${schedule.room}` : 'N/A',
+      participants: `${schedule.current_participants || 0}/${schedule.max_participants || 0}`,
+      status: getStatusText(schedule.status),
+      difficulty: getDifficultyText(schedule.difficulty_level)
+    }));
+    
+    // Tạo filter summary
+    const filterSummary = [];
+    if (trainer_id) filterSummary.push(`Huấn luyện viên: ${trainer_id}`);
+    if (status) filterSummary.push(`Trạng thái: ${getStatusText(status)}`);
+    if (difficulty_level) filterSummary.push(`Độ khó: ${getDifficultyText(difficulty_level)}`);
+    if (from) filterSummary.push(`Từ ngày: ${new Date(from).toLocaleDateString('vi-VN')}`);
+    if (to) filterSummary.push(`Đến ngày: ${new Date(to).toLocaleDateString('vi-VN')}`);
+    
+    const headers = [
+      { type: 'title', value: 'DANH SÁCH LỚP HỌC & LỊCH TẬP' },
+      { type: 'info', value: `Ngày xuất: ${new Date().toLocaleDateString('vi-VN')} ${new Date().toLocaleTimeString('vi-VN')}` },
+      { type: 'info', value: `Tổng số lớp: ${schedules.length}` }
+    ];
+    
+    if (filterSummary.length > 0) {
+      headers.push({ type: 'info', value: `Bộ lọc: ${filterSummary.join(', ')}` });
+    }
+    
+    headers.push({ type: 'empty' });
+    
+    // Cấu hình xuất Excel
+    const config = {
+      fileName: `schedules_${new Date().toISOString().split('T')[0]}.xlsx`,
+      sheetName: 'Danh sách lớp học',
+      headers,
+      columns: [
+        { header: 'STT', key: 'stt', width: 8 },
+        { header: 'Tên lớp học', key: 'className', width: 25 },
+        { header: 'Huấn luyện viên', key: 'trainer', width: 25 },
+        { header: 'Ngày học', key: 'date', width: 15 },
+        { header: 'Thời gian', key: 'time', width: 15 },
+        { header: 'Vị trí', key: 'location', width: 20 },
+        { header: 'Học viên', key: 'participants', width: 12 },
+        { header: 'Trạng thái', key: 'status', width: 15 },
+        { header: 'Độ khó', key: 'difficulty', width: 15 }
+      ],
+      data: excelData,
+      styles: presetStyles.green
+    };
+    
+    // Tạo file Excel
+    const buffer = await exportToExcel(config);
+    
+    // Gửi file về client
+    res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+    res.setHeader('Content-Disposition', `attachment; filename="${encodeURIComponent(config.fileName)}"`);
+    res.send(buffer);
+    
+  } catch (e) {
+    console.error('Error exporting schedules:', e);
+    next(e);
+  }
+};
+
+// Helper functions
+function getStatusText(status) {
+  const statusMap = {
+    'scheduled': 'Đã lên lịch',
+    'ongoing': 'Đang diễn ra',
+    'completed': 'Hoàn thành',
+    'cancelled': 'Đã hủy'
+  };
+  return statusMap[status] || status;
+}
+
+function getDifficultyText(level) {
+  const levelMap = {
+    'beginner': 'Cơ bản',
+    'intermediate': 'Trung cấp',
+    'advanced': 'Nâng cao'
+  };
+  return levelMap[level] || level;
+}
+
+// Export enrolled users to Excel
+export const exportEnrolledUsers = async (req, res, next) => {
+  try {
+    const scheduleId = req.params.id;
+    
+    // Lấy thông tin lớp học
+    const schedule = await scheduleService.byId(scheduleId);
+    if (!schedule) {
+      return res.status(404).json({ 
+        success: false, 
+        message: "Lớp học không tồn tại" 
+      });
+    }
+    
+    // Lấy danh sách học viên đăng ký
+    const enrollments = await scheduleRepo.getEnrollments(scheduleId);
+    
+    // Chuẩn bị data cho Excel
+    const excelData = enrollments.map((user, index) => ({
+      stt: index + 1,
+      name: user.name || user.full_name || 'N/A',
+      email: user.email || 'N/A',
+      phone: user.phone || 'N/A',
+      enrolledDate: user.enrolled_at ? 
+        new Date(user.enrolled_at).toLocaleDateString('vi-VN') : 
+        'N/A',
+      status: 'Đã đăng ký'
+    }));
+    
+    // Cấu hình xuất Excel
+    const config = {
+      fileName: `enrolled_users_${schedule.class_name.replace(/\s+/g, '_')}_${new Date().toISOString().split('T')[0]}.xlsx`,
+      sheetName: 'Danh sách học viên',
+      headers: [
+        { type: 'title', value: 'DANH SÁCH HỌC VIÊN ĐĂNG KÝ LỚP HỌC' },
+        { type: 'info', value: `Tên lớp: ${schedule.class_name}` },
+        { type: 'info', value: `Huấn luyện viên: ${schedule.trainer_name || 'Chưa có'}` },
+        { type: 'info', value: `Ngày học: ${new Date(schedule.class_date).toLocaleDateString('vi-VN')}` },
+        { type: 'info', value: `Thời gian: ${schedule.start_time?.substring(0, 5)} - ${schedule.end_time?.substring(0, 5)}` },
+        { type: 'info', value: `Vị trí: Tầng ${schedule.floor} - ${schedule.room}` },
+        { type: 'info', value: `Tổng số học viên: ${enrollments.length}/${schedule.max_participants}` },
+        { type: 'empty' }
+      ],
+      columns: [
+        { header: 'STT', key: 'stt', width: 8 },
+        { header: 'Tên học viên', key: 'name', width: 30 },
+        { header: 'Email', key: 'email', width: 35 },
+        { header: 'Số điện thoại', key: 'phone', width: 18 },
+        { header: 'Ngày đăng ký', key: 'enrolledDate', width: 18 },
+        { header: 'Trạng thái', key: 'status', width: 15 }
+      ],
+      data: excelData,
+      styles: presetStyles.green // Sử dụng theme xanh lá cho gym
+    };
+    
+    // Tạo file Excel
+    const buffer = await exportToExcel(config);
+    
+    // Gửi file về client
+    res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+    res.setHeader('Content-Disposition', `attachment; filename="${encodeURIComponent(config.fileName)}"`);
+    res.send(buffer);
+    
+  } catch (e) { 
+    console.error('Error exporting enrolled users:', e);
     next(e); 
   }
 };
